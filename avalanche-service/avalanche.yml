@@ -1,0 +1,23 @@
+http:
+  port: 8080
+  adminPort: 8081
+  maxIdleTime: 30s
+  requestLog:
+    console:
+      enabled: true
+    file:
+      enabled: false
+      currentLogFilename: /var/log/avalanche/requests.log
+      archivedLogFilenamePattern: /var/log/avalanche/requests-%d.log.gz
+      archivedFileCount: 5
+logging:
+  level: INFO
+  loggers:
+    com.ning.http.client.providers.netty: WARN
+  console:
+    enabled: true
+  file:
+    enabled: false
+    currentLogFilename: /var/log/avalanche/avalanche.log
+    archivedLogFilenamePattern: /var/log/avalanche/avalanche-%d.log.gz
+    archivedFileCount: 5
