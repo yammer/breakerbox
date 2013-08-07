@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.service.azure;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -10,47 +9,47 @@ import com.yammer.azure.core.AzureTableName;
 import com.yammer.azure.core.TableKey;
 import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.core.EnvironmentId;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TenacityEntity extends TableType {
+public class DependencyEntity extends TableType {
     private String tenacityConfigurationAsString;
     private static final ObjectMapper OBJECTMAPPER = new ObjectMapperFactory().build();
     private static final Validator VALIDATOR = new Validator();
-    private static final Logger LOGGER = LoggerFactory.getLogger(TenacityEntity.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyEntity.class);
 
     @Deprecated
-    public TenacityEntity() {
-        super(TableId.TENACITYSERVICES);
+    public DependencyEntity() {
+        super(TableId.DEPENDENCIES);
     }
 
-    private TenacityEntity(String tenacityConfigurationAsString, ServiceId serviceId, DependencyId dependencyId) throws JsonProcessingException {
-        super(TableId.TENACITYSERVICES);
+    private DependencyEntity(String tenacityConfigurationAsString, DependencyId dependencyId, EnvironmentId environmentId) {
+        super(TableId.DEPENDENCIES);
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
-        this.partitionKey = serviceId.getId();
+        this.partitionKey = environmentId.getId();
         this.rowKey = dependencyId.getId();
     }
 
-    public static TenacityEntity build(TenacityConfiguration tenacityConfiguration,
-                                       ServiceId serviceId,
-                                       DependencyId dependencyId) {
+    public static DependencyEntity build(TenacityConfiguration tenacityConfiguration,
+                                         EnvironmentId environmentId,
+                                         DependencyId dependencyId) {
         try {
-            return new TenacityEntity(
+            return new DependencyEntity(
                     OBJECTMAPPER.writeValueAsString(tenacityConfiguration),
-                    serviceId,
-                    dependencyId);
+                    dependencyId,
+                    environmentId);
         } catch (Exception err) {
             LOGGER.warn("Could not convert TenacityConfiguration to json", err);
             throw new RuntimeException(err);
         }
     }
 
-    public TenacityEntity using(TenacityConfiguration configuration) {
-        return TenacityEntity.build(configuration, getServiceId(), getDependencyId());
+    public DependencyEntity using(TenacityConfiguration configuration) {
+        return DependencyEntity.build(configuration, getEnvironmentId(), getDependencyId());
     }
 
     public Optional<TenacityConfiguration> getTenacityConfiguration() {
@@ -67,12 +66,12 @@ public class TenacityEntity extends TableType {
         return Optional.absent();
     }
 
-    public static Key key(ServiceId serviceId, DependencyId dependencyId) {
-        return new Key(serviceId.getId(), dependencyId.getId());
+    public static Key key(EnvironmentId environmentId, DependencyId dependencyId) {
+        return new Key(environmentId.getId(), dependencyId.getId());
     }
 
     public Key key() {
-        return new Key(getRowKey(), getPartitionKey());
+        return key(getEnvironmentId(), getDependencyId());
     }
 
     @Deprecated
@@ -85,8 +84,8 @@ public class TenacityEntity extends TableType {
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
     }
 
-    public ServiceId getServiceId() {
-        return ServiceId.from(getPartitionKey());
+    public EnvironmentId getEnvironmentId() {
+        return EnvironmentId.from(getPartitionKey());
     }
 
     public DependencyId getDependencyId() {
@@ -99,10 +98,8 @@ public class TenacityEntity extends TableType {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        TenacityEntity that = (TenacityEntity) o;
+        DependencyEntity that = (DependencyEntity) o;
 
-        if (partitionKey != null ? !partitionKey.equals(that.partitionKey) : that.partitionKey != null) return false;
-        if (rowKey != null ? !rowKey.equals(that.rowKey) : that.rowKey != null) return false;
         if (!tenacityConfigurationAsString.equals(that.tenacityConfigurationAsString)) return false;
 
         return true;
@@ -116,10 +113,10 @@ public class TenacityEntity extends TableType {
     }
 
     public static class Key implements TableKey {
-        private final String rowKey;
         private final String partitionKey;
+        private final String rowKey;
 
-        public Key(String rowKey, String partitionKey) {
+        public Key(String partitionKey, String rowKey) {
             this.rowKey = rowKey;
             this.partitionKey = partitionKey;
         }
@@ -136,12 +133,32 @@ public class TenacityEntity extends TableType {
 
         @Override
         public Class<? extends TableServiceEntity> getEntityClass() {
-            return TenacityEntity.class;
+            return DependencyEntity.class;
         }
 
         @Override
         public AzureTableName getTable() {
-            return TableId.TENACITYSERVICES;
+            return TableId.DEPENDENCIES;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Key key = (Key) o;
+
+            if (!partitionKey.equals(key.partitionKey)) return false;
+            if (!rowKey.equals(key.rowKey)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = partitionKey.hashCode();
+            result = 31 * result + rowKey.hashCode();
+            return result;
         }
     }
 }

@@ -23,6 +23,8 @@ public abstract class TableType extends TableServiceEntity {
         TableType that = (TableType) o;
 
         if (azureTableName != that.azureTableName) return false;
+        if (partitionKey != null ? !partitionKey.equals(that.partitionKey) : that.partitionKey != null) return false;
+        if (rowKey != null ? !rowKey.equals(that.rowKey) : that.rowKey != null) return false;
 
         return true;
     }
