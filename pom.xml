@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.yammer.avalanche</groupId>
-    <artifactId>avalanche-parent</artifactId>
+    <groupId>com.yammer.breakerbox</groupId>
+    <artifactId>breakerbox-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Avalanche Project</name>
@@ -13,19 +13,19 @@
     </prerequisites>
 
     <modules>
-        <module>avalanche-service</module>
+        <module>breakerbox-service</module>
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.int.yammer.com/yammer/avalanche.git</connection>
-        <developerConnection>scm:git:git@github.int.yammer.com:yammer/avalanche.git</developerConnection>
-        <url>http://github.int.yammer.com/yammer/avalanche/</url>
+        <connection>scm:git:git://github.int.yammer.com/yammer/breakerbox.git</connection>
+        <developerConnection>scm:git:git@github.int.yammer.com:yammer/breakerbox.git</developerConnection>
+        <url>http://github.int.yammer.com/yammer/breakerbox/</url>
       <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>http://github.int.yammer.com/yammer/avalanche/issues</url>
+        <url>http://github.int.yammer.com/yammer/breakerbox/issues</url>
     </issueManagement>
 
     <properties>
