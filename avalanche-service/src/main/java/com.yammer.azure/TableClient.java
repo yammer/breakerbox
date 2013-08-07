@@ -47,6 +47,17 @@ public class TableClient {
         throw new IllegalStateException("Error adding data in table " + entity.getAzureTableName());
     }
 
+    public boolean insertOrReplace(TableType entity) {
+        try {
+            final TableResult tableResult = cloudTableClient.execute(
+                    entity.getAzureTableName().toString(), TableOperation.insertOrReplace(entity));
+            return tableResult.getHttpStatusCode() == Response.Status.CREATED.getStatusCode();
+        } catch (StorageException e) {
+            LOG.warn("Error performing operation on Storage service", e);
+        }
+        throw new IllegalStateException("Error insertOrReplace in table " + entity.getAzureTableName());
+    }
+
     public <EntityType extends TableServiceEntity> EntityType retrieve(TableKey tableKey) {
         try {
             final TableResult tableResult = cloudTableClient.execute(
