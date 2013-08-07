@@ -23,11 +23,16 @@ public class TenacityEntity extends TableType {
     private static final Validator VALIDATOR = new Validator();
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityEntity.class);
 
+    @Deprecated
+    public TenacityEntity() {
+        super(TableId.TENACITYSERVICES);
+    }
+
     private TenacityEntity(String tenacityConfigurationAsString, ServiceId serviceId, DependencyId dependencyId) throws JsonProcessingException {
         super(TableId.TENACITYSERVICES);
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
-        this.partitionKey = serviceId.toString();
-        this.rowKey = dependencyId.toString();
+        this.partitionKey = serviceId.getId();
+        this.rowKey = dependencyId.getId();
     }
 
     public static TenacityEntity build(TenacityConfiguration tenacityConfiguration,
@@ -60,6 +65,10 @@ public class TenacityEntity extends TableType {
             LOGGER.warn("Failed to parse TenacityConfiguration", err);
         }
         return Optional.absent();
+    }
+
+    public static Key key(ServiceId serviceId, DependencyId dependencyId) {
+        return new Key(serviceId.getId(), dependencyId.getId());
     }
 
     public Key key() {

@@ -1,5 +1,6 @@
 package com.yammer.azure;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.core.storage.StorageException;
 import com.microsoft.windowsazure.services.table.client.*;
@@ -51,24 +52,30 @@ public class TableClient {
         try {
             final TableResult tableResult = cloudTableClient.execute(
                     entity.getAzureTableName().toString(), TableOperation.insertOrReplace(entity));
-            return tableResult.getHttpStatusCode() == Response.Status.CREATED.getStatusCode();
+            switch (Response.Status.fromStatusCode(tableResult.getHttpStatusCode())) {
+                case CREATED:
+                case NO_CONTENT:
+                    return true;
+                default:
+                    return false;
+            }
         } catch (StorageException e) {
             LOG.warn("Error performing operation on Storage service", e);
         }
         throw new IllegalStateException("Error insertOrReplace in table " + entity.getAzureTableName());
     }
 
-    public <EntityType extends TableServiceEntity> EntityType retrieve(TableKey tableKey) {
+    public <EntityType extends TableServiceEntity> Optional<EntityType> retrieve(TableKey tableKey) {
         try {
             final TableResult tableResult = cloudTableClient.execute(
                     tableKey.getTable().toString(),
                     TableOperation.retrieve(
                             tableKey.getPartitionKey(), tableKey.getRowKey(), tableKey.getEntityClass()));
-            return tableResult.getResultAsType();
+            return Optional.fromNullable((EntityType)tableResult.getResultAsType());
         } catch (StorageException e) {
-            LOG.warn("Error retrieving entities from table: {}", tableKey.getTable(), e);
+            LOG.warn("Error retrieving entity from table: {}", tableKey.getTable(), e);
         }
-        throw new IllegalStateException("Unable to retrieve data from table: " + tableKey.getTable());
+        return Optional.absent();
     }
 
     public boolean update(TableType entity) {
