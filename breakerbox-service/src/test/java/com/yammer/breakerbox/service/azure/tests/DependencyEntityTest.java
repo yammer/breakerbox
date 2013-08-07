@@ -1,6 +1,7 @@
-package com.yammer.breakerbox.service.azure;
+package com.yammer.breakerbox.service.azure.tests;
 
 import com.google.common.base.Optional;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.EnvironmentId;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
@@ -28,7 +29,7 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
 
     @After
     public void teardown() {
-        final Optional<DependencyEntity> entity = tableClient.retrieve(DependencyEntity.key(testEnvironmentId, testDependencyId));
+        final Optional<DependencyEntity> entity = tableClient.retrieve(DependencyEntity.build(testDependencyId, testEnvironmentId));
         if (entity.isPresent()) {
             assertTrue(tableClient.remove(entity.get()));
         }
@@ -36,14 +37,16 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
 
     @Test
     public void canInsert() {
-        final DependencyEntity entity = DependencyEntity.build(new TenacityConfiguration(), testEnvironmentId, testDependencyId);
+        final DependencyEntity entity = DependencyEntity.build(testDependencyId, testEnvironmentId);
         assertThat(Optional.of(new TenacityConfiguration())).isEqualTo(entity.getTenacityConfiguration());
         assertTrue(tableClient.insertOrReplace(entity));
+        assertThat(entity.getDependencyId()).isEqualTo(testDependencyId);
+        assertThat(entity.getEnvironmentId()).isEqualTo(testEnvironmentId);
     }
 
     @Test
     public void canReplace() {
-        final DependencyEntity entity = DependencyEntity.build(new TenacityConfiguration(), testEnvironmentId, testDependencyId);
+        final DependencyEntity entity = DependencyEntity.build(testDependencyId, testEnvironmentId);
 
         assertTrue(tableClient.insertOrReplace(entity));
 
@@ -53,7 +56,7 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
                 3000);
 
         assertTrue(tableClient.insertOrReplace(entity.using(alteredConfiguration)));
-        final Optional<DependencyEntity> retrievedEntity = tableClient.retrieve(entity.key());
+        final Optional<DependencyEntity> retrievedEntity = tableClient.retrieve(entity);
         assertTrue(retrievedEntity.isPresent());
         assertThat(retrievedEntity.get().getTenacityConfiguration()).isEqualTo(Optional.of(alteredConfiguration));
     }

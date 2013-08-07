@@ -16,32 +16,34 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DependencyEntity extends TableType {
+public class DependencyEntity extends TableType implements TableKey {
     private String tenacityConfigurationAsString;
     private static final ObjectMapper OBJECTMAPPER = new ObjectMapperFactory().build();
     private static final Validator VALIDATOR = new Validator();
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyEntity.class);
 
-    @Deprecated
-    public DependencyEntity() {
+    private DependencyEntity(DependencyId dependencyId,
+                             EnvironmentId environmentId,
+                             String tenacityConfigurationAsString) {
         super(TableId.DEPENDENCIES);
-    }
-
-    private DependencyEntity(String tenacityConfigurationAsString, DependencyId dependencyId, EnvironmentId environmentId) {
-        super(TableId.DEPENDENCIES);
+        this.partitionKey = dependencyId.getId();
+        this.rowKey = environmentId.getId();
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
-        this.partitionKey = environmentId.getId();
-        this.rowKey = dependencyId.getId();
     }
 
-    public static DependencyEntity build(TenacityConfiguration tenacityConfiguration,
+    public static DependencyEntity build(DependencyId dependencyId,
+                                         EnvironmentId environmentId) {
+        return build(dependencyId, environmentId, new TenacityConfiguration());
+    }
+
+    public static DependencyEntity build(DependencyId dependencyId,
                                          EnvironmentId environmentId,
-                                         DependencyId dependencyId) {
+                                         TenacityConfiguration tenacityConfiguration) {
         try {
             return new DependencyEntity(
-                    OBJECTMAPPER.writeValueAsString(tenacityConfiguration),
                     dependencyId,
-                    environmentId);
+                    environmentId,
+                    OBJECTMAPPER.writeValueAsString(tenacityConfiguration));
         } catch (Exception err) {
             LOGGER.warn("Could not convert TenacityConfiguration to json", err);
             throw new RuntimeException(err);
@@ -49,7 +51,7 @@ public class DependencyEntity extends TableType {
     }
 
     public DependencyEntity using(TenacityConfiguration configuration) {
-        return DependencyEntity.build(configuration, getEnvironmentId(), getDependencyId());
+        return DependencyEntity.build(getDependencyId(), getEnvironmentId(), configuration);
     }
 
     public Optional<TenacityConfiguration> getTenacityConfiguration() {
@@ -66,30 +68,12 @@ public class DependencyEntity extends TableType {
         return Optional.absent();
     }
 
-    public static Key key(EnvironmentId environmentId, DependencyId dependencyId) {
-        return new Key(environmentId.getId(), dependencyId.getId());
-    }
-
-    public Key key() {
-        return key(getEnvironmentId(), getDependencyId());
-    }
-
-    @Deprecated
-    public String getTenacityConfigurationAsString() {
-        return tenacityConfigurationAsString;
-    }
-
-    @Deprecated
-    public void setTenacityConfigurationAsString(String tenacityConfigurationAsString) {
-        this.tenacityConfigurationAsString = tenacityConfigurationAsString;
+    public DependencyId getDependencyId() {
+        return DependencyId.from(getPartitionKey());
     }
 
     public EnvironmentId getEnvironmentId() {
-        return EnvironmentId.from(getPartitionKey());
-    }
-
-    public DependencyId getDependencyId() {
-        return DependencyId.from(getRowKey());
+        return EnvironmentId.from(getRowKey());
     }
 
     @Override
@@ -112,53 +96,29 @@ public class DependencyEntity extends TableType {
         return result;
     }
 
-    public static class Key implements TableKey {
-        private final String partitionKey;
-        private final String rowKey;
+    @Override
+    public Class<? extends TableServiceEntity> getEntityClass() {
+        return DependencyEntity.class;
+    }
 
-        public Key(String partitionKey, String rowKey) {
-            this.rowKey = rowKey;
-            this.partitionKey = partitionKey;
-        }
+    @Override
+    public AzureTableName getTable() {
+        return TableId.DEPENDENCIES;
+    }
 
-        @Override
-        public String getRowKey() {
-            return rowKey;
-        }
+    //** For Azure */
+    @Deprecated
+    public DependencyEntity() {
+        super(TableId.DEPENDENCIES);
+    }
 
-        @Override
-        public String getPartitionKey() {
-            return partitionKey;
-        }
+    @Deprecated
+    public String getTenacityConfigurationAsString() {
+        return tenacityConfigurationAsString;
+    }
 
-        @Override
-        public Class<? extends TableServiceEntity> getEntityClass() {
-            return DependencyEntity.class;
-        }
-
-        @Override
-        public AzureTableName getTable() {
-            return TableId.DEPENDENCIES;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Key key = (Key) o;
-
-            if (!partitionKey.equals(key.partitionKey)) return false;
-            if (!rowKey.equals(key.rowKey)) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = partitionKey.hashCode();
-            result = 31 * result + rowKey.hashCode();
-            return result;
-        }
+    @Deprecated
+    public void setTenacityConfigurationAsString(String tenacityConfigurationAsString) {
+        this.tenacityConfigurationAsString = tenacityConfigurationAsString;
     }
 }
