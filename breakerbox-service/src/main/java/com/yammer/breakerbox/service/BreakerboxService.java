@@ -4,7 +4,7 @@ import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.resources.ConfigurationResource;
-import com.yammer.breakerbox.service.resources.SelectionResource;
+import com.yammer.breakerbox.service.resources.DashboardResource;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -30,6 +30,6 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
         environment.addResource(new ConfigurationResource());
-        environment.addResource(new SelectionResource());
+        environment.addResource(new DashboardResource());
     }
 }

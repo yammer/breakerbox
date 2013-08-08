@@ -1,3 +1,10 @@
+azure:
+  accountName: breakerboxtest
+  accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==
+  connectionTimeout: 500ms
+  retryInterval: 5s
+  retryAttempts: 2
+
 http:
   port: 8080
   adminPort: 8081

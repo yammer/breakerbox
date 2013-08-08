@@ -9,9 +9,7 @@
             <ul class="dropdown-menu">
                 {{#clusters}}
                     <li>
-                        <a href="/assets/monitor/monitor.html?stream=localhost%3A8080%2Fturbine.stream%3Fcluster%3D{{toString}}">
-                            {{toString}}
-                        </a>
+                        <a href="/?cluster={{toString}}">{{toString}}</a>
                     </li>
                 {{/clusters}}
             </ul>
