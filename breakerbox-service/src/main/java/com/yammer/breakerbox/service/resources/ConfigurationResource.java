@@ -8,11 +8,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/configuration/{service}/{key}/{environment}")
+@Path("/configuration/{service}/{dependency}/{environment}")
 public class ConfigurationResource {
     @GET @Timed @Produces(MediaType.TEXT_PLAIN)
     public String getConfiguration(@PathParam("service") String service,
-                                   @PathParam("key") String key,
+                                   @PathParam("dependency") String dependency,
                                    @PathParam("environment") String environment) {
         final StringBuilder builder = new StringBuilder();
         builder.append("somekey");
