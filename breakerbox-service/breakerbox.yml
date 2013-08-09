@@ -6,8 +6,8 @@ azure:
   retryAttempts: 2
 
 tenacityClient:
-  connectionTimeout: 50ms
-  timeout: 100ms
+  connectionTimeout: 500ms
+  timeout: 1000ms
 
 http:
   port: 8080

@@ -36,11 +36,11 @@ public class InstancesTest {
     public void propertyKeyUris() {
         assertThat(Instances.propertyKeyUris())
                 .isEqualTo(ImmutableSet.of(
-                        URI.create("http://localhost:8080/tenacity/propertykeys"),
-                        URI.create("http://completie-001.sjc1.yammer.com:8080/tenacity/propertykeys"),
-                        URI.create("http://completie-002.sjc1.yammer.com:8080/tenacity/propertykeys"),
-                        URI.create("http://completie-003.sjc1.yammer.com:8080/tenacity/propertykeys"),
-                        URI.create("http://completie-004.sjc1.yammer.com:8080/tenacity/propertykeys"),
-                        URI.create("http://deploy-001.sjc1.yammer.com:9090/tenacity/propertykeys")));
+                        URI.create("http://localhost:8080"),
+                        URI.create("http://completie-001.sjc1.yammer.com:8080"),
+                        URI.create("http://completie-002.sjc1.yammer.com:8080"),
+                        URI.create("http://completie-003.sjc1.yammer.com:8080"),
+                        URI.create("http://completie-004.sjc1.yammer.com:8080"),
+                        URI.create("http://deploy-001.sjc1.yammer.com:9090")));
     }
 }
