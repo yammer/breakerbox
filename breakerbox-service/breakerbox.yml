@@ -5,6 +5,10 @@ azure:
   retryInterval: 5s
   retryAttempts: 2
 
+tenacityClient:
+  connectionTimeout: 50ms
+  timeout: 100ms
+
 http:
   port: 8080
   adminPort: 8081
