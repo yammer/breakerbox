@@ -28,7 +28,17 @@
         </dependency>
         <dependency>
             <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-core</artifactId>
+            <version>${tenacity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.tenacity</groupId>
             <artifactId>tenacity-dashboard</artifactId>
+            <version>${tenacity.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-client</artifactId>
             <version>${tenacity.version}</version>
         </dependency>
         <dependency>
