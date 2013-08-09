@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.netflix.turbine.discovery.ConfigPropertyBasedDiscovery;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.tenacity.client.TenacityClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class Instances {
                            original.getUserInfo(),
                            original.getHost(),
                            original.getPort(),
-                           TenacityClient.TENACITY_PROPERTYKEYS_PATH,
+                           "",
                            original.getQuery(),
                            original.getFragment());
                 } catch (URISyntaxException err) {

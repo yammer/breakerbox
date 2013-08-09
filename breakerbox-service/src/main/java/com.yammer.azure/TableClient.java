@@ -71,7 +71,8 @@ public class TableClient {
                     tableKey.getTable().toString(),
                     TableOperation.retrieve(
                             tableKey.getPartitionKey(), tableKey.getRowKey(), tableKey.getEntityClass()));
-            return Optional.fromNullable((EntityType)tableResult.getResultAsType());
+            final EntityType entityType = tableResult.getResultAsType();
+            return Optional.fromNullable(entityType);
         } catch (StorageException e) {
             LOG.warn("Error retrieving entity from table: {}", tableKey.getTable(), e);
         }
