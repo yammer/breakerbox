@@ -2,16 +2,15 @@ package com.yammer.breakerbox.service.core;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.core.TableType;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
+import com.yammer.tenacity.core.config.TenacityConfiguration;
 
 public class TenacityStore {
     private final TableClient tableClient;
@@ -23,7 +22,11 @@ public class TenacityStore {
     }
 
     public boolean store(ServiceId serviceId, DependencyId dependencyId) {
-        return store(new ServiceEntity(serviceId, dependencyId));
+        return store(ServiceEntity.build(serviceId, dependencyId));
+    }
+
+    public boolean store(ServiceId serviceId, DependencyId dependencyId, TenacityConfiguration tenacityConfiguration) {
+        return store(ServiceEntity.build(serviceId, dependencyId, tenacityConfiguration));
     }
 
     public boolean store(ServiceEntity serviceEntity) {
@@ -35,32 +38,7 @@ public class TenacityStore {
     }
 
     public Optional<ServiceEntity> retrieve(ServiceId serviceId, DependencyId dependencyId) {
-        return tableClient.retrieve(new ServiceEntity(serviceId, dependencyId));
-    }
-
-    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, EnvironmentId environmentId) {
-        return tableClient.retrieve(DependencyEntity.build(dependencyId, environmentId));
-    }
-
-    public boolean store(DependencyId dependencyId, EnvironmentId environmentId) {
-        return store(DependencyEntity.build(dependencyId, environmentId));
-    }
-
-    public boolean store(DependencyEntity dependencyEntity) {
-        return tableClient.insertOrReplace(dependencyEntity);
-    }
-
-    public ImmutableList<EnvironmentId> listEnvironments(ServiceEntity serviceEntity) {
-        final ImmutableList.Builder<EnvironmentId> builder = ImmutableList.builder();
-        for (DependencyEntity entity : tableClient.search(TableQuery
-                .from(TableId.DEPENDENCIES.toString(), DependencyEntity.class)
-                .where(TableQuery.generateFilterCondition(
-                        TableConstants.PARTITION_KEY,
-                        TableQuery.QueryComparisons.EQUAL,
-                        serviceEntity.getDependencyId().toString())))) {
-            builder.add(entity.getEnvironmentId());
-        }
-        return builder.build();
+        return tableClient.retrieve(ServiceEntity.build(serviceId, dependencyId));
     }
 
     public ImmutableList<ServiceEntity> listServices() {
