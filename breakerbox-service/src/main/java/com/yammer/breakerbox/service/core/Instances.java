@@ -50,7 +50,7 @@ public class Instances {
         return new Function<Instance, URI>() {
             @Override
             public URI apply(Instance input) {
-                final URI original = URI.create(input.getHostname());
+                final URI original = URI.create("http://" + input.getHostname());
                 try {
                     return new URI(
                            original.getScheme(),

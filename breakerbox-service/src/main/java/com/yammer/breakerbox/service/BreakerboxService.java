@@ -71,7 +71,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                 .scheduleAtFixedRate(
                         new ScheduledTenacityPoller(tenacityPropertyKeysStore),
                         0,
-                        1,
-                        TimeUnit.MINUTES);
+                        5,
+                        TimeUnit.SECONDS);
     }
 }

@@ -29,7 +29,7 @@ public class InstancesTest {
     @Test
     public void instances() {
         assertThat(Instances.instances())
-                .isEqualTo(ImmutableSet.of(new Instance("http://localhost:8080/tenacity/mock.stream", "mock", true)));
+                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080/tenacity/mock.stream", "mock", true)));
     }
 
     @Test

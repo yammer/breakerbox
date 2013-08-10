@@ -12,7 +12,7 @@ tenacityClient:
 http:
   port: 8080
   adminPort: 8081
-  maxIdleTime: 30s
+  maxIdleTime: 5s
   requestLog:
     console:
       enabled: true
