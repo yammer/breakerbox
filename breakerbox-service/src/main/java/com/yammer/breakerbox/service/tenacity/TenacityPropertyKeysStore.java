@@ -30,13 +30,13 @@ public class TenacityPropertyKeysStore {
             return tenacityPropertyKeyCache.get(uri, new Callable<ImmutableList<String>>() {
                 @Override
                 public ImmutableList<String> call() throws Exception {
-                    return tenacityPoller.execute();
+                    return tenacityPoller.execute().get();
                 }
             });
         } catch (ExecutionException err) {
             LOGGER.warn("Unexpected exception", err);
         }
-        return tenacityPoller.getFallback();
+        return tenacityPoller.getFallback().or(ImmutableList.<String>of());
     }
 
     public ImmutableMap<URI, ImmutableList<String>> snapshotMap() {
