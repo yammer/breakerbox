@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.core.Instances;
+import com.yammer.breakerbox.service.core.ServiceId;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -42,5 +43,17 @@ public class InstancesTest {
                         URI.create("http://completie-003.sjc1.yammer.com:8080"),
                         URI.create("http://completie-004.sjc1.yammer.com:8080"),
                         URI.create("http://deploy-001.sjc1.yammer.com:9090")));
+    }
+
+    @Test
+    public void instancesForCluster() {
+        assertThat(Instances.instances(ServiceId.from("mock")))
+                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080/tenacity/mock.stream", "mock", true)));
+    }
+
+    @Test
+    public void propertyKeysUrisForCluster() {
+        assertThat(Instances.propertyKeyUris(ServiceId.from("mock")))
+                .isEqualTo(ImmutableSet.of(URI.create("http://localhost:8080")));
     }
 }

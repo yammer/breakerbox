@@ -10,10 +10,10 @@ import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.resources.ConfigurationResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
 import com.yammer.breakerbox.service.resources.DashboardResource;
+import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
+import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKey;
-import com.yammer.breakerbox.service.tenacity.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
-import com.yammer.breakerbox.service.tenacity.TenacityPropertyKeysStore;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -53,25 +53,26 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         registerProperties(configuration);
         
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
+        final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
+                new TenacityPoller.Factory(
+                        new TenacityClientFactory(configuration.getTenacityClient())
+                                .build(environment)));
         
         environment.addHealthCheck(new TableClientHealthcheck(tableClient));
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
         environment.addResource(new ConfigurationResource());
-        environment.addResource(new ConfigureResource());
+        environment.addResource(new ConfigureResource(tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
 
-        final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-                new TenacityPoller.Factory(
-                        new TenacityClientFactory(configuration.getTenacityClient())
-                                .build(environment)));
+
 
         environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1)
                 .scheduleAtFixedRate(
                         new ScheduledTenacityPoller(tenacityPropertyKeysStore),
                         0,
-                        1,
-                        TimeUnit.MINUTES);
+                        5,
+                        TimeUnit.SECONDS);
     }
 }

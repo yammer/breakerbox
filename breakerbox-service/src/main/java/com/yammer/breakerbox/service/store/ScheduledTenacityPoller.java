@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.tenacity;
+package com.yammer.breakerbox.service.store;
 
 import com.yammer.breakerbox.service.core.Instances;
 import org.slf4j.Logger;

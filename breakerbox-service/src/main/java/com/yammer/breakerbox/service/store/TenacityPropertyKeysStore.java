@@ -1,9 +1,13 @@
-package com.yammer.breakerbox.service.tenacity;
+package com.yammer.breakerbox.service.store;
 
+import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +40,22 @@ public class TenacityPropertyKeysStore {
         } catch (ExecutionException err) {
             LOGGER.warn("Unexpected exception", err);
         }
-        return tenacityPoller.getFallback().or(ImmutableList.<String>of());
+        return ImmutableList.of();
     }
 
     public ImmutableMap<URI, ImmutableList<String>> snapshotMap() {
         return ImmutableMap.copyOf(tenacityPropertyKeyCache.asMap());
+    }
+
+    public ImmutableSet<String> tenacityPropertyKeysFor(Iterable<URI> uris) {
+        return FluentIterable
+                .from(uris)
+                .transformAndConcat(new Function<URI, ImmutableList<String>>() {
+                    @Override
+                    public ImmutableList<String> apply(URI input) {
+                        return getTenacityPropertyKeys(input);
+                    }
+                })
+                .toSet();
     }
 }

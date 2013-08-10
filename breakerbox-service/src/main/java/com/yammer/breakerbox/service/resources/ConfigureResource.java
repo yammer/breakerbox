@@ -1,6 +1,8 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
@@ -13,9 +15,19 @@ import javax.ws.rs.core.Response;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
+    private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
+
+    public ConfigureResource(TenacityPropertyKeysStore tenacityPropertyKeysStore) {
+        this.tenacityPropertyKeysStore = tenacityPropertyKeysStore;
+    }
+
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     public ConfigureView render(@PathParam("service") String serviceName) {
-        return new ConfigureView(ServiceId.from(serviceName));
+        final ServiceId serviceId = ServiceId.from(serviceName);
+        return new ConfigureView(
+                serviceId,
+                tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)),
+                new TenacityConfiguration());
     }
 
 

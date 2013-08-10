@@ -46,6 +46,15 @@ public class Instances {
         };
     }
 
+    public static Predicate<Instance> filterClusterOnly(final String clusterName) {
+        return new Predicate<Instance>() {
+            @Override
+            public boolean apply(@Nullable Instance input) {
+                return input != null && input.getCluster().equals(clusterName);
+            }
+        };
+    }
+
     private static Function<Instance, URI> toPropertyKeyUri() {
         return new Function<Instance, URI>() {
             @Override
@@ -89,6 +98,19 @@ public class Instances {
         return rawInstances()
                 .filter(pruneMetaClusters())
                 .toSortedSet(Ordering.natural());
+    }
+
+    public static ImmutableSet<Instance> instances(ServiceId serviceId) {
+        return rawInstances()
+                .filter(filterClusterOnly(serviceId.getId()))
+                .toSet();
+    }
+
+    public static ImmutableSet<URI> propertyKeyUris(ServiceId serviceId) {
+        return rawInstances()
+                .filter(filterClusterOnly(serviceId.getId()))
+                .transform(toPropertyKeyUri())
+                .toSet();
     }
 
     public static ImmutableSet<URI> propertyKeyUris() {
