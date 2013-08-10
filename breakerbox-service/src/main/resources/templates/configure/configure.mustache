@@ -1,7 +1,18 @@
 {{</templates/default}}
 {{$content}}
 <form method="POST" class="form-horizontal" action="/configure/{{serviceId}}/fake/fake">
-    <legend>Configure Tenacity for {{serviceId}}</legend>
+    <legend>Select which dependency to configure for {{serviceId}}</legend>
+    <div class="form-group">
+        <label for="selectDependency" class="col-lg-2 control-label">Tenacity Dependency</label>
+        <div class="input-group col-lg-3">
+            <select id="selectDependency" class="form-control">
+                {{#serviceDependencies}}
+                    <option>{{toString}}</option>
+                {{/serviceDependencies}}
+            </select>
+        </div>
+    </div>
+    <legend>Absolute Timeout</legend>
     <div class="form-group">
         <label for="inputExecutionTimeout" class="col-lg-2 control-label">Execution Timeout</label>
         <div class="input-group col-lg-2">
@@ -125,4 +136,9 @@
     </div>
 </form>
 {{/content}}
+{{$moreScripts}}
+<script type="text/javascript">
+
+</script>
+{{/moreScripts}}
 {{//templates/default}}
