@@ -2,6 +2,7 @@ package com.yammer.breakerbox.service.core;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.core.TableType;
@@ -16,6 +17,7 @@ public class TenacityStore {
     private final TableClient tableClient;
 
     private static final Timer LIST_SERVICES = Metrics.newTimer(TenacityStore.class, "list-services");
+    private static final Timer LIST_SERVICE = Metrics.newTimer(TenacityStore.class, "list-service");
 
     public TenacityStore(TableClient tableClient) {
         this.tableClient = tableClient;
@@ -43,6 +45,25 @@ public class TenacityStore {
 
     public ImmutableList<ServiceEntity> listServices() {
         return allServiceEntities();
+    }
+
+    public ImmutableList<ServiceEntity> listDependencies(ServiceId serviceId) {
+        return allServiceEntities(serviceId);
+    }
+
+    private ImmutableList<ServiceEntity> allServiceEntities(ServiceId serviceId) {
+        final TimerContext timerContext = LIST_SERVICE.time();
+        try {
+            return tableClient.search(TableQuery
+                    .from(TableId.SERVICES.toString(), ServiceEntity.class)
+                    .where(TableQuery
+                            .generateFilterCondition(
+                                    TableConstants.PARTITION_KEY,
+                                    TableQuery.QueryComparisons.EQUAL,
+                                    serviceId.getId())));
+        } finally {
+            timerContext.stop();
+        }
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities() {

@@ -41,4 +41,13 @@ public class TenacityStoreTest extends AbstractTestWithConfiguration {
         assertThat(tenacityStore.listServices())
                 .contains(ServiceEntity.build(testServiceId, testDependencyId));
     }
+
+    @Test
+    public void listDependencies() {
+        assertTrue(tenacityStore.store(testServiceId, testDependencyId));
+        assertThat(tenacityStore.listDependencies(testServiceId))
+                .contains(ServiceEntity.build(testServiceId, testDependencyId));
+        assertThat(tenacityStore.listDependencies(ServiceId.from(UUID.randomUUID().toString())))
+                .isEmpty();
+    }
 }
