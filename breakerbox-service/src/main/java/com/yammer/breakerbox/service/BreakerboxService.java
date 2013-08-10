@@ -44,7 +44,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     
     private static void registerProperties(BreakerboxConfiguration configuration) {
         new TenacityPropertyRegister(ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
-                BreakerboxDependencyKey.BRKRBX_SERVICES, new TenacityConfiguration()))
+                BreakerboxDependencyKey.BRKRBX_SERVICES, configuration.getBreakerboxServicesTenacity()))
                 .register();
     }
 
