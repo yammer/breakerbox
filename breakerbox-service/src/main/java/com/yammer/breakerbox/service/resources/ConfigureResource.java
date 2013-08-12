@@ -1,7 +1,11 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.google.common.base.Optional;
+import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.metrics.annotation.Timed;
@@ -12,12 +16,15 @@ import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
+    private final TenacityStore tenacityStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
 
-    public ConfigureResource(TenacityPropertyKeysStore tenacityPropertyKeysStore) {
+    public ConfigureResource(TenacityStore tenacityStore, TenacityPropertyKeysStore tenacityPropertyKeysStore) {
+        this.tenacityStore = tenacityStore;
         this.tenacityPropertyKeysStore = tenacityPropertyKeysStore;
     }
 
@@ -30,12 +37,26 @@ public class ConfigureResource {
                 new TenacityConfiguration());
     }
 
+    @GET @Timed @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{dependency}")
+    public TenacityConfiguration get(@PathParam("service") String serviceName,
+                                     @PathParam("dependency") String dependencyName) {
+        final Optional<ServiceEntity> serviceEntity = tenacityStore.retrieve(
+                ServiceId.from(serviceName),
+                DependencyId.from(dependencyName));
+        if (serviceEntity.isPresent()) {
+            final Optional<TenacityConfiguration> tenacityConfiguration = serviceEntity.get().getTenacityConfiguration();
+            if (tenacityConfiguration.isPresent()) {
+                return tenacityConfiguration.get();
+            }
+        }
+        throw new WebApplicationException();
+    }
+
 
     @POST @Timed @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("/{dependency}/{environment}")
     public Response configure(@PathParam("service") String serviceName,
-                              @PathParam("dependency") String dependencyName,
-                              @PathParam("environment") String environmentName,
+                              @FormParam("dependency") String dependencyName,
                               @FormParam("executionTimeout") Integer executionTimeout,
                               @FormParam("requestVolumeThreshold") Integer requestVolumeThreshold,
                               @FormParam("errorThresholdPercentage") Integer errorThresholdPercentage,
@@ -63,7 +84,15 @@ public class ConfigureResource {
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
                 executionTimeout);
-        return Response.ok().build();
-
+        if (tenacityStore.store(
+                ServiceId.from(serviceName),
+                DependencyId.from(dependencyName),
+                tenacityConfiguration)) {
+            return Response
+                    .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
+                    .build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 }

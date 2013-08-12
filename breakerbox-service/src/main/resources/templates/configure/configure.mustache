@@ -1,13 +1,13 @@
 {{</templates/default}}
 {{$content}}
-<form method="POST" class="form-horizontal" action="/configure/{{serviceId}}/fake/fake">
+<form method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
     <legend>Select which dependency to configure for {{serviceId}}</legend>
     <div class="form-group">
         <label for="selectDependency" class="col-lg-2 control-label">Tenacity Dependency</label>
         <div class="input-group col-lg-3">
-            <select id="selectDependency" class="form-control">
+            <select id="selectDependency" class="form-control" name="dependency">
                 {{#serviceDependencies}}
-                    <option>{{toString}}</option>
+                    <option value="{{toString}}">{{toString}}</option>
                 {{/serviceDependencies}}
             </select>
         </div>

@@ -7,6 +7,7 @@ import com.yammer.azure.TableClient;
 import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
+import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.resources.ConfigurationResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
 import com.yammer.breakerbox.service.resources.DashboardResource;
@@ -53,6 +54,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         registerProperties(configuration);
         
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
+        final TenacityStore tenacityStore = new TenacityStore(tableClient);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
                 new TenacityPoller.Factory(
                         new TenacityClientFactory(configuration.getTenacityClient())
@@ -63,7 +65,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
         environment.addResource(new ConfigurationResource());
-        environment.addResource(new ConfigureResource(tenacityPropertyKeysStore));
+        environment.addResource(new ConfigureResource(tenacityStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
 
 
