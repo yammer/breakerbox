@@ -1,6 +1,8 @@
 package com.yammer.breakerbox.service.core;
 
-public class DependencyId {
+import com.yammer.tenacity.core.properties.TenacityPropertyKey;
+
+public class DependencyId implements TenacityPropertyKey {
     private final String id;
 
     private DependencyId(String id) {

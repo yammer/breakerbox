@@ -8,7 +8,7 @@ import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.core.TenacityStore;
-import com.yammer.breakerbox.service.resources.ConfigurationResource;
+import com.yammer.breakerbox.service.resources.ArchaiusResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
 import com.yammer.breakerbox.service.resources.DashboardResource;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
@@ -64,7 +64,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
-        environment.addResource(new ConfigurationResource());
+        environment.addResource(new ArchaiusResource(tenacityStore));
         environment.addResource(new ConfigureResource(tenacityStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
 
