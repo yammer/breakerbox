@@ -20,7 +20,7 @@ public class TenacityPropertyKeysStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityPropertyKeysStore.class);
     private final Cache<URI, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(1, TimeUnit.HOURS)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
     private final TenacityPoller.Factory tenacityPollerFactory;
 
@@ -28,13 +28,12 @@ public class TenacityPropertyKeysStore {
         this.tenacityPollerFactory = tenacityPollerFactory;
     }
 
-    public ImmutableList<String> getTenacityPropertyKeys(URI uri) {
-        final TenacityPoller tenacityPoller = tenacityPollerFactory.create(uri);
+    public ImmutableList<String> getTenacityPropertyKeys(final URI uri) {
         try {
             return tenacityPropertyKeyCache.get(uri, new Callable<ImmutableList<String>>() {
                 @Override
                 public ImmutableList<String> call() throws Exception {
-                    return tenacityPoller.execute().get();
+                    return tenacityPollerFactory.create(uri).execute().get();
                 }
             });
         } catch (ExecutionException err) {

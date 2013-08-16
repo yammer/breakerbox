@@ -1,11 +1,15 @@
 package com.yammer.breakerbox.service;
 
 import com.google.common.collect.ImmutableMap;
+import com.netflix.config.ConfigurationManager;
+import com.netflix.config.DynamicConfiguration;
+import com.netflix.config.sources.URLConfigurationSource;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
+import com.yammer.breakerbox.service.archaius.TenacityPollingScheduler;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
@@ -25,6 +29,7 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
 import com.yammer.tenacity.dashboard.bundle.TenacityDashboardBundle;
 
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public class BreakerboxService extends Service<BreakerboxConfiguration> {
@@ -68,13 +73,17 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         environment.addResource(new ConfigureResource(tenacityStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
 
-
-
         environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1)
                 .scheduleAtFixedRate(
                         new ScheduledTenacityPoller(tenacityPropertyKeysStore),
                         0,
-                        5,
-                        TimeUnit.SECONDS);
+                        1,
+                        TimeUnit.MINUTES);
+
+        ConfigurationManager.install(new DynamicConfiguration(
+                new URLConfigurationSource(
+                        new URL("file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties"),
+                        new URL("http://localhost:8080/archaius/breakerbox")),
+                new TenacityPollingScheduler()));
     }
 }
