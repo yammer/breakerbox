@@ -26,7 +26,7 @@ public class ConfigureView extends NavbarView {
     }
 
     public TenacityConfiguration getTenacityConfiguration() {
-        return new TenacityConfiguration();
+        return tenacityConfiguration;
     }
 
     @Override

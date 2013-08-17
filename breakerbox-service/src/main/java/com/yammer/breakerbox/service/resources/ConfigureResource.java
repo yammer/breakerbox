@@ -1,6 +1,9 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
@@ -17,6 +20,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Comparator;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
@@ -31,11 +35,52 @@ public class ConfigureResource {
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     public ConfigureView render(@PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
+        final Optional<ServiceEntity> firstDependencyKey = FluentIterable
+                .from(tenacityStore.listDependencies(serviceId))
+                .first();
+        if (firstDependencyKey.isPresent()) {
+            return create(serviceId, firstDependencyKey.get().getDependencyId());
+        }
+        throw new WebApplicationException();
+    }
+
+    @GET @Timed @Produces(MediaType.TEXT_HTML)
+    @Path("/{dependency}")
+    public ConfigureView render(@PathParam("service") String serviceName,
+                                @PathParam("dependency") String dependencyName) {
+        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName));
+    }
+
+    private ConfigureView create(ServiceId serviceId,
+                                 DependencyId dependencyId) {
+        final Optional<ServiceEntity> serviceEntity = tenacityStore.retrieve(serviceId, dependencyId);
         return new ConfigureView(
                 serviceId,
-                tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)),
-                new TenacityConfiguration());
+                Ordering
+                        .from(new SortKeyFirst(dependencyId))
+                        .immutableSortedCopy(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId))),
+                serviceEntity
+                        .or(ServiceEntity.build(serviceId, dependencyId))
+                        .getTenacityConfiguration()
+                        .or(new TenacityConfiguration()));
     }
+
+    private static class SortKeyFirst implements Comparator<String> {
+        private final String sortFirst;
+
+        private SortKeyFirst(DependencyId sortFirst) {
+            this.sortFirst = sortFirst.getId().toUpperCase();
+        }
+
+        @Override
+        public int compare(String o1, String o2) {
+            return ComparisonChain
+                    .start()
+                    .compareTrueFirst(o1.equals(sortFirst), o2.equals(sortFirst))
+                    .result();
+        }
+    }
+
 
     @GET @Timed @Produces(MediaType.APPLICATION_JSON)
     @Path("/{dependency}")

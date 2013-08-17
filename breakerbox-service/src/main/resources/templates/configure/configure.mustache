@@ -138,7 +138,9 @@
 {{/content}}
 {{$moreScripts}}
 <script type="text/javascript">
-
+    $('#selectDependency').change(function(eventObj) {
+        window.location.href = "/configure/{{serviceId}}/" + $(this).val();
+    });
 </script>
 {{/moreScripts}}
 {{//templates/default}}
