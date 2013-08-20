@@ -35,11 +35,11 @@ public class ConfigureResource {
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     public ConfigureView render(@PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
-        final Optional<ServiceEntity> firstDependencyKey = FluentIterable
-                .from(tenacityStore.listDependencies(serviceId))
+        final Optional<String> firstDependencyKey = FluentIterable
+                .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
                 .first();
         if (firstDependencyKey.isPresent()) {
-            return create(serviceId, firstDependencyKey.get().getDependencyId());
+            return create(serviceId, DependencyId.from(firstDependencyKey.get()));
         }
         throw new WebApplicationException();
     }
