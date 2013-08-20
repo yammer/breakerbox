@@ -20,7 +20,7 @@ public class TenacityPropertyKeysStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityPropertyKeysStore.class);
     private final Cache<URI, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .expireAfterWrite(1, TimeUnit.MINUTES)
             .build();
     private final TenacityPoller.Factory tenacityPollerFactory;
 
