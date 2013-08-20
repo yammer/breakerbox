@@ -69,7 +69,7 @@ public class ConfigureResource {
         private final String sortFirst;
 
         private SortKeyFirst(DependencyId sortFirst) {
-            this.sortFirst = sortFirst.getId().toUpperCase();
+            this.sortFirst = sortFirst.getId();
         }
 
         @Override

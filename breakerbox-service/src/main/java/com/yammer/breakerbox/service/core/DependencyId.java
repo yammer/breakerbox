@@ -6,7 +6,7 @@ public class DependencyId implements TenacityPropertyKey {
     private final String id;
 
     private DependencyId(String id) {
-        this.id = id;
+        this.id = id.toUpperCase();
     }
 
     public String getId() {

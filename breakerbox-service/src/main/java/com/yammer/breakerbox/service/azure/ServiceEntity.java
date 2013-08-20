@@ -26,7 +26,7 @@ public class ServiceEntity extends TableType implements TableKey {
                           String tenacityConfigurationAsString) {
         super(TableId.SERVICES);
         this.partitionKey = serviceId.getId();
-        this.rowKey = dependencyId.getId().toUpperCase();
+        this.rowKey = dependencyId.getId();
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
     }
 
