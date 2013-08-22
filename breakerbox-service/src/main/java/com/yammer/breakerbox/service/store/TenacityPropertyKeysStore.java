@@ -3,6 +3,7 @@ package com.yammer.breakerbox.service.store;
 import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class TenacityPropertyKeysStore {
@@ -33,10 +33,12 @@ public class TenacityPropertyKeysStore {
             return tenacityPropertyKeyCache.get(uri, new Callable<ImmutableList<String>>() {
                 @Override
                 public ImmutableList<String> call() throws Exception {
-                    return tenacityPollerFactory.create(uri).execute().get();
+                    return tenacityPollerFactory.create(uri).execute().orNull();
                 }
             });
-        } catch (ExecutionException err) {
+        } catch (CacheLoader.InvalidCacheLoadException err) {
+            //null was returned
+        } catch (Exception err) {
             LOGGER.warn("Unexpected exception", err);
         }
         return ImmutableList.of();
