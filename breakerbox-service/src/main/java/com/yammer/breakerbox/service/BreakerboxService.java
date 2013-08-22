@@ -61,8 +61,6 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
     @Override
     public void run(BreakerboxConfiguration configuration, Environment environment) throws Exception {
-        registerProperties(configuration);
-        
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
         final TenacityStore tenacityStore = new TenacityStore(tableClient);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
@@ -86,5 +84,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                         0,
                         1,
                         TimeUnit.MINUTES);
+
+        registerProperties(configuration);
     }
 }
