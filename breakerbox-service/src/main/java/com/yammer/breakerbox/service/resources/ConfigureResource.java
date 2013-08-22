@@ -11,6 +11,8 @@ import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.views.ConfigureView;
+import com.yammer.breakerbox.service.views.NoPropertyKeysView;
+import com.yammer.dropwizard.views.View;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -33,15 +35,16 @@ public class ConfigureResource {
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
-    public ConfigureView render(@PathParam("service") String serviceName) {
+    public View render(@PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
         final Optional<String> firstDependencyKey = FluentIterable
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
                 .first();
         if (firstDependencyKey.isPresent()) {
             return create(serviceId, DependencyId.from(firstDependencyKey.get()));
+        } else {
+            return new NoPropertyKeysView(serviceId);
         }
-        throw new WebApplicationException();
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
