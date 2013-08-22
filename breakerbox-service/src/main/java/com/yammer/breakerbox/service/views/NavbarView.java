@@ -11,4 +11,8 @@ public abstract class NavbarView extends View {
     public Iterable<String> getClusters() {
         return Instances.clusters();
     }
+
+    public Iterable<String> getNoMetaClusters() {
+        return Instances.noMetaClusters();
+    }
 }

@@ -29,8 +29,8 @@ public class InstancesTest {
 
     @Test
     public void instances() {
-        assertThat(Instances.instances())
-                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080/tenacity/mock.stream", "mock", true)));
+        assertThat(Instances.noMetaClusters())
+                .isEqualTo(ImmutableSet.of("mock"));
     }
 
     @Test

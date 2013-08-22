@@ -94,9 +94,10 @@ public class Instances {
                 .toSortedSet(Ordering.natural());
     }
 
-    public static ImmutableSet<Instance> instances() {
+    public static ImmutableSet<String> noMetaClusters() {
         return rawInstances()
                 .filter(pruneMetaClusters())
+                .transform(toClusterName())
                 .toSortedSet(Ordering.natural());
     }
 
