@@ -6,6 +6,7 @@ import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
+import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
@@ -52,6 +53,12 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                 .register();
     }
 
+    private static void initializeAzureTables(TableClient tableClient) {
+        for (TableId tableId : TableId.values()) {
+            tableClient.create(tableId);
+        }
+    }
+
     @Override
     public void run(BreakerboxConfiguration configuration, Environment environment) throws Exception {
         registerProperties(configuration);
@@ -62,6 +69,8 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                 new TenacityPoller.Factory(
                         new TenacityClientFactory(configuration.getTenacityClient())
                                 .build(environment)));
+
+        initializeAzureTables(tableClient);
         
         environment.addHealthCheck(new TableClientHealthcheck(tableClient));
 
