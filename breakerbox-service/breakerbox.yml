@@ -3,6 +3,12 @@ breakerbox:
   initialDelay: 10000
   delay: 60000
 
+breakerboxServicesTenacity:
+  executionIsolationThreadTimeoutInMillis: 1000
+  circuitBreaker:
+    requestVolumeThreshold: 500
+    errorThresholdPercentage: 100
+
 configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
 
 azure:

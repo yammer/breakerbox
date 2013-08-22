@@ -78,13 +78,13 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         environment.addResource(new ConfigureResource(tenacityStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
 
+        registerProperties(configuration);
+
         environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1)
                 .scheduleAtFixedRate(
                         new ScheduledTenacityPoller(tenacityPropertyKeysStore),
                         0,
                         1,
                         TimeUnit.MINUTES);
-
-        registerProperties(configuration);
     }
 }
