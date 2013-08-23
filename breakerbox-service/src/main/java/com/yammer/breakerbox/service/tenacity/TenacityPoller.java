@@ -25,7 +25,7 @@ public class TenacityPoller extends TenacityCommand<Optional<ImmutableList<Strin
 
     public TenacityPoller(TenacityClient tenacityClient,
                           URI uri) {
-        super(BreakerboxDependencyKey.BRKRBX_SERVICES);
+        super(BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS);
         this.tenacityClient = tenacityClient;
         this.uri = uri;
     }

@@ -20,7 +20,10 @@ public class BreakerboxConfiguration extends Configuration {
     private final JerseyClientConfiguration tenacityClient;
 
     @NotNull @Valid
-    private final TenacityConfiguration breakerboxServicesTenacity;
+    private final TenacityConfiguration breakerboxServicesPropertyKeys;
+
+    @NotNull @Valid
+    private final TenacityConfiguration breakerboxServicesConfiguration;
 
     @NotNull @Valid
     private final com.yammer.tenacity.core.config.BreakerboxConfiguration breakerboxConfiguration;
@@ -31,12 +34,14 @@ public class BreakerboxConfiguration extends Configuration {
     @JsonCreator
     public BreakerboxConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                    @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
-                                   @JsonProperty("breakerboxServicesTenacity") TenacityConfiguration breakerboxServicesTenacity,
+                                   @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
+                                   @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
                                    @JsonProperty("breakerbox") com.yammer.tenacity.core.config.BreakerboxConfiguration breakerboxConfiguration,
                                    @JsonProperty("configProperties") URI configProperties) {
         this.azure = azure;
         this.tenacityClient = tenacityClientConfiguration;
-        this.breakerboxServicesTenacity = Optional.fromNullable(breakerboxServicesTenacity).or(new TenacityConfiguration());
+        this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
+        this.breakerboxServicesConfiguration = Optional.fromNullable(breakerboxServicesConfiguration).or(new TenacityConfiguration());
         this.breakerboxConfiguration = breakerboxConfiguration;
         this.configProperties = configProperties;
     }
@@ -49,8 +54,12 @@ public class BreakerboxConfiguration extends Configuration {
         return tenacityClient;
     }
 
-    public TenacityConfiguration getBreakerboxServicesTenacity() {
-        return breakerboxServicesTenacity;
+    public TenacityConfiguration getBreakerboxServicesPropertyKeys() {
+        return breakerboxServicesPropertyKeys;
+    }
+
+    public TenacityConfiguration getBreakerboxServicesConfiguration() {
+        return breakerboxServicesConfiguration;
     }
 
     public com.yammer.tenacity.core.config.BreakerboxConfiguration getBreakerboxConfiguration() {
@@ -70,7 +79,8 @@ public class BreakerboxConfiguration extends Configuration {
 
         if (!azure.equals(that.azure)) return false;
         if (!breakerboxConfiguration.equals(that.breakerboxConfiguration)) return false;
-        if (!breakerboxServicesTenacity.equals(that.breakerboxServicesTenacity)) return false;
+        if (!breakerboxServicesConfiguration.equals(that.breakerboxServicesConfiguration)) return false;
+        if (!breakerboxServicesPropertyKeys.equals(that.breakerboxServicesPropertyKeys)) return false;
         if (!configProperties.equals(that.configProperties)) return false;
         if (!tenacityClient.equals(that.tenacityClient)) return false;
 
@@ -81,7 +91,8 @@ public class BreakerboxConfiguration extends Configuration {
     public int hashCode() {
         int result = azure.hashCode();
         result = 31 * result + tenacityClient.hashCode();
-        result = 31 * result + breakerboxServicesTenacity.hashCode();
+        result = 31 * result + breakerboxServicesPropertyKeys.hashCode();
+        result = 31 * result + breakerboxServicesConfiguration.hashCode();
         result = 31 * result + breakerboxConfiguration.hashCode();
         result = 31 * result + configProperties.hashCode();
         return result;

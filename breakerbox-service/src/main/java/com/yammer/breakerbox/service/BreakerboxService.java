@@ -39,7 +39,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     @Override
     public void initialize(Bootstrap<BreakerboxConfiguration> bootstrap) {
         bootstrap.setName("Breakerbox");
-        bootstrap.addBundle(new TenacityBundle(BreakerboxDependencyKey.values()));
+        bootstrap.addBundle(new TenacityBundle(BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, BreakerboxDependencyKey.values()));
         bootstrap.addBundle(new TenacityDashboardBundle());
 
         TurbineInit.init();
@@ -47,7 +47,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     
     private static void registerProperties(BreakerboxConfiguration configuration) {
         new TenacityPropertyRegister(ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
-                BreakerboxDependencyKey.BRKRBX_SERVICES, configuration.getBreakerboxServicesTenacity()),
+                BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, configuration.getBreakerboxServicesPropertyKeys()),
                 configuration.getBreakerboxConfiguration(),
                 new ArchaiusPropertyRegister())
                 .register();

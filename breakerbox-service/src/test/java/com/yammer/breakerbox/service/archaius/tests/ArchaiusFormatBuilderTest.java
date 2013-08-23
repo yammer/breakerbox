@@ -19,10 +19,10 @@ public class ArchaiusFormatBuilderTest {
     public void single() {
         assertThat(ArchaiusFormatBuilder
                 .builder()
-                .with(BreakerboxDependencyKey.BRKRBX_SERVICES, new TenacityConfiguration())
+                .with(BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, new TenacityConfiguration())
                 .build())
-                .contains("hystrix.command.BRKRBX_SERVICES.execution.isolation.thread.timeoutInMilliseconds=1000")
-                .contains("hystrix.command.BRKRBX_SERVICES.metrics.rollingStats.numBuckets=10");
+                .contains("hystrix.command.BRKRBX_SERVICES_PROPERTYKEYS.execution.isolation.thread.timeoutInMilliseconds=1000")
+                .contains("hystrix.command.BRKRBX_SERVICES_PROPERTYKEYS.metrics.rollingStats.numBuckets=10");
     }
 
     private static enum DependencyKeys implements TenacityPropertyKey {
