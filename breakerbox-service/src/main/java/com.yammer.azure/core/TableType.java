@@ -31,6 +31,9 @@ public abstract class TableType extends TableServiceEntity {
 
     @Override
     public int hashCode() {
-        return azureTableName.hashCode();
+        int result = azureTableName.hashCode();
+        result = 31 * result + (partitionKey != null ? partitionKey.hashCode() : 0);
+        result = 31 * result + (rowKey != null ? rowKey.hashCode() : 0);
+        return result;
     }
 }
