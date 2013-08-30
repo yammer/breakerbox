@@ -1,145 +1,160 @@
 {{</templates/default}}
 {{$content}}
-<form method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
-    <legend>Select which dependency to configure for {{serviceId}}</legend>
-    <div class="form-group">
-        <label for="selectDependency" class="col-lg-2 control-label">Tenacity Dependency</label>
-        <div class="input-group col-lg-3">
-            <select id="selectDependency" class="form-control" name="dependency">
-                {{#serviceDependencies}}
-                    <option value="{{toString}}">{{toString}}</option>
-                {{/serviceDependencies}}
-            </select>
+<div class="row col-lg-7">
+    <form method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
+        <legend>Select which dependency to configure for {{serviceId}}</legend>
+        <div class="form-group">
+            <label for="selectDependency" class="col-lg-4 control-label">Tenacity Dependency</label>
+            <div class="input-group col-lg-6">
+                <select id="selectDependency" class="form-control" name="dependency">
+                    {{#serviceDependencies}}
+                        <option value="{{toString}}">{{toString}}</option>
+                    {{/serviceDependencies}}
+                </select>
+            </div>
         </div>
-    </div>
-    <legend>Absolute Timeout</legend>
-    <div class="form-group">
-        <label for="inputExecutionTimeout" class="col-lg-2 control-label">Execution Timeout</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputExecutionTimeout" name="executionTimeout" value=
-            {{#tenacityConfiguration}}
-                {{executionIsolationThreadTimeoutInMillis}}
-            {{/tenacityConfiguration}}>
-            <span class="input-group-addon">ms</span>
+        <legend>Absolute Timeout</legend>
+        <div class="form-group">
+            <label for="inputExecutionTimeout" class="col-lg-4 control-label">Execution Timeout</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputExecutionTimeout" name="executionTimeout" value=
+                    {{#tenacityConfiguration}}
+                        {{executionIsolationThreadTimeoutInMillis}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">ms</span>
+            </div>
         </div>
-    </div>
-    <legend>Circuit Breaker</legend>
-    <div class="form-group">
-        <label for="inputRequestVolumeThreshold" class="col-lg-2 control-label">Request Volume Threshold</label>
-        <div class="col-lg-2">
-            <input type="number" class="form-control" id="inputRequestVolumeThreshold" name="requestVolumeThreshold" value=
-            {{#tenacityConfiguration}}
-                {{#circuitBreaker}}{{requestVolumeThreshold}}{{/circuitBreaker}}
-            {{/tenacityConfiguration}}>
+        <legend>Circuit Breaker</legend>
+        <div class="form-group">
+            <label for="inputRequestVolumeThreshold" class="col-lg-4 control-label">Request Volume Threshold</label>
+            <div class="col-lg-4">
+                <input type="number" class="form-control" id="inputRequestVolumeThreshold" name="requestVolumeThreshold" value=
+                    {{#tenacityConfiguration}}
+                        {{#circuitBreaker}}{{requestVolumeThreshold}}{{/circuitBreaker}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputErrorThresholdPercentage" class="col-lg-2 control-label">Error Threshold</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputErrorThresholdPercentage" name="errorThresholdPercentage" value=
-                {{#tenacityConfiguration}}
-                    {{#circuitBreaker}}{{errorThresholdPercentage}}{{/circuitBreaker}}
-                {{/tenacityConfiguration}}>
-            <span class="input-group-addon">%</span>
+        <div class="form-group">
+            <label for="inputErrorThresholdPercentage" class="col-lg-4 control-label">Error Threshold</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputErrorThresholdPercentage" name="errorThresholdPercentage" value=
+                    {{#tenacityConfiguration}}
+                        {{#circuitBreaker}}{{errorThresholdPercentage}}{{/circuitBreaker}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">%</span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputSleepWindow" class="col-lg-2 control-label">Sleep Window</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputSleepWindow" name="sleepWindow" value=
-                {{#tenacityConfiguration}}
-                    {{#circuitBreaker}}{{sleepWindowInMillis}}{{/circuitBreaker}}
-                {{/tenacityConfiguration}}>
-            <span class="input-group-addon">ms</span>
+        <div class="form-group">
+            <label for="inputSleepWindow" class="col-lg-4 control-label">Sleep Window</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputSleepWindow" name="sleepWindow" value=
+                    {{#tenacityConfiguration}}
+                        {{#circuitBreaker}}{{sleepWindowInMillis}}{{/circuitBreaker}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">ms</span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputCircuitBreakerRollingStatisticalWindow" class="col-lg-2 control-label">Statistical Window</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputCircuitBreakerRollingStatisticalWindow" name="circuitBreakerstatisticalWindow" value=
-                {{#tenacityConfiguration}}
-                    {{#circuitBreaker}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/circuitBreaker}}
-                {{/tenacityConfiguration}}>
-            <span class="input-group-addon">ms</span>
+        <div class="form-group">
+            <label for="inputCircuitBreakerRollingStatisticalWindow" class="col-lg-4 control-label">Statistical Window</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputCircuitBreakerRollingStatisticalWindow" name="circuitBreakerstatisticalWindow" value=
+                    {{#tenacityConfiguration}}
+                        {{#circuitBreaker}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/circuitBreaker}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">ms</span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputCircuitBreakerStatisticalWindowBuckets" class="col-lg-2 control-label">Statistical Window Buckets</label>
-        <div class="col-lg-2">
-            <input type="number" class="form-control" id="inputCircuitBreakerStatisticalWindowBuckets" name="circuitBreakerStatisticalWindowBuckets" value=
-                {{#tenacityConfiguration}}
-                    {{#circuitBreaker}}{{metricsRollingStatisticalWindowBuckets}}{{/circuitBreaker}}
-                {{/tenacityConfiguration}}>
+        <div class="form-group">
+            <label for="inputCircuitBreakerStatisticalWindowBuckets" class="col-lg-4 control-label">Statistical Window Buckets</label>
+            <div class="col-lg-4">
+                <input type="number" class="form-control" id="inputCircuitBreakerStatisticalWindowBuckets" name="circuitBreakerStatisticalWindowBuckets" value=
+                    {{#tenacityConfiguration}}
+                        {{#circuitBreaker}}{{metricsRollingStatisticalWindowBuckets}}{{/circuitBreaker}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <legend>Threadpool</legend>
-    <div class="form-group">
-        <label for="inputThreadPoolCoreSize" class="col-lg-2 control-label">Core Size</label>
-        <div class="col-lg-2">
-            <input type="number" class="form-control" id="inputThreadPoolCoreSize" name="threadPoolCoreSize" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{threadPoolCoreSize}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
+        <legend>Threadpool</legend>
+        <div class="form-group">
+            <label for="inputThreadPoolCoreSize" class="col-lg-4 control-label">Core Size</label>
+            <div class="col-lg-4">
+                <input type="number" class="form-control" id="inputThreadPoolCoreSize" name="threadPoolCoreSize" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{threadPoolCoreSize}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputKeepAliveMinutes" class="col-lg-2 control-label">Keep Alive Time</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputKeepAliveMinutes" name="keepAliveMinutes" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{keepAliveTimeMinutes}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
-            <span class="input-group-addon">mins</span>
+        <div class="form-group">
+            <label for="inputKeepAliveMinutes" class="col-lg-4 control-label">Keep Alive Time</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputKeepAliveMinutes" name="keepAliveMinutes" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{keepAliveTimeMinutes}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">mins</span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputMaxQueueSize" class="col-lg-2 control-label">Max Queue Size</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputMaxQueueSize" name="maxQueueSize" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{maxQueueSize}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
+        <div class="form-group">
+            <label for="inputMaxQueueSize" class="col-lg-4 control-label">Max Queue Size</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputMaxQueueSize" name="maxQueueSize" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{maxQueueSize}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputQueueSizeRejectionThreshold" class="col-lg-2 control-label">Queue Size Rejection Threshold</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputQueueSizeRejectionThreshold" name="queueSizeRejectionThreshold" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{queueSizeRejectionThreshold}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
+        <div class="form-group">
+            <label for="inputQueueSizeRejectionThreshold" class="col-lg-4 control-label">Queue Size Rejection Threshold</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputQueueSizeRejectionThreshold" name="queueSizeRejectionThreshold" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{queueSizeRejectionThreshold}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputThreadpoolRollingStatisticalWindow" class="col-lg-2 control-label">Statistical Window</label>
-        <div class="input-group col-lg-2">
-            <input type="number" class="form-control" id="inputThreadpoolRollingStatisticalWindow" name="threadpoolStatisticalWindow" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
-            <span class="input-group-addon">ms</span>
+        <div class="form-group">
+            <label for="inputThreadpoolRollingStatisticalWindow" class="col-lg-4 control-label">Statistical Window</label>
+            <div class="input-group col-lg-4">
+                <input type="number" class="form-control" id="inputThreadpoolRollingStatisticalWindow" name="threadpoolStatisticalWindow" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+                <span class="input-group-addon">ms</span>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="inputThreadpoolStatisticalWindowBuckets" class="col-lg-2 control-label">Statistical Window Buckets</label>
-        <div class="col-lg-2">
-            <input type="number" class="form-control" id="inputThreadpoolStatisticalWindowBuckets" name="threadpoolStatisticalWindowBuckets" value=
-                {{#tenacityConfiguration}}
-                    {{#threadpool}}{{metricsRollingStatisticalWindowBuckets}}{{/threadpool}}
-                {{/tenacityConfiguration}}>
+        <div class="form-group">
+            <label for="inputThreadpoolStatisticalWindowBuckets" class="col-lg-4 control-label">Statistical Window Buckets</label>
+            <div class="col-lg-4">
+                <input type="number" class="form-control" id="inputThreadpoolStatisticalWindowBuckets" name="threadpoolStatisticalWindowBuckets" value=
+                    {{#tenacityConfiguration}}
+                        {{#threadpool}}{{metricsRollingStatisticalWindowBuckets}}{{/threadpool}}
+                    {{/tenacityConfiguration}}>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-2">
-            <button type="submit" class="btn btn-default">Submit</button>
+        <div class="form-group">
+            <div class="col-lg-offset-2 col-lg-4">
+                <button type="submit" class="btn btn-default">Submit</button>
+            </div>
         </div>
+    </form>
+</div>
+<div class="row col-lg-5">
+    <div class="well lead">
+        <i class="icon-spinner icon-spin icon-large" id="sync-spinner"></i> Checking if all services are synchronized...
+        <span id="sync-state"></span>
     </div>
-</form>
+</div>
 {{/content}}
 {{$moreScripts}}
 <script type="text/javascript">
     $('#selectDependency').change(function(eventObj) {
         window.location.href = "/configure/{{serviceId}}/" + $(this).val();
+    });
+
+    var syncState = new Breakerbox.SyncState({
+        serviceId: '{{serviceId}}',
+        dependencyId: $('#selectDependency').val(),
+        syncSpinnerId: 'sync-spinner',
+        domId: 'sync-state'
     });
 </script>
 {{/moreScripts}}
