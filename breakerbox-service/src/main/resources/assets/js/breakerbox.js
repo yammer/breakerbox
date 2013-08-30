@@ -53,9 +53,9 @@ Breakerbox.SyncState.prototype.createDom = function(jsonData) {
     var htmlAcc = '';
 
     $(jsonData).each(function(index, value) {
-        if (value.syncStatus = 'UNSYNCHRONIZED') {
+        if (value.syncStatus == 'UNSYNCHRONIZED') {
             htmlAcc += '<dt>Unsynchronized <span class="glyphicon glyphicon-exclamation-sign"></span></dt>';
-        } else if (value.syncStatus = 'SYNCHRONIZED') {
+        } else if (value.syncStatus == 'SYNCHRONIZED') {
             htmlAcc += '<dt>Synchronized <span class="glyphicon glyphicon-ok-sign"></span></dt>';
         } else {
             htmlAcc += '<dt>Unknown <span class="glyphicon glyphicon-question-sign"></span></dt>';
