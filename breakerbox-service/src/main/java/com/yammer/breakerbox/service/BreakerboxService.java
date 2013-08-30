@@ -52,7 +52,8 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     
     private static void registerProperties(BreakerboxConfiguration configuration) {
         new TenacityPropertyRegister(ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
-                BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, configuration.getBreakerboxServicesPropertyKeys()),
+                BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, configuration.getBreakerboxServicesPropertyKeys(),
+                BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, configuration.getBreakerboxServicesConfiguration()),
                 configuration.getBreakerboxConfiguration(),
                 new ArchaiusPropertyRegister())
                 .register();
