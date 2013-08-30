@@ -7,7 +7,13 @@ var Breakerbox = {
         this.syncSpinnerId = opts.syncSpinnerId;
         this.domId = opts.domId;
 
-        this._ticker = setInterval(this.inSync(), 5000);
+        var self = this;
+
+        this.inSync();
+
+        this._ticker = setInterval(function() {
+            self.inSync();
+        }, 5000);
     }
 };
 
