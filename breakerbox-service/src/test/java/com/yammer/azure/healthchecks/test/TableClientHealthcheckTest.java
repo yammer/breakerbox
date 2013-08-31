@@ -18,7 +18,7 @@ public class TableClientHealthcheckTest {
         final TableClient mockTableClient = mock(TableClient.class);
         final TableClientHealthcheck tableClientHealthcheck = new TableClientHealthcheck(mockTableClient);
 
-        when(mockTableClient.listTables()).thenReturn(ImmutableList.of(TableId.SERVICES.toString()));
+        when(mockTableClient.listTables()).thenReturn(ImmutableList.of(TableId.SERVICE.toString()));
         assertThat(tableClientHealthcheck.check()).isEqualTo(HealthCheck.Result.healthy());
     }
 

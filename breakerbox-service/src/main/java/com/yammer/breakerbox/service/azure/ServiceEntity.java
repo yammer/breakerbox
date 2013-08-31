@@ -24,7 +24,7 @@ public class ServiceEntity extends TableType implements TableKey {
     private ServiceEntity(ServiceId serviceId,
                           DependencyId dependencyId,
                           String tenacityConfigurationAsString) {
-        super(TableId.SERVICES);
+        super(TableId.SERVICE);
         this.partitionKey = serviceId.getId();
         this.rowKey = dependencyId.getId();
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
@@ -50,7 +50,7 @@ public class ServiceEntity extends TableType implements TableKey {
             return new ServiceEntity(
                     serviceId,
                     dependencyId,
-                    OBJECTMAPPER.writeValueAsString(tenacityConfiguration));
+                    OBJECTMAPPER.writeValueAsString(tenacityConfiguration)); //TODO: pshaw 08-30 this line & try/catch will go away
         } catch (Exception err) {
             LOGGER.warn("Could not convert TenacityConfiguration to json", err);
             throw new RuntimeException(err);
@@ -61,6 +61,7 @@ public class ServiceEntity extends TableType implements TableKey {
         return ServiceEntity.build(getServiceId(), getDependencyId(), configuration);
     }
 
+    //TODO pshaw 08-30 this has to die
     public Optional<TenacityConfiguration> getTenacityConfiguration() {
         try {
             final TenacityConfiguration configuration = OBJECTMAPPER.readValue(tenacityConfigurationAsString, TenacityConfiguration.class);
@@ -103,14 +104,14 @@ public class ServiceEntity extends TableType implements TableKey {
 
     @Override
     public AzureTableName getTable() {
-        return TableId.SERVICES;
+        return TableId.SERVICE;
     }
 
     /** For Azure */
 
     @Deprecated
     public ServiceEntity() {
-        super(TableId.SERVICES);
+        super(TableId.SERVICE);
     }
 
     @Deprecated

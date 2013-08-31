@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.core.tests.TableClientTestUtils;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -28,11 +29,8 @@ public class ServiceEntityTest extends AbstractTestWithConfiguration {
     }
 
     @After
-    public void teardown() {
-        final Optional<ServiceEntity> entity = tableClient.retrieve(ServiceEntity.build(testServiceId, testDependencyId));
-        if (entity.isPresent()) {
-            assertTrue(tableClient.remove(entity.get()));
-        }
+    public void tearDown() {
+        TableClientTestUtils.tearDownTestTable(tableClient, ServiceEntity.build(testServiceId, testDependencyId));
     }
 
     @Test

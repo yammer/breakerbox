@@ -79,7 +79,7 @@ public class TenacityStore {
         final TimerContext timerContext = LIST_SERVICE.time();
         try {
             return tableClient.search(TableQuery
-                    .from(TableId.SERVICES.toString(), ServiceEntity.class)
+                    .from(TableId.SERVICE.toString(), ServiceEntity.class)
                     .where(TableQuery
                             .generateFilterCondition(
                                     TableConstants.PARTITION_KEY,
@@ -94,7 +94,7 @@ public class TenacityStore {
         final TimerContext timerContext = LIST_SERVICES.time();
         try {
             return tableClient.search(TableQuery
-                    .from(TableId.SERVICES.toString(), ServiceEntity.class));
+                    .from(TableId.SERVICE.toString(), ServiceEntity.class));
         } finally {
             timerContext.stop();
         }
