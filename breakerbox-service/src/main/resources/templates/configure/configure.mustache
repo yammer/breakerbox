@@ -148,13 +148,14 @@
 {{/content}}
 {{$moreScripts}}
 <script type="text/javascript">
-    $('#selectDependency').change(function(eventObj) {
+    var selectDependencySelector = $('#selectDependency');
+    selectDependencySelector.change(function(eventObj) {
         window.location.href = "/configure/{{serviceId}}/" + $(this).val();
     });
 
     var syncState = new Breakerbox.SyncState({
         serviceId: '{{serviceId}}',
-        dependencyId: $('#selectDependency').val(),
+        dependencyId: selectDependencySelector.val(),
         syncSpinnerId: 'sync-spinner',
         domId: 'sync-state'
     });
