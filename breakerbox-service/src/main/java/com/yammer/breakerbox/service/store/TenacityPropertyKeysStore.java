@@ -6,7 +6,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import org.slf4j.Logger;
@@ -42,10 +41,6 @@ public class TenacityPropertyKeysStore {
             LOGGER.warn("Unexpected exception", err);
         }
         return ImmutableList.of();
-    }
-
-    public ImmutableMap<URI, ImmutableList<String>> snapshotMap() {
-        return ImmutableMap.copyOf(tenacityPropertyKeyCache.asMap());
     }
 
     public ImmutableSet<String> tenacityPropertyKeysFor(Iterable<URI> uris) {
