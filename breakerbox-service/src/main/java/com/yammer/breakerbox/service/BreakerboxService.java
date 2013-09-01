@@ -8,8 +8,8 @@ import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
+import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.SyncComparator;
-import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
 import com.yammer.breakerbox.service.resources.DashboardResource;
@@ -68,13 +68,13 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     @Override
     public void run(BreakerboxConfiguration configuration, Environment environment) throws Exception {
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
-        final TenacityStore tenacityStore = new TenacityStore(tableClient);
+        final BreakerboxStore breakerboxStore = new BreakerboxStore(tableClient);
         final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
                 new TenacityPoller.Factory(tenacityClient));
         final SyncComparator syncComparator = new SyncComparator(
                 new TenacityConfigurationFetcher.Factory(tenacityClient),
-                tenacityStore);
+                breakerboxStore);
 
         initializeAzureTables(tableClient);
         
@@ -82,8 +82,8 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
-        environment.addResource(new ArchaiusResource(tenacityStore));
-        environment.addResource(new ConfigureResource(tenacityStore, tenacityPropertyKeysStore));
+        environment.addResource(new ArchaiusResource(breakerboxStore));
+        environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
         environment.addResource(new InSyncResource(syncComparator));
 

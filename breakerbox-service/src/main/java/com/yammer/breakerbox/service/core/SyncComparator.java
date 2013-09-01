@@ -16,12 +16,12 @@ import java.util.concurrent.Future;
 
 public class SyncComparator {
     private final TenacityConfigurationFetcher.Factory fetcherFactory;
-    private final TenacityStore tenacityStore;
+    private final BreakerboxStore breakerboxStore;
     private static final Logger LOGGER = LoggerFactory.getLogger(SyncComparator.class);
 
-    public SyncComparator(TenacityConfigurationFetcher.Factory fetcherFactory, TenacityStore tenacityStore) {
+    public SyncComparator(TenacityConfigurationFetcher.Factory fetcherFactory, BreakerboxStore breakerboxStore) {
         this.fetcherFactory = fetcherFactory;
-        this.tenacityStore = tenacityStore;
+        this.breakerboxStore = breakerboxStore;
     }
 
     private Function<URI, InstanceConfiguration> funFetchConfiguration(final DependencyId dependencyId) {
@@ -71,7 +71,7 @@ public class SyncComparator {
 
     public ImmutableList<SyncState> inSync(ServiceId serviceId, DependencyId dependencyId) {
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
-        final Optional<ServiceEntity> serviceEntity = tenacityStore.retrieve(serviceId, dependencyId);
+        final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
         if (serviceEntity.isPresent()) {
             final Optional<TenacityConfiguration> tenacityConfiguration = serviceEntity.get().getTenacityConfiguration();
             if (tenacityConfiguration.isPresent()) {

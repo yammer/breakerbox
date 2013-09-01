@@ -21,18 +21,18 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class TenacityStore {
+public class BreakerboxStore {
     private final TableClient tableClient;
     private final Cache<ServiceId, ImmutableList<ServiceEntity>> listDependenciesCache = CacheBuilder
             .newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
 
-    private static final Timer LIST_SERVICES = Metrics.newTimer(TenacityStore.class, "list-services");
-    private static final Timer LIST_SERVICE = Metrics.newTimer(TenacityStore.class, "list-service");
-    private static final Logger LOGGER = LoggerFactory.getLogger(TenacityStore.class);
+    private static final Timer LIST_SERVICES = Metrics.newTimer(BreakerboxStore.class, "list-services");
+    private static final Timer LIST_SERVICE = Metrics.newTimer(BreakerboxStore.class, "list-service");
+    private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxStore.class);
 
-    public TenacityStore(TableClient tableClient) {
+    public BreakerboxStore(TableClient tableClient) {
         this.tableClient = tableClient;
     }
 

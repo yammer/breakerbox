@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 public class SyncComparatorTest {
     TenacityConfigurationFetcher.Factory mockFactory;
-    TenacityStore mockTenacityStory;
+    BreakerboxStore mockTenacityStory;
     TenacityConfigurationFetcher mockFetcher;
     ServiceId serviceId = ServiceId.from("production");
     DependencyId dependencyId = DependencyId.from(UUID.randomUUID().toString());
@@ -32,7 +32,7 @@ public class SyncComparatorTest {
     @Before
     public void setup() {
         mockFactory = mock(TenacityConfigurationFetcher.Factory.class);
-        mockTenacityStory = mock(TenacityStore.class);
+        mockTenacityStory = mock(BreakerboxStore.class);
         mockFetcher = mock(TenacityConfigurationFetcher.class);
     }
 

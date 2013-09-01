@@ -5,10 +5,10 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.ServiceId;
-import com.yammer.breakerbox.service.core.TenacityStore;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
@@ -26,11 +26,11 @@ import java.util.Comparator;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
-    private final TenacityStore tenacityStore;
+    private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
 
-    public ConfigureResource(TenacityStore tenacityStore, TenacityPropertyKeysStore tenacityPropertyKeysStore) {
-        this.tenacityStore = tenacityStore;
+    public ConfigureResource(BreakerboxStore breakerboxStore, TenacityPropertyKeysStore tenacityPropertyKeysStore) {
+        this.breakerboxStore = breakerboxStore;
         this.tenacityPropertyKeysStore = tenacityPropertyKeysStore;
     }
 
@@ -56,7 +56,7 @@ public class ConfigureResource {
 
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId) {
-        final Optional<ServiceEntity> serviceEntity = tenacityStore.retrieve(serviceId, dependencyId);
+        final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
         return new ConfigureView(
                 serviceId,
                 Ordering
@@ -89,7 +89,7 @@ public class ConfigureResource {
     @Path("/{dependency}")
     public TenacityConfiguration get(@PathParam("service") String serviceName,
                                      @PathParam("dependency") String dependencyName) {
-        final Optional<ServiceEntity> serviceEntity = tenacityStore.retrieve(
+        final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(
                 ServiceId.from(serviceName),
                 DependencyId.from(dependencyName));
         if (serviceEntity.isPresent()) {
@@ -132,7 +132,7 @@ public class ConfigureResource {
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
                 executionTimeout);
-        if (tenacityStore.store(
+        if (breakerboxStore.store(
                 ServiceId.from(serviceName),
                 DependencyId.from(dependencyName),
                 tenacityConfiguration)) {
