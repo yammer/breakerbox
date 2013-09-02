@@ -1,7 +1,7 @@
 {{</templates/default}}
 {{$content}}
 <div class="row col-lg-7">
-    <form method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
+    <form id="configure-form" method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
         <legend>Select which dependency to configure for {{serviceId}}</legend>
         <div class="form-group">
             <label for="selectDependency" class="col-lg-4 control-label">Tenacity Dependency</label>
@@ -132,7 +132,7 @@
         </div>
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-4">
-                <button type="submit" class="btn btn-default">Submit</button>
+                <button type="submit" class="btn btn-default" data-loading-text="Saving..." data-complete-text="Saved!">Save</button>
             </div>
         </div>
     </form>
@@ -149,8 +149,11 @@
 {{$moreScripts}}
 <script type="text/javascript">
     var selectDependencySelector = $('#selectDependency');
-    selectDependencySelector.change(function(eventObj) {
-        window.location.href = "/configure/{{serviceId}}/" + $(this).val();
+
+    var configureForm = new Breakerbox.ConfigureForm({
+        serviceId: '{{serviceId}}',
+        selectDependencyObj: selectDependencySelector,
+        formObj: $('#configure-form')
     });
 
     var syncState = new Breakerbox.SyncState({

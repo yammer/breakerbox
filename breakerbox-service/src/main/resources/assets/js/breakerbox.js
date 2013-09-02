@@ -14,8 +14,52 @@ var Breakerbox = {
         this._ticker = setInterval(function() {
             self.inSync();
         }, 5000);
+    },
+
+    ConfigureForm: function(opts) {
+        opts = opts || {};
+
+        this.serviceId = opts.serviceId;
+        this.selectDependencyObj = opts.selectDependencyObj;
+        this.formObj = opts.formObj;
+
+        this.registerDependencyChange();
+        this.registerSubmit();
     }
 };
+
+Breakerbox.ConfigureForm.prototype.registerDependencyChange = function() {
+    var serviceId = this.serviceId;
+    this.selectDependencyObj.change(function() {
+        window.location.href = '/configure/' + serviceId + '/' + $(this).val();
+    });
+}
+
+Breakerbox.ConfigureForm.prototype.registerSubmit = function() {
+    var self = this;
+    this.formObj.submit(function() {
+        event.preventDefault();
+
+        var buttonSelector = $('.btn');
+        buttonSelector.button('loading');
+
+        $.ajax({
+            type: "POST",
+            timeout: 5000,
+            data: $(this).serialize(),
+            url: '/configure/' + self.serviceId,
+            success: function() {
+                buttonSelector.button('complete');
+                setTimeout(function() {
+                    window.location.href = '/configure/' + self.serviceId + '/' + self.selectDependencyObj.val();
+                }, 1000);
+            },
+            error: function() {
+                buttonSelector.button('reset');
+            }
+        });
+    });
+}
 
 Breakerbox.SyncState.prototype.showSpinner = function() {
     $('.' + this.syncSpinnerId).show();
@@ -39,7 +83,8 @@ Breakerbox.SyncState.prototype.inSync = function() {
     var self = this;
 
     $.ajax({
-        dataType: "json",
+        type: 'GET',
+        dataType: 'json',
         url: "/sync/" + this.serviceId + '/' + this.dependencyId,
         timeout: 2000,
         success: function(data) {
