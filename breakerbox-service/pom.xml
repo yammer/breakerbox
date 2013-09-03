@@ -27,6 +27,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.yammer.dropwizard</groupId>
+            <artifactId>dropwizard-authenticator-ldap</artifactId>
+            <version>${dropwizard-authenticator-ldap.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.yammer.tenacity</groupId>
             <artifactId>tenacity-core</artifactId>
             <version>${tenacity.version}</version>

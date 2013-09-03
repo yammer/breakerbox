@@ -8,6 +8,7 @@ import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
+import com.yammer.breakerbox.service.config.LdapConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
@@ -21,6 +22,12 @@ import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKeyFactory;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.auth.CachingAuthenticator;
+import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
+import com.yammer.dropwizard.auth.basic.BasicCredentials;
+import com.yammer.dropwizard.authenticator.LdapAuthenticator;
+import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
+import com.yammer.dropwizard.authenticator.resources.ResourceAuthenticator;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.client.TenacityClient;
@@ -67,6 +74,8 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
     @Override
     public void run(BreakerboxConfiguration configuration, Environment environment) throws Exception {
+        setupAuth(configuration.getLdapConfiguration(), environment);
+
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
         final BreakerboxStore breakerboxStore = new BreakerboxStore(tableClient);
         final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
@@ -95,5 +104,14 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                         0,
                         1,
                         TimeUnit.MINUTES);
+    }
+
+    private static void setupAuth(LdapConfiguration ldapConfiguration, Environment environment) {
+        final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration.getHostAndPort());
+        final CachingAuthenticator<BasicCredentials, BasicCredentials> resourceAuthenticator =
+                CachingAuthenticator.wrap(new ResourceAuthenticator(ldapAuthenticator), ldapConfiguration.getCache());
+
+        environment.addHealthCheck(new LdapHealthCheck(ldapAuthenticator));
+        environment.addResource(new BasicAuthProvider<>(resourceAuthenticator, "clank"));
     }
 }

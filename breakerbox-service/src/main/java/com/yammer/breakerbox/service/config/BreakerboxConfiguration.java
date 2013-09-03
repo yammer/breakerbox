@@ -31,19 +31,24 @@ public class BreakerboxConfiguration extends Configuration {
     @NotNull @Valid
     private final URI configProperties;
 
+    @NotNull @Valid
+    private LdapConfiguration ldapConfiguration;
+
     @JsonCreator
     public BreakerboxConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                    @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
                                    @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
                                    @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
                                    @JsonProperty("breakerbox") com.yammer.tenacity.core.config.BreakerboxConfiguration breakerboxConfiguration,
-                                   @JsonProperty("configProperties") URI configProperties) {
+                                   @JsonProperty("configProperties") URI configProperties,
+                                   @JsonProperty("ldapConfiguration") LdapConfiguration ldapConfiguration) {
         this.azure = azure;
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
         this.breakerboxServicesConfiguration = Optional.fromNullable(breakerboxServicesConfiguration).or(new TenacityConfiguration());
         this.breakerboxConfiguration = breakerboxConfiguration;
         this.configProperties = configProperties;
+        this.ldapConfiguration = ldapConfiguration;
     }
 
     public AzureTableConfiguration getAzure() {
@@ -70,6 +75,14 @@ public class BreakerboxConfiguration extends Configuration {
         return configProperties;
     }
 
+    public LdapConfiguration getLdapConfiguration() {
+        return ldapConfiguration;
+    }
+
+    public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+        this.ldapConfiguration = ldapConfiguration;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -83,6 +96,7 @@ public class BreakerboxConfiguration extends Configuration {
         if (!breakerboxServicesPropertyKeys.equals(that.breakerboxServicesPropertyKeys)) return false;
         if (!configProperties.equals(that.configProperties)) return false;
         if (!tenacityClient.equals(that.tenacityClient)) return false;
+        if (!ldapConfiguration.equals(that.ldapConfiguration)) return false;
 
         return true;
     }
@@ -95,6 +109,7 @@ public class BreakerboxConfiguration extends Configuration {
         result = 31 * result + breakerboxServicesConfiguration.hashCode();
         result = 31 * result + breakerboxConfiguration.hashCode();
         result = 31 * result + configProperties.hashCode();
+        result = 31 * result + ldapConfiguration.hashCode();
         return result;
     }
 }

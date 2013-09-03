@@ -3,3 +3,4 @@
 *.iml
 *.tmp
 target*
+dependency-reduced-pom.xml
