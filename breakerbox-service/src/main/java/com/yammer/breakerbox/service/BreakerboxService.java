@@ -112,6 +112,6 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
                 CachingAuthenticator.wrap(new ResourceAuthenticator(ldapAuthenticator), ldapConfiguration.getCache());
 
         environment.addHealthCheck(new LdapHealthCheck(ldapAuthenticator));
-        environment.addResource(new BasicAuthProvider<>(resourceAuthenticator, "clank"));
+        environment.addResource(new BasicAuthProvider<>(resourceAuthenticator, "breakerbox"));
     }
 }
