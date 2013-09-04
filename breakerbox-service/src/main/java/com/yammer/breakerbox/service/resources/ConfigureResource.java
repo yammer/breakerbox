@@ -12,6 +12,8 @@ import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
+import com.yammer.dropwizard.auth.Auth;
+import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.views.View;
 import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
@@ -35,7 +37,7 @@ public class ConfigureResource {
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
-    public View render(@PathParam("service") String serviceName) {
+    public View render(@Auth BasicCredentials creds, @PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
         final Optional<String> firstDependencyKey = FluentIterable
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
@@ -49,7 +51,8 @@ public class ConfigureResource {
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     @Path("/{dependency}")
-    public ConfigureView render(@PathParam("service") String serviceName,
+    public ConfigureView render(@Auth BasicCredentials creds,
+                                @PathParam("service") String serviceName,
                                 @PathParam("dependency") String dependencyName) {
         return create(ServiceId.from(serviceName), DependencyId.from(dependencyName));
     }
@@ -103,7 +106,8 @@ public class ConfigureResource {
 
 
     @POST @Timed @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response configure(@PathParam("service") String serviceName,
+    public Response configure(@Auth BasicCredentials creds,
+                              @PathParam("service") String serviceName,
                               @FormParam("dependency") String dependencyName,
                               @FormParam("executionTimeout") Integer executionTimeout,
                               @FormParam("requestVolumeThreshold") Integer requestVolumeThreshold,
