@@ -14,7 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/archaius/{service}")
+@Path("/")
 public class ArchaiusResource {
     private final BreakerboxStore breakerboxStore;
 
@@ -22,6 +22,7 @@ public class ArchaiusResource {
         this.breakerboxStore = breakerboxStore;
     }
 
+    @Path("/v1/archaius/{service}")
     @GET @Timed @Produces(MediaType.TEXT_PLAIN)
     public String getServiceConfigurations(@PathParam("service") String service) {
         final ArchaiusFormatBuilder archaiusBuilder = ArchaiusFormatBuilder.builder();
@@ -33,5 +34,12 @@ public class ArchaiusResource {
             }
         }
         return archaiusBuilder.build();
+    }
+
+    @Path("/archaius/{service}")
+    @GET @Timed @Produces(MediaType.TEXT_PLAIN)
+    @Deprecated
+    public String getServiceConfigurationsDepreciated(@PathParam("service") String service) {
+        return getServiceConfigurations(service);
     }
 }
