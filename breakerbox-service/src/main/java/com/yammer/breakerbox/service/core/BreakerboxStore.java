@@ -8,6 +8,8 @@ import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.metrics.Metrics;
@@ -30,23 +32,29 @@ public class BreakerboxStore {
 
     private static final Timer LIST_SERVICES = Metrics.newTimer(BreakerboxStore.class, "list-services");
     private static final Timer LIST_SERVICE = Metrics.newTimer(BreakerboxStore.class, "list-service");
+    private static final Timer LATEST_DEPENDENCY_CONFIG = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
     private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxStore.class);
 
     public BreakerboxStore(TableClient tableClient) {
         this.tableClient = tableClient;
     }
 
-    public boolean store(ServiceId serviceId, DependencyId dependencyId) {
-        return store(ServiceEntity.build(serviceId, dependencyId));
+    public boolean storeServiceEntity(ServiceId serviceId, DependencyId dependencyId) {
+        return storeServiceEntity(ServiceEntity.build(serviceId, dependencyId));
     }
 
-    public boolean store(ServiceId serviceId, DependencyId dependencyId, TenacityConfiguration tenacityConfiguration) {
-        return store(ServiceEntity.build(serviceId, dependencyId, tenacityConfiguration));
-    }
-
-    public boolean store(ServiceEntity serviceEntity) {
+    public boolean storeServiceEntity(ServiceEntity serviceEntity) {
         listDependenciesCache.invalidate(serviceEntity.getServiceId());
         return tableClient.insertOrReplace(serviceEntity);
+    }
+
+    //pass in timestamp=System.currentTimemillis if new entry
+    public boolean storeDependencyEntity(DependencyId dependencyId, long timestamp, TenacityConfiguration tenacityConfiguration, String username) {
+        return storeDependencyEntity(DependencyEntity.build(dependencyId, DependencyEntityData.create(timestamp, username, tenacityConfiguration)));
+    }
+
+    private boolean storeDependencyEntity(DependencyEntity dependencyEntity) {
+        return tableClient.insertOrReplace(dependencyEntity);
     }
 
     public boolean remove(TableType tableType) {
@@ -55,6 +63,10 @@ public class BreakerboxStore {
 
     public Optional<ServiceEntity> retrieve(ServiceId serviceId, DependencyId dependencyId) {
         return tableClient.retrieve(ServiceEntity.build(serviceId, dependencyId));
+    }
+
+    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp) {
+        return tableClient.retrieve(DependencyEntity.build(dependencyId, timestamp));
     }
 
     public ImmutableList<ServiceEntity> listServices() {
@@ -95,6 +107,20 @@ public class BreakerboxStore {
         try {
             return tableClient.search(TableQuery
                     .from(TableId.SERVICE.toString(), ServiceEntity.class));
+        } finally {
+            timerContext.stop();
+        }
+    }
+
+    public ImmutableList<DependencyEntity> listDependencyConfigurations(DependencyId dependencyId) {
+        final TimerContext timerContext = LATEST_DEPENDENCY_CONFIG.time();
+        try {
+            return tableClient.search(TableQuery
+                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+                    .where(TableQuery.generateFilterCondition(
+                            TableConstants.PARTITION_KEY,
+                            TableQuery.QueryComparisons.EQUAL,
+                            dependencyId.getId())));
         } finally {
             timerContext.stop();
         }

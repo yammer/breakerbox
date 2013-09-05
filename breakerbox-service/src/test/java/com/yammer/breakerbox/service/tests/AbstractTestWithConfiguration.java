@@ -12,15 +12,15 @@ import org.junit.Before;
 import java.io.File;
 
 public abstract class AbstractTestWithConfiguration {
-    protected BreakerboxConfiguration configuration;
+    protected BreakerboxConfiguration breakerboxConfiguration;
     protected TableClient tableClient;
 
     @Before
     public void setupTest() throws Exception {
-        configuration = ConfigurationFactory
+        breakerboxConfiguration = ConfigurationFactory
                 .forClass(BreakerboxConfiguration.class, new Validator())
                 .build(new File(Resources.getResource("test.yml").toURI()));
-        tableClient = new TableClientFactory(configuration.getAzure()).create();
+        tableClient = new TableClientFactory(breakerboxConfiguration.getAzure()).create();
 
         for (TableId id : TableId.values()) {
             tableClient.create(id);

@@ -3,6 +3,7 @@ package com.yammer.breakerbox.service.resources;
 import com.google.common.base.Optional;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
@@ -19,6 +20,8 @@ import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -28,6 +31,8 @@ import java.util.Comparator;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigureResource.class);
+
     private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
 
@@ -60,14 +65,15 @@ public class ConfigureResource {
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId) {
         final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
+//        breakerboxStore.listDependencyConfigurations(dependencyId);
+        final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
                 Ordering
                         .from(new SortKeyFirst(dependencyId))
-                        .immutableSortedCopy(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId))),
+                        .immutableSortedCopy(propertyKeys),
                 serviceEntity
-                        .or(ServiceEntity.build(serviceId, dependencyId))
-                        .getTenacityConfiguration()
+                        .or(ServiceEntity.build(serviceId, dependencyId)).getTenacityConfiguration()
                         .or(new TenacityConfiguration()));
     }
 
@@ -121,6 +127,7 @@ public class ConfigureResource {
                               @FormParam("queueSizeRejectionThreshold") Integer queueSizeRejectionThreshold,
                               @FormParam("threadpoolStatisticalWindow") Integer threadpoolStatisticalWindow,
                               @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets) {
+        final String username = creds.getUsername();
         final TenacityConfiguration tenacityConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(
                         threadPoolCoreSize,
@@ -136,15 +143,28 @@ public class ConfigureResource {
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
                 executionTimeout);
-        if (breakerboxStore.store(
-                ServiceId.from(serviceName),
-                DependencyId.from(dependencyName),
-                tenacityConfiguration)) {
+        if (commitSuccessful(serviceName, dependencyName, tenacityConfiguration, username)) {
             return Response
                     .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
                     .build();
         } else {
             return Response.serverError().build();
         }
+    }
+
+    private boolean commitSuccessful(String serviceName, String dependencyName, TenacityConfiguration tenacityConfiguration, String username) {
+        if(username == null || "".equals(username)){
+            username = "unknown_user";
+            LOG.warn("Unable to resolve username from credentials while submitting configuration");
+        }
+
+//        return breakerboxStore.storeDependencyEntity(
+//                DependencyId.from(dependencyName),
+//                tenacityConfiguration,
+//                username);
+        return breakerboxStore.storeServiceEntity(ServiceEntity.build(
+                ServiceId.from(serviceName),
+                DependencyId.from(dependencyName),
+                tenacityConfiguration));
     }
 }

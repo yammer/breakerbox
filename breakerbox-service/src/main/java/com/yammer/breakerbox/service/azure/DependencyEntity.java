@@ -8,7 +8,6 @@ import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
 import com.yammer.azure.core.AzureTableName;
 import com.yammer.azure.core.TableKey;
 import com.yammer.azure.core.TableType;
-import com.yammer.breakerbox.service.core.DependencyTableEntry;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
@@ -17,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Bean to represent the DependencyEntity table.
+ * Bean to represent the Dependency table.
+ * This is for looking up time-based configurations on a per-key basis. It is assumed that you know which
+ * Dependency Key you wish to use before accessing this table.
  */
 public class DependencyEntity extends TableType implements TableKey {
     private static final ObjectMapper OBJECTMAPPER = new ObjectMapperFactory().build();
@@ -35,7 +36,7 @@ public class DependencyEntity extends TableType implements TableKey {
         this.user = user;
     }
 
-    public static DependencyEntity build(DependencyId dependencyId, DependencyTableEntry record){
+    public static DependencyEntity build(DependencyId dependencyId, DependencyEntityData record){
         try {
             final String configurationAsString = OBJECTMAPPER.writeValueAsString(record.getConfiguration());
             return new DependencyEntity(dependencyId, record.getTimestamp(), record.getUser(), configurationAsString);
@@ -45,14 +46,18 @@ public class DependencyEntity extends TableType implements TableKey {
         }
     }
 
-    public Optional<DependencyTableEntry> getDependencyTableEntry() {
+    public static DependencyEntity build(DependencyId dependencyId, long timestamp) {
+        return build(dependencyId, DependencyEntityData.createLookup(timestamp));
+    }
+
+    public Optional<DependencyEntityData> getDependencyTableEntry() {
         try {
             final TenacityConfiguration dependencyConfiguration = OBJECTMAPPER.readValue(tenacityConfigurationAsString, TenacityConfiguration.class);
             final ImmutableList<String> validationErrors = VALIDATOR.validate(dependencyConfiguration);
             if (!validationErrors.isEmpty()) {
                 LOGGER.warn("Failed to validate TenacityConfiguration", validationErrors.toString());
             }
-            return Optional.of(DependencyTableEntry.create(Long.valueOf(rowKey), user, dependencyConfiguration));
+            return Optional.of(DependencyEntityData.create(Long.valueOf(rowKey), user, dependencyConfiguration));
         } catch (Exception err) {
             LOGGER.warn("Failed to parse TenacityConfiguration", err);
         }

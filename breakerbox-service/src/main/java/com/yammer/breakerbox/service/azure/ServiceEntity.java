@@ -15,6 +15,12 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Bean to represent the Service table.
+ * Partitioned by service, each service contains a list of service dependency keys.
+ * As of 5-SEP-2013, these dependency keys are updated by the continuous polling of services'
+ * Tenacity endpoint for DependencyKeys. See TenacityClient for more.
+ */
 public class ServiceEntity extends TableType implements TableKey {
     private String tenacityConfigurationAsString;
     private static final ObjectMapper OBJECTMAPPER = new ObjectMapperFactory().build();
