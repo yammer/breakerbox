@@ -38,10 +38,11 @@ Breakerbox.ConfigureForm.prototype.registerDependencyChange = function() {
 }
 
 Breakerbox.ConfigureForm.prototype.registerConfigVersionChange = function() {
-//    var serviceId = this.serviceId;
-//    this.dependencyConfigVersion.change(function() {
-//        window.location.href = '/configure/' + serviceId + '/' + $(this).val();
-//    });
+    var serviceId = this.serviceId;
+    var dependency = this.selectDependencyObj.val()
+    this.dependencyConfigVersion.change(function() {
+        window.location.href = '/configure/' + serviceId + '/' + dependency + '?version=' + $(this).val();
+    });
 }
 
 Breakerbox.ConfigureForm.prototype.registerSubmit = function() {

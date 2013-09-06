@@ -1,15 +1,22 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.comparable.DescendingRowOrder;
+import com.yammer.breakerbox.service.comparable.DescendingRowVersionFirstOrder;
+import com.yammer.breakerbox.service.comparable.SortKeyFirst;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
+import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
 import com.yammer.dropwizard.auth.Auth;
@@ -47,7 +54,7 @@ public class ConfigureResource {
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
                 .first();
         if (firstDependencyKey.isPresent()) {
-            return create(serviceId, DependencyId.from(firstDependencyKey.get()));
+            return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<String>absent());
         } else {
             return new NoPropertyKeysView(serviceId);
         }
@@ -57,15 +64,21 @@ public class ConfigureResource {
     @Path("/{dependency}")
     public ConfigureView render(@Auth BasicCredentials creds,
                                 @PathParam("service") String serviceName,
-                                @PathParam("dependency") String dependencyName) {
-        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName));
+                                @PathParam("dependency") String dependencyName,
+                                @QueryParam("version") String version) {
+        final Optional<String> versionOpt = Optional.fromNullable(version);
+        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), versionOpt);
     }
 
     private ConfigureView create(ServiceId serviceId,
-                                 DependencyId dependencyId) {
+                                 DependencyId dependencyId,
+                                 Optional<String> version) {
         final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
         final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listDependencyConfigurations(dependencyId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
+        Comparator<DependencyEntity> versionSortingStrategy = version.isPresent()
+                ? new DescendingRowVersionFirstOrder<DependencyEntity>(SimpleDateParser.dateToMillis(version.get()))
+                : new DescendingRowOrder<DependencyEntity>();
         return new ConfigureView(
                 serviceId,
                 Ordering.from(new SortKeyFirst(dependencyId))
@@ -73,26 +86,24 @@ public class ConfigureResource {
                 serviceEntity
                         .or(ServiceEntity.build(serviceId, dependencyId)).getTenacityConfiguration()
                         .or(new TenacityConfiguration()),
-                Ordering.from(new DescendingRowOrder<DependencyEntity>())
-                        .immutableSortedCopy(dependencyEntities));
+                getDependencyEntities(dependencyEntities, versionSortingStrategy));
     }
 
-    private static class SortKeyFirst implements Comparator<String> {
-        private final String sortFirst;
+    private ImmutableList<String> getDependencyEntities(ImmutableList<DependencyEntity> dependencyEntities,
+                                                                  Comparator<DependencyEntity> versionSortingStrategy) {
+        final ImmutableList<DependencyEntity> sortedEntities = Ordering.from(versionSortingStrategy)
+                .immutableSortedCopy(dependencyEntities);
 
-        private SortKeyFirst(DependencyId sortFirst) {
-            this.sortFirst = sortFirst.getId();
+        final ImmutableList.Builder<String> builder = ImmutableList.builder();
+        for (DependencyEntity entity : sortedEntities) {
+            final Optional<DependencyEntityData> dependencyData = entity.getDependencyData();
+            if(dependencyData.isPresent()){
+                builder.add(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + dependencyData.get().getUser());
+            }
         }
 
-        @Override
-        public int compare(String o1, String o2) {
-            return ComparisonChain
-                    .start()
-                    .compareTrueFirst(o1.equals(sortFirst), o2.equals(sortFirst))
-                    .result();
-        }
+        return builder.build();
     }
-
 
     @GET @Timed @Produces(MediaType.APPLICATION_JSON)
     @Path("/{dependency}")

@@ -1,9 +1,6 @@
 package com.yammer.breakerbox.service.views;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 
@@ -16,21 +13,12 @@ public class ConfigureView extends NavbarView {
     public ConfigureView(ServiceId serviceId,
                          Iterable<String> serviceDependencies,
                          TenacityConfiguration tenacityConfiguration,
-                         Iterable<DependencyEntity> dependencyEntities) {
+                         ImmutableList<String> dependencyEntities) {
         super("/templates/configure/configure.mustache");
         this.serviceId = serviceId;
         this.serviceDependencies = serviceDependencies;
         this.tenacityConfiguration = tenacityConfiguration;
-
-        //TODO: fix this awful awful thing living in the view
-        final ImmutableList.Builder<String> builder = ImmutableList.<String>builder();
-        for (DependencyEntity dependencyEntity : dependencyEntities) {
-            final Optional<DependencyEntityData> dependencyData = dependencyEntity.getDependencyData();
-            if(dependencyData.isPresent()){
-                builder.add(dependencyEntity.getRowKey() + " " + dependencyData.get().getUser());
-            }
-        }
-        configurationVersions = builder.build();
+        this.configurationVersions = dependencyEntities;
     }
 
     public ServiceId getServiceId() {
