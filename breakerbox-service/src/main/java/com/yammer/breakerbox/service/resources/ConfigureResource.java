@@ -11,6 +11,7 @@ import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.comparable.DescendingRowOrder;
 import com.yammer.breakerbox.service.comparable.DescendingRowVersionFirstOrder;
 import com.yammer.breakerbox.service.comparable.SortKeyFirst;
+import com.yammer.breakerbox.service.comparable.TimeUtil;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
@@ -73,7 +74,7 @@ public class ConfigureResource {
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId,
                                  Optional<String> version) {
-        final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
+        final Optional<DependencyEntity> dependencyEntityForConfigForm = breakerboxStore.retrieve(dependencyId, version.or(TimeUtil.LATEST));
         final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listDependencyConfigurations(dependencyId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         Comparator<DependencyEntity> versionSortingStrategy = version.isPresent()
@@ -83,14 +84,13 @@ public class ConfigureResource {
                 serviceId,
                 Ordering.from(new SortKeyFirst(dependencyId))
                         .immutableSortedCopy(propertyKeys),
-                serviceEntity
-                        .or(ServiceEntity.build(serviceId, dependencyId)).getTenacityConfiguration()
-                        .or(new TenacityConfiguration()),
-                getDependencyEntities(dependencyEntities, versionSortingStrategy));
+                dependencyEntityForConfigForm.or(DependencyEntity.build(dependencyId, System.currentTimeMillis()))
+                        .getDependencyData().get().getConfiguration(),
+                getDependencyVersionNameList(dependencyEntities, versionSortingStrategy));
     }
 
-    private ImmutableList<String> getDependencyEntities(ImmutableList<DependencyEntity> dependencyEntities,
-                                                                  Comparator<DependencyEntity> versionSortingStrategy) {
+    private ImmutableList<String> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities,
+                                                               Comparator<DependencyEntity> versionSortingStrategy) {
         final ImmutableList<DependencyEntity> sortedEntities = Ordering.from(versionSortingStrategy)
                 .immutableSortedCopy(dependencyEntities);
 
@@ -101,6 +101,9 @@ public class ConfigureResource {
                 builder.add(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + dependencyData.get().getUser());
             }
         }
+
+        if(sortedEntities.size()==0)
+            builder.add("Default");
 
         return builder.build();
     }

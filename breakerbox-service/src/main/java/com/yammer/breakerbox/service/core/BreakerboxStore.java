@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.UnmodifiableIterator;
 import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.azure.TableClient;
@@ -12,6 +13,8 @@ import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
+import com.yammer.breakerbox.service.comparable.TimeUtil;
+import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -32,7 +35,8 @@ public class BreakerboxStore {
 
     private static final Timer LIST_SERVICES = Metrics.newTimer(BreakerboxStore.class, "list-services");
     private static final Timer LIST_SERVICE = Metrics.newTimer(BreakerboxStore.class, "list-service");
-    private static final Timer LATEST_DEPENDENCY_CONFIG = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
+    private static final Timer DEPENDENCY_CONFIGS = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
+    private static final Timer SPECIFIC_DEPENDENCY_CONFIG = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
     private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxStore.class);
 
     public BreakerboxStore(TableClient tableClient) {
@@ -48,7 +52,6 @@ public class BreakerboxStore {
         return tableClient.insertOrReplace(serviceEntity);
     }
 
-    //pass in timestamp=System.currentTimemillis if new entry
     public boolean storeDependencyEntity(DependencyId dependencyId, long timestamp, TenacityConfiguration tenacityConfiguration, String username) {
         return storeDependencyEntity(DependencyEntity.build(dependencyId, DependencyEntityData.create(timestamp, username, tenacityConfiguration)));
     }
@@ -67,6 +70,39 @@ public class BreakerboxStore {
 
     public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp) {
         return tableClient.retrieve(DependencyEntity.build(dependencyId, timestamp));
+    }
+
+    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, String timestamp) {
+        final ImmutableList<DependencyEntity> dependencyEntities = listDependencyConfigurations(dependencyId);
+        if(dependencyEntities.size() == 0) return Optional.absent();
+
+        if(TimeUtil.LATEST.equals(timestamp))
+            return Optional.of(fetchLatest(dependencyEntities));
+        else
+            return Optional.of(fetchByTimestamp(SimpleDateParser.dateToMillis(timestamp), dependencyEntities));
+    }
+
+    private DependencyEntity fetchLatest(ImmutableList<DependencyEntity> dependencyEntities) {
+        //TODO: This feels clunky - having an off day. Find a smoother way of doing this.
+        final UnmodifiableIterator<DependencyEntity> iterator = dependencyEntities.iterator();
+        DependencyEntity latestEntity = iterator.next();
+        while(iterator.hasNext()){
+            final DependencyEntity next = iterator.next();
+            if(next.getDependencyData().get().getTimestamp() > latestEntity.getDependencyData().get().getTimestamp()) {
+                latestEntity = next;
+            }
+        }
+        return latestEntity;
+    }
+
+    private DependencyEntity fetchByTimestamp(String timestamp, ImmutableList<DependencyEntity> dependencyEntities) {
+        for (DependencyEntity dependencyEntity : dependencyEntities) {
+            if(dependencyEntity.getRowKey().contains(TimeUtil.trimMillis(timestamp))) {
+                return dependencyEntity;
+            }
+        }
+        LOGGER.info("Attempted to fetch dependency {} timestamp {} but wasn't found. Returning default value.", dependencyEntities.get(0).getPartitionKey() , timestamp);
+        return fetchLatest(dependencyEntities); //invalid timestamp came in from url; default to the latest.
     }
 
     public ImmutableList<ServiceEntity> listServices() {
@@ -113,7 +149,7 @@ public class BreakerboxStore {
     }
 
     public ImmutableList<DependencyEntity> listDependencyConfigurations(DependencyId dependencyId) {
-        final TimerContext timerContext = LATEST_DEPENDENCY_CONFIG.time();
+        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
         try {
             return tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)

@@ -5,6 +5,7 @@ import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.ServiceId;
@@ -34,7 +35,7 @@ public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
         breakerboxStore = new BreakerboxStore(tableClient);
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
-        timestamp = 1337000000l;
+        timestamp = 1345938944000l;
         dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), 6789);
         user = "USER";
     }
