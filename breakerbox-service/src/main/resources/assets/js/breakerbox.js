@@ -21,9 +21,11 @@ var Breakerbox = {
 
         this.serviceId = opts.serviceId;
         this.selectDependencyObj = opts.selectDependencyObj;
+        this.dependencyConfigVersion = opts.dependencyConfigVersion
         this.formObj = opts.formObj;
 
         this.registerDependencyChange();
+        this.registerConfigVersionChange();
         this.registerSubmit();
     }
 };
@@ -33,6 +35,13 @@ Breakerbox.ConfigureForm.prototype.registerDependencyChange = function() {
     this.selectDependencyObj.change(function() {
         window.location.href = '/configure/' + serviceId + '/' + $(this).val();
     });
+}
+
+Breakerbox.ConfigureForm.prototype.registerConfigVersionChange = function() {
+//    var serviceId = this.serviceId;
+//    this.dependencyConfigVersion.change(function() {
+//        window.location.href = '/configure/' + serviceId + '/' + $(this).val();
+//    });
 }
 
 Breakerbox.ConfigureForm.prototype.registerSubmit = function() {

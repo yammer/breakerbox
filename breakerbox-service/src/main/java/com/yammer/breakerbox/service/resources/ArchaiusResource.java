@@ -14,32 +14,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/")
+@Path("/archaius/{service}")
 public class ArchaiusResource {
-    private final BreakerboxStore breakerboxStore;
+    private final ArchaiusResourceV1 delegatingArchaiusResource;
 
-    public ArchaiusResource(BreakerboxStore breakerboxStore) {
-        this.breakerboxStore = breakerboxStore;
+    public ArchaiusResource(ArchaiusResourceV1 delegatingArchaiusResource) {
+        this.delegatingArchaiusResource = delegatingArchaiusResource;
     }
 
-    @Path("/v1/archaius/{service}")
-    @GET @Timed @Produces(MediaType.TEXT_PLAIN)
-    public String getServiceConfigurations(@PathParam("service") String service) {
-        final ArchaiusFormatBuilder archaiusBuilder = ArchaiusFormatBuilder.builder();
-        for (ServiceEntity serviceEntity : breakerboxStore.listDependencies(ServiceId.from(service))) {
-            final Optional<TenacityConfiguration> tenacityConfiguration = serviceEntity.getTenacityConfiguration();
-            if (tenacityConfiguration.isPresent()) {
-                archaiusBuilder
-                        .with(serviceEntity.getDependencyId(), tenacityConfiguration.get());
-            }
-        }
-        return archaiusBuilder.build();
-    }
-
-    @Path("/archaius/{service}")
     @GET @Timed @Produces(MediaType.TEXT_PLAIN)
     @Deprecated
     public String getServiceConfigurationsDepreciated(@PathParam("service") String service) {
-        return getServiceConfigurations(service);
+        return delegatingArchaiusResource.getServiceConfigurations(service);
     }
 }

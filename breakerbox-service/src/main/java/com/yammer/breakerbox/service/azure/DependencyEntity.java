@@ -50,7 +50,7 @@ public class DependencyEntity extends TableType implements TableKey {
         return build(dependencyId, DependencyEntityData.createLookup(timestamp));
     }
 
-    public Optional<DependencyEntityData> getDependencyTableEntry() {
+    public Optional<DependencyEntityData> getDependencyData() {
         try {
             final TenacityConfiguration dependencyConfiguration = OBJECTMAPPER.readValue(tenacityConfigurationAsString, TenacityConfiguration.class);
             final ImmutableList<String> validationErrors = VALIDATOR.validate(dependencyConfiguration);

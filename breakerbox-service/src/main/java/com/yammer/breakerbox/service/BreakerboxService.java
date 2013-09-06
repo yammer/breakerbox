@@ -11,10 +11,7 @@ import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.config.LdapConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.SyncComparator;
-import com.yammer.breakerbox.service.resources.ArchaiusResource;
-import com.yammer.breakerbox.service.resources.ConfigureResource;
-import com.yammer.breakerbox.service.resources.DashboardResource;
-import com.yammer.breakerbox.service.resources.InSyncResource;
+import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKey;
@@ -91,7 +88,10 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
-        environment.addResource(new ArchaiusResource(breakerboxStore));
+        //TODO: clean this up when removing the archaius !V1 resource
+        final ArchaiusResourceV1 archaiusResource = new ArchaiusResourceV1(breakerboxStore);
+        environment.addResource(archaiusResource);
+        environment.addResource(new ArchaiusResource(archaiusResource));
         environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
         environment.addResource(new InSyncResource(syncComparator));

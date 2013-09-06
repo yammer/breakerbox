@@ -51,7 +51,7 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
         final TenacityConfiguration dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), 6789);//numbers totally arbitrary
         final DependencyEntity entry = DependencyEntity.build(dependencyId, DependencyEntityData.create(testTimeStamp, user, dependencyConfiguration));
 
-        final TenacityConfiguration recomposedConfiguration = entry.getDependencyTableEntry().get().getConfiguration();
+        final TenacityConfiguration recomposedConfiguration = entry.getDependencyData().get().getConfiguration();
         assertThat(recomposedConfiguration).isEqualsToByComparingFields(dependencyConfiguration);
 
     }

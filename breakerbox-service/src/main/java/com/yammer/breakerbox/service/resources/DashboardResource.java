@@ -17,7 +17,6 @@ public class DashboardResource {
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     public DashboardView render(@Auth BasicCredentials credentials,
             @DefaultValue("production") @QueryParam("cluster") String clusterName) {
-        System.out.println(credentials);
         return new DashboardView(clusterName);
     }
 }

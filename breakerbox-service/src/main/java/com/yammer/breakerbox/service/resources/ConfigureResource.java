@@ -1,11 +1,10 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.*;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.comparable.DescendingRowOrder;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
@@ -65,16 +64,17 @@ public class ConfigureResource {
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId) {
         final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
-//        breakerboxStore.listDependencyConfigurations(dependencyId);
+        final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listDependencyConfigurations(dependencyId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
-                Ordering
-                        .from(new SortKeyFirst(dependencyId))
+                Ordering.from(new SortKeyFirst(dependencyId))
                         .immutableSortedCopy(propertyKeys),
                 serviceEntity
                         .or(ServiceEntity.build(serviceId, dependencyId)).getTenacityConfiguration()
-                        .or(new TenacityConfiguration()));
+                        .or(new TenacityConfiguration()),
+                Ordering.from(new DescendingRowOrder<DependencyEntity>())
+                        .immutableSortedCopy(dependencyEntities));
     }
 
     private static class SortKeyFirst implements Comparator<String> {
@@ -158,11 +158,16 @@ public class ConfigureResource {
             LOG.warn("Unable to resolve username from credentials while submitting configuration");
         }
 
-//        return breakerboxStore.storeDependencyEntity(
-//                DependencyId.from(dependencyName),
-//                tenacityConfiguration,
-//                username);
-        return breakerboxStore.storeServiceEntity(ServiceEntity.build(
+        //double dispatch for now
+        return breakerboxStore.storeDependencyEntity(
+                DependencyId.from(dependencyName),
+                System.currentTimeMillis(),
+                tenacityConfiguration,
+                username)
+
+                &&
+
+                breakerboxStore.storeServiceEntity(ServiceEntity.build(
                 ServiceId.from(serviceName),
                 DependencyId.from(dependencyName),
                 tenacityConfiguration));

@@ -1,9 +1,9 @@
 breakerbox:
-  urls: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties,http://localhost:8080/v1/archaius/breakerbox
+  urls: file:///Users/pshaw/gitrepos/breakerbox/breakerbox-service/config.properties,http://localhost:8080/v1/archaius/mock
   initialDelay: 10s
   delay: 60s
 
-configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
+configProperties: file:///Users/pshaw/gitrepos/breakerbox/breakerbox-service/config.properties
 
 azure:
   accountName: breakerboxtest
