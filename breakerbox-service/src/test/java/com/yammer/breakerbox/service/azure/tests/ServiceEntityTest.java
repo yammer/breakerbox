@@ -44,21 +44,4 @@ public class ServiceEntityTest extends AbstractTestWithConfiguration {
         assertThat(retrieveEntity.get().getServiceId()).isEqualTo(testServiceId);
         assertThat(retrieveEntity.get().getDependencyId()).isEqualTo(testDependencyId);
     }
-
-    @Test
-    public void canReplace() {
-        final ServiceEntity entity = ServiceEntity.build(testServiceId, testDependencyId);
-
-        assertTrue(tableClient.insertOrReplace(entity));
-
-        final TenacityConfiguration alteredConfiguration = new TenacityConfiguration(
-                new ThreadPoolConfiguration(),
-                new CircuitBreakerConfiguration(1234, 5678, 910, 20000, 10),
-                3000);
-
-        assertTrue(tableClient.insertOrReplace(entity.using(alteredConfiguration)));
-        final Optional<ServiceEntity> retrievedEntity = tableClient.retrieve(entity);
-        assertTrue(retrievedEntity.isPresent());
-        assertThat(retrievedEntity.get().getTenacityConfiguration()).isEqualTo(Optional.of(alteredConfiguration));
-    }
 }

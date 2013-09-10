@@ -15,6 +15,11 @@ import java.net.URI;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * TenacityPropertyKeysStore is a component used to track known keys for presentation in the Breakerbox
+ * configuration front-end. Adding keys to any externally hosted data structures happens outside the
+ * context of this class.
+ */
 public class TenacityPropertyKeysStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityPropertyKeysStore.class);
     private final Cache<URI, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder

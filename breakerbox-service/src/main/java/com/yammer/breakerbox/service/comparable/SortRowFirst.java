@@ -1,16 +1,14 @@
 package com.yammer.breakerbox.service.comparable;
 
-import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;
 
-
-public class DescendingRowOrder<T extends TableType> implements Comparator<T> {
+public class SortRowFirst implements Comparator<DependencyEntity> {
 
     @Override
-    public int compare(@Nullable T left, @Nullable T right) {
-        //force nulls to the end
+    public int compare(@Nullable DependencyEntity left, @Nullable DependencyEntity right) {
         if (left == null || left.getRowKey() == null || "null".equals(left.getRowKey())) return 1;
         if (right == null || right.getRowKey() == null || "null".equals(right.getRowKey())) return -1;
 

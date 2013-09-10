@@ -73,7 +73,7 @@ public class SyncComparator {
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
         final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
         if (serviceEntity.isPresent()) {
-            final Optional<TenacityConfiguration> tenacityConfiguration = serviceEntity.get().getTenacityConfiguration();
+            final Optional<TenacityConfiguration> tenacityConfiguration = breakerboxStore.retrieve(dependencyId, Optional.<String>absent()).get().getConfiguration();
             if (tenacityConfiguration.isPresent()) {
                 return FluentIterable
                         .from(configurations)

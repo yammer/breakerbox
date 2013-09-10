@@ -36,10 +36,14 @@ public class DependencyEntity extends TableType implements TableKey {
         this.user = user;
     }
 
-    public static DependencyEntity build(DependencyId dependencyId, DependencyEntityData record){
+    public static DependencyEntity buildDefault(DependencyId dependencyId, long timeStamp, String user) {
+        return build(dependencyId, timeStamp, user, new TenacityConfiguration());
+    }
+
+    public static DependencyEntity build(DependencyId dependencyId, long timeStamp, String user, TenacityConfiguration configuration) {
         try {
-            final String configurationAsString = OBJECTMAPPER.writeValueAsString(record.getConfiguration());
-            return new DependencyEntity(dependencyId, record.getTimestamp(), record.getUser(), configurationAsString);
+            final String configurationAsString = OBJECTMAPPER.writeValueAsString(configuration);
+            return new DependencyEntity(dependencyId, timeStamp, user, configurationAsString);
         } catch (JsonProcessingException err) {
             LOGGER.warn("Could not convert TenacityConfiguration to json", err);
             throw new RuntimeException(err);
@@ -47,23 +51,31 @@ public class DependencyEntity extends TableType implements TableKey {
     }
 
     public static DependencyEntity build(DependencyId dependencyId, long timestamp) {
-        return build(dependencyId, DependencyEntityData.createLookup(timestamp));
+        return build(dependencyId, timestamp, "", new TenacityConfiguration());
     }
 
-    public Optional<DependencyEntityData> getDependencyData() {
+    public static TenacityConfiguration defaultConfiguration() {
+        return new TenacityConfiguration();
+    }
+
+    public Optional<TenacityConfiguration> getConfiguration() {
         try {
             final TenacityConfiguration dependencyConfiguration = OBJECTMAPPER.readValue(tenacityConfigurationAsString, TenacityConfiguration.class);
             final ImmutableList<String> validationErrors = VALIDATOR.validate(dependencyConfiguration);
             if (!validationErrors.isEmpty()) {
                 LOGGER.warn("Failed to validate TenacityConfiguration", validationErrors.toString());
             }
-            return Optional.of(DependencyEntityData.create(Long.valueOf(rowKey), user, dependencyConfiguration));
+            return Optional.of(dependencyConfiguration);
         } catch (Exception err) {
             LOGGER.warn("Failed to parse TenacityConfiguration", err);
         }
         return Optional.absent();
+
     }
 
+    public long getConfigurationTimestamp() {
+        return Long.parseLong(rowKey);
+    }
 
     @Override
     public Class<? extends TableServiceEntity> getEntityClass() {
@@ -116,7 +128,10 @@ public class DependencyEntity extends TableType implements TableKey {
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
     }
 
-    @Deprecated
+    /**
+     * Getter for user field. <br/>
+     * NOTE: This method is exposed, but is also used for bean serialization. Don't remove this.
+     */
     public String getUser() {
         return user;
     }

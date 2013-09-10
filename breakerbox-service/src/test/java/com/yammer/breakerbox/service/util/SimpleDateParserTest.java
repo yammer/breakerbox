@@ -11,9 +11,9 @@ public class SimpleDateParserTest {
 
     @Test
     public void testToMillis() throws Exception {
-        assertThat(SimpleDateParser.dateToMillis(testDateFormatted)).isEqualTo(String.valueOf(testDateEpoch));
-        assertThat(SimpleDateParser.dateToMillis("2012-02-03 10:12:14 some more text on the end")).isEqualTo(String.valueOf(1328292734000l));
-        assertThat(SimpleDateParser.dateToMillis("2012-02-03 10:13:14 plus a minute")).isEqualTo(String.valueOf(1328292794000l));
+        assertThat(SimpleDateParser.dateToMillis(testDateFormatted)).isEqualTo(testDateEpoch);
+        assertThat(SimpleDateParser.dateToMillis("2012-02-03 10:12:14 some more text on the end")).isEqualTo(1328292734000l);
+        assertThat(SimpleDateParser.dateToMillis("2012-02-03 10:13:14 plus a minute")).isEqualTo(1328292794000l);
     }
 
     @Test

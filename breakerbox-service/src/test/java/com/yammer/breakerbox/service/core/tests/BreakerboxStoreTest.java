@@ -3,9 +3,7 @@ package com.yammer.breakerbox.service.core.tests;
 import com.google.common.base.Optional;
 import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.azure.DependencyEntityData;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
-import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.ServiceId;
@@ -54,14 +52,14 @@ public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
 
     @Test
     public void testListServices() {
-        assertTrue(breakerboxStore.storeServiceEntity(testServiceId, testDependencyId));
+        assertTrue(breakerboxStore.store(testServiceId, testDependencyId));
         assertThat(breakerboxStore.listServices())
                 .contains(ServiceEntity.build(testServiceId, testDependencyId));
     }
 
     @Test
     public void testListDependencies() {
-        assertTrue(breakerboxStore.storeServiceEntity(testServiceId, testDependencyId));
+        assertTrue(breakerboxStore.store(testServiceId, testDependencyId));
         assertThat(breakerboxStore.listDependencies(testServiceId))
                 .contains(ServiceEntity.build(testServiceId, testDependencyId));
         assertThat(breakerboxStore.listDependencies(ServiceId.from(UUID.randomUUID().toString())))
@@ -70,10 +68,10 @@ public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
 
     @Test
     public void testGetDependencyConfigurations(){
-        assertTrue(breakerboxStore.storeDependencyEntity(testDependencyId, timestamp, dependencyConfiguration, user));
-        assertThat(breakerboxStore.listDependencyConfigurations(testDependencyId))
-                .contains(DependencyEntity.build(testDependencyId, DependencyEntityData.create(timestamp, user, dependencyConfiguration)));
-        assertThat(breakerboxStore.listDependencyConfigurations(DependencyId.from(UUID.randomUUID().toString())))
+        assertTrue(breakerboxStore.store(testDependencyId, timestamp, dependencyConfiguration, user));
+        assertThat(breakerboxStore.listConfigurations(testDependencyId))
+                .contains(DependencyEntity.build(testDependencyId, timestamp, user, dependencyConfiguration));
+        assertThat(breakerboxStore.listConfigurations(DependencyId.from(UUID.randomUUID().toString())))
                 .isEmpty();
     }
 

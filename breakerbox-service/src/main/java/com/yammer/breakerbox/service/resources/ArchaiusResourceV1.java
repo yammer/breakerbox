@@ -1,12 +1,13 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.service.archaius.ArchaiusFormatBuilder;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.metrics.annotation.Timed;
-import com.yammer.tenacity.core.config.TenacityConfiguration;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,11 +28,11 @@ public class ArchaiusResourceV1 {
     @Produces(MediaType.TEXT_PLAIN)
     public String getServiceConfigurations(@PathParam("service") String service) {
         final ArchaiusFormatBuilder archaiusBuilder = ArchaiusFormatBuilder.builder();
-        for (ServiceEntity serviceEntity : breakerboxStore.listDependencies(ServiceId.from(service))) {
-            final Optional<TenacityConfiguration> tenacityConfiguration = serviceEntity.getTenacityConfiguration();
-            if (tenacityConfiguration.isPresent()) {
-                archaiusBuilder
-                        .with(serviceEntity.getDependencyId(), tenacityConfiguration.get());
+        final ImmutableList<ServiceEntity> propertyKeys = breakerboxStore.listDependencies(ServiceId.from(service));
+        for (ServiceEntity propertyKey : propertyKeys) {
+            final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieve(propertyKey.getDependencyId(), Optional.<String>absent());
+            if (dependencyEntity.isPresent()) {
+                archaiusBuilder.with(propertyKey.getDependencyId(), dependencyEntity.get().getConfiguration().or(DependencyEntity.defaultConfiguration()));
             }
         }
         return archaiusBuilder.build();
