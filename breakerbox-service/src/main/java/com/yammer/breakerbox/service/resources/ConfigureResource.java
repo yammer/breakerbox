@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.comparable.SortKeyFirst;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
@@ -127,7 +126,6 @@ public class ConfigureResource {
                               @FormParam("queueSizeRejectionThreshold") Integer queueSizeRejectionThreshold,
                               @FormParam("threadpoolStatisticalWindow") Integer threadpoolStatisticalWindow,
                               @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets) {
-        final String username = creds.getUsername();
         final TenacityConfiguration tenacityConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(
                         threadPoolCoreSize,
@@ -143,7 +141,7 @@ public class ConfigureResource {
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
                 executionTimeout);
-        if (commitSuccessful(serviceName, dependencyName, tenacityConfiguration, username)) {
+        if (breakerboxStore.store(ServiceId.from(serviceName), DependencyId.from(dependencyName), tenacityConfiguration, creds.getUsername())) {
             return Response
                     .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
                     .build();
@@ -152,21 +150,4 @@ public class ConfigureResource {
         }
     }
 
-    private boolean commitSuccessful(String serviceName, String dependencyName, TenacityConfiguration tenacityConfiguration, String username) {
-        if (username == null || "".equals(username)) {
-            username = "unknown_user";
-            LOG.warn("Unable to resolve username from credentials while submitting configuration");
-        }
-
-        return breakerboxStore.store(
-                DependencyId.from(dependencyName),
-                System.currentTimeMillis(),
-                tenacityConfiguration,
-                username)
-                &&
-                breakerboxStore.store(
-                        ServiceEntity.build(
-                                ServiceId.from(serviceName),
-                                DependencyId.from(dependencyName)));
-    }
 }

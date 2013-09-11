@@ -41,17 +41,20 @@ public class BreakerboxStore {
         this.tableClient = tableClient;
     }
 
-    public boolean store(ServiceId serviceId, DependencyId dependencyId) {
-        return store(ServiceEntity.build(serviceId, dependencyId));
-    }
-
-    public boolean store(ServiceEntity serviceEntity) {
-        listDependenciesCache.invalidate(serviceEntity.getServiceId());
-        return tableClient.insertOrReplace(serviceEntity);
+    public boolean store(ServiceId serviceId, DependencyId dependencyId, TenacityConfiguration tenacityConfiguration, String username) {
+        return store(serviceId, dependencyId)
+                &&
+                store(dependencyId, System.currentTimeMillis(), tenacityConfiguration, username);
     }
 
     public boolean store(DependencyId dependencyId, long timestamp, TenacityConfiguration tenacityConfiguration, String username) {
         return tableClient.insertOrReplace(DependencyEntity.build(dependencyId, timestamp, username, tenacityConfiguration));
+    }
+
+    public boolean store(ServiceId serviceId, DependencyId dependencyId) {
+        ServiceEntity serviceEntity = ServiceEntity.build(serviceId, dependencyId);
+        listDependenciesCache.invalidate(serviceEntity.getServiceId());
+        return tableClient  .insertOrReplace(serviceEntity);
     }
 
     public boolean remove(TableType tableType) {
