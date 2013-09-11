@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
@@ -71,13 +71,14 @@ public class SyncComparator {
 
     public ImmutableList<SyncState> inSync(ServiceId serviceId, DependencyId dependencyId) {
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
-        final Optional<ServiceEntity> serviceEntity = breakerboxStore.retrieve(serviceId, dependencyId);
-        if (serviceEntity.isPresent()) {
-            final Optional<TenacityConfiguration> tenacityConfiguration = breakerboxStore.retrieve(dependencyId, Optional.<String>absent()).get().getConfiguration();
-            if (tenacityConfiguration.isPresent()) {
+        final Optional<DependencyEntity> entityOptional = breakerboxStore.retrieve(dependencyId, Optional.<String>absent());
+        if (entityOptional.isPresent()) {
+
+            final DependencyEntity entity = entityOptional.get();
+            if (entity.getConfiguration().isPresent()) {
                 return FluentIterable
                         .from(configurations)
-                        .transform(funComputeSyncState(tenacityConfiguration.get()))
+                        .transform(funComputeSyncState(entity.getConfiguration().get()))
                         .toList();
             } else {
                 throw new IllegalStateException("Unable to determine in sync state because of corrupted stored TenacityConfiguration");

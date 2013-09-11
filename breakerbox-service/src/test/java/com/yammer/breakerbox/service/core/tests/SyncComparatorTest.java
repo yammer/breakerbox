@@ -13,6 +13,7 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 
 import java.net.URI;
 import java.util.UUID;
@@ -110,7 +111,7 @@ public class SyncComparatorTest {
      public void noBreakerboxConfiguration() {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
-        when(mockTenacityStory.retrieve(serviceId, dependencyId)).thenReturn(Optional.<ServiceEntity>absent());
+        when(mockTenacityStory.retrieve(eq(dependencyId), eq(Optional.<String>absent()))).thenReturn(Optional.<DependencyEntity>absent());
         when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
 
@@ -122,7 +123,7 @@ public class SyncComparatorTest {
     public void noConfigurations() {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
-        when(mockTenacityStory.retrieve(serviceId, dependencyId)).thenReturn(Optional.<ServiceEntity>absent());
+        when(mockTenacityStory.retrieve(eq(dependencyId), eq(Optional.<String>absent()))).thenReturn(Optional.<DependencyEntity>absent());
         when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
 
@@ -219,5 +220,20 @@ public class SyncComparatorTest {
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
                 .isEqualTo(unknown());
+    }
+
+    @Test
+    public void testKeyRunningOnDefaultConfig() throws Exception {
+        final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
+
+        when(mockTenacityStory.retrieve(dependencyId, Optional.<String>absent()))
+                .thenReturn(Optional.<DependencyEntity>absent());
+        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
+
+        assertThat(syncComparator.inSync(serviceId,dependencyId))
+                .isEqualTo(unsynchronized());
+
+
     }
 }
