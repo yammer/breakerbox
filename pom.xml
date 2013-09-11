@@ -40,6 +40,10 @@
             <name>Chris Gray</name>
             <email>cgray@yammer-inc.com</email>
         </developer>
+        <developer>
+            <name>Peter Shaw</name>
+            <email>pshaw@yammer-inc.com</email>
+        </developer>
     </developers>
 
     <distributionManagement>
