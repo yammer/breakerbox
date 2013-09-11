@@ -18,6 +18,6 @@ public class SimpleDateParserTest {
 
     @Test
     public void testToDate() throws Exception {
-        assertThat(SimpleDateParser.millisToDate(testDateEpoch)).isEqualTo(testDateFormatted);
+        assertThat(SimpleDateParser.millisToDate(String.valueOf(testDateEpoch))).isEqualTo(testDateFormatted);
     }
 }

@@ -20,10 +20,6 @@ public class SimpleDateParser {
         }
     }
 
-    public static String millisToDate(long timeMillis) {
-        return millisToDate(String.valueOf(timeMillis));
-    }
-
     public static String millisToDate(String timeMillis) {
         return new SimpleDateFormat(DATE_FORMAT).format(new Date(Long.parseLong(timeMillis)));
     }
