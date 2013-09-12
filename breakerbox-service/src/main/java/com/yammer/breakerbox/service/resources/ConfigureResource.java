@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.comparable.SortKeyFirst;
+import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.DependencyId;
 import com.yammer.breakerbox.service.core.Instances;
@@ -50,7 +50,7 @@ public class ConfigureResource {
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
                 .first();
         if (firstDependencyKey.isPresent()) {
-            return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<String>absent(), creds);
+            return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<Long>absent(), creds.getUsername());
         } else {
             return new NoPropertyKeysView(serviceId);
         }
@@ -62,24 +62,30 @@ public class ConfigureResource {
                                 @PathParam("service") String serviceName,
                                 @PathParam("dependency") String dependencyName,
                                 @QueryParam("version") String version) {
-        final Optional<String> versionOpt = Optional.fromNullable(version);
-        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), versionOpt, creds);
+        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), getVersion(version), creds.getUsername());
     }
 
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId,
-                                 Optional<String> version,
-                                 BasicCredentials creds) {
-        final Optional<DependencyEntity> dependencyEntityForConfigForm = breakerboxStore.retrieve(dependencyId, version);
+                                 Optional<Long> version,
+                                 String username) {
         final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listConfigurations(dependencyId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
                 Ordering.from(new SortKeyFirst(dependencyId))
                         .immutableSortedCopy(propertyKeys),
-                dependencyEntityForConfigForm.or(DependencyEntity.buildDefault(dependencyId, System.currentTimeMillis(), creds.getUsername()))
-                        .getConfiguration().get(),
+                getConfiguration(dependencyId, version, username),
                 getDependencyVersionNameList(dependencyEntities));
+    }
+
+    private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, String username) {
+        final Optional<DependencyEntity> dependencyEntity = version.isPresent()
+                ? breakerboxStore.retrieve(dependencyId, version.get())
+                : breakerboxStore.retrieveLatest(dependencyId);
+
+        return dependencyEntity.or(DependencyEntity.build(dependencyId, username))
+                .getConfiguration().get();
     }
 
     private ImmutableList<String> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities) {
@@ -98,11 +104,22 @@ public class ConfigureResource {
         return builder.build();
     }
 
+    private Optional<Long> getVersion(String version) {
+        if (version != null) {
+            try {
+                return Optional.of(SimpleDateParser.dateToMillis(version));
+            } catch (Exception e) {
+                LOG.warn("failed to parse version {}. {}", version, e);
+            }
+        }
+        return Optional.absent();
+    }
+
     @GET @Timed @Produces(MediaType.APPLICATION_JSON)
     @Path("/{dependency}")
     public TenacityConfiguration get(@PathParam("service") String serviceName,
                                      @PathParam("dependency") String dependencyName) {
-        final Optional<DependencyEntity> entity = breakerboxStore.retrieve(DependencyId.from(dependencyName), Optional.<String>absent());
+        final Optional<DependencyEntity> entity = breakerboxStore.retrieveLatest(DependencyId.from(dependencyName));
         if (entity.isPresent()) {
             return entity.get().getConfiguration().or(DependencyEntity.defaultConfiguration());
         }

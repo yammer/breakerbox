@@ -2,6 +2,7 @@ package com.yammer.breakerbox.service.azure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
@@ -28,34 +29,35 @@ public class DependencyEntity extends TableType implements TableKey {
     private String tenacityConfigurationAsString;
     private String user;
 
-    private DependencyEntity(DependencyId dependencyId, long timeStamp, String user, String configuration) {
+    private DependencyEntity(DependencyId dependencyId, long timeStamp, String userName, String configuration) {
         super(TableId.DEPENDENCY);
         this.partitionKey = dependencyId.getId();
         this.rowKey = String.valueOf(timeStamp);
         this.tenacityConfigurationAsString = configuration;
-        this.user = user;
+        this.user = userName;
     }
 
-    public static DependencyEntity buildDefault(DependencyId dependencyId, long timeStamp, String user) {
-        return build(dependencyId, timeStamp, user, new TenacityConfiguration());
+    @VisibleForTesting
+    static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName) {
+        return build(dependencyId, timeStamp, userName, new TenacityConfiguration());
     }
 
-    public static DependencyEntity build(DependencyId dependencyId, long timeStamp, String user, TenacityConfiguration configuration) {
-        try {
-            final String configurationAsString = OBJECTMAPPER.writeValueAsString(configuration);
-            return new DependencyEntity(dependencyId, timeStamp, user, configurationAsString);
-        } catch (JsonProcessingException err) {
-            LOGGER.warn("Could not convert TenacityConfiguration to json", err);
-            throw new RuntimeException(err);
-        }
+    public static DependencyEntity build(DependencyId dependencyId, String username) {
+        return build(dependencyId, System.currentTimeMillis(), username);
     }
 
     public static DependencyEntity build(DependencyId dependencyId, long timestamp) {
         return build(dependencyId, timestamp, "", new TenacityConfiguration());
     }
 
-    public static TenacityConfiguration defaultConfiguration() {
-        return new TenacityConfiguration();
+    public static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName, TenacityConfiguration configuration) {
+        try {
+            final String configurationAsString = OBJECTMAPPER.writeValueAsString(configuration);
+            return new DependencyEntity(dependencyId, timeStamp, userName, configurationAsString);
+        } catch (JsonProcessingException err) {
+            LOGGER.warn("Could not convert TenacityConfiguration to json", err);
+            throw new RuntimeException(err);
+        }
     }
 
     public Optional<TenacityConfiguration> getConfiguration() {
@@ -75,6 +77,10 @@ public class DependencyEntity extends TableType implements TableKey {
 
     public long getConfigurationTimestamp() {
         return Long.parseLong(rowKey);
+    }
+
+    public static TenacityConfiguration defaultConfiguration() {
+        return new TenacityConfiguration();
     }
 
     @Override

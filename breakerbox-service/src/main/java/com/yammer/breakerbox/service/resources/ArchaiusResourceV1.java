@@ -30,7 +30,7 @@ public class ArchaiusResourceV1 {
         final ArchaiusFormatBuilder archaiusBuilder = ArchaiusFormatBuilder.builder();
         final ImmutableList<ServiceEntity> propertyKeys = breakerboxStore.listDependencies(ServiceId.from(service));
         for (ServiceEntity propertyKey : propertyKeys) {
-            final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieve(propertyKey.getDependencyId(), Optional.<String>absent());
+            final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieveLatest(propertyKey.getDependencyId());
             if (dependencyEntity.isPresent()) {
                 archaiusBuilder.with(propertyKey.getDependencyId(), dependencyEntity.get().getConfiguration().or(DependencyEntity.defaultConfiguration()));
             }

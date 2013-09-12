@@ -32,16 +32,16 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
 
     @After
     public void tearDown() {
-        TableClientTestUtils.tearDownTestTable(tableClient, DependencyEntity.buildDefault(dependencyId, testTimeStamp, user));
+        TableClientTestUtils.tearDownTestTable(tableClient, DependencyEntity.build(dependencyId, testTimeStamp, user));
     }
 
     @Test
     public void testCanInsert() throws Exception {
-        final DependencyEntity entity = DependencyEntity.buildDefault(dependencyId, testTimeStamp, user);
+        final DependencyEntity entity = DependencyEntity.build(dependencyId, testTimeStamp, user);
         final boolean success = tableClient.insert(entity);
         assertTrue(success);
 
-        final Optional<TableServiceEntity> retrieve = tableClient.retrieve(DependencyEntity.buildDefault(dependencyId, testTimeStamp, user));
+        final Optional<TableServiceEntity> retrieve = tableClient.retrieve(DependencyEntity.build(dependencyId, testTimeStamp, user));
         assertTrue(retrieve.isPresent());
         assertThat(retrieve.get()).isEqualTo(entity);
     }

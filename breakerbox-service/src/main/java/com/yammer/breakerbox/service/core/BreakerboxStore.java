@@ -12,7 +12,6 @@ import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
-import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -65,19 +64,15 @@ public class BreakerboxStore {
         return tableClient.retrieve(ServiceEntity.build(serviceId, dependencyId));
     }
 
-    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp) {
-        return tableClient.retrieve(DependencyEntity.build(dependencyId, timestamp));
-    }
-
     //TODO short ttl cache around this
-    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, Optional<String> timestamp) {
+    public Optional<DependencyEntity> retrieveLatest(DependencyId dependencyId) {
         final ImmutableList<DependencyEntity> dependencyEntities = listConfigurations(dependencyId);
         if (dependencyEntities.size() == 0) return Optional.absent();
-        if (timestamp.isPresent()) {
-            return fetchByTimestamp(SimpleDateParser.dateToMillis(timestamp.get()), dependencyEntities);
-        } else {
-            return Optional.of(fetchLatest(dependencyEntities));
-        }
+        return Optional.of(fetchLatest(dependencyEntities));
+    }
+
+    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp) {
+        return fetchByTimestamp(dependencyId, timestamp);
     }
 
     private DependencyEntity fetchLatest(ImmutableList<DependencyEntity> dependencyEntities) {
@@ -93,7 +88,8 @@ public class BreakerboxStore {
         return latestEntity;
     }
 
-    private Optional<DependencyEntity> fetchByTimestamp(long timestamp, ImmutableList<DependencyEntity> dependencyEntities) {
+    private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp) {
+        final ImmutableList<DependencyEntity> dependencyEntities = listConfigurations(dependencyId);
         for (DependencyEntity dependencyEntity : dependencyEntities) {
             final DateTime remoteTime = new DateTime(dependencyEntity.getConfigurationTimestamp()).withMillisOfSecond(0);
             final DateTime requestedTime = new DateTime(timestamp).withMillisOfSecond(0);
@@ -101,7 +97,6 @@ public class BreakerboxStore {
                 return Optional.of(dependencyEntity);
             }
         }
-        LOGGER.info("Attempted to fetch dependency {} timestamp {} but wasn't found. Returning default value.", dependencyEntities.get(0).getPartitionKey(), timestamp);
         return Optional.absent();
     }
 
