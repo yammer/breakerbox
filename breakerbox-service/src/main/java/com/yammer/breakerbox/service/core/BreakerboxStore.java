@@ -16,7 +16,6 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,13 +88,9 @@ public class BreakerboxStore {
     }
 
     private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp) {
-        final ImmutableList<DependencyEntity> dependencyEntities = listConfigurations(dependencyId);
-        for (DependencyEntity dependencyEntity : dependencyEntities) {
-            final DateTime remoteTime = new DateTime(dependencyEntity.getConfigurationTimestamp()).withMillisOfSecond(0);
-            final DateTime requestedTime = new DateTime(timestamp).withMillisOfSecond(0);
-            if (remoteTime.equals(requestedTime)) {
-                return Optional.of(dependencyEntity);
-            }
+        final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp);
+        if (dependencyEntities.size() >= 1) {
+            return Optional.of(dependencyEntities.get(0));
         }
         return Optional.absent();
     }
@@ -123,14 +118,18 @@ public class BreakerboxStore {
         try {
             return tableClient.search(TableQuery
                     .from(TableId.SERVICE.toString(), ServiceEntity.class)
-                    .where(TableQuery
-                            .generateFilterCondition(
-                                    TableConstants.PARTITION_KEY,
-                                    TableQuery.QueryComparisons.EQUAL,
-                                    serviceId.getId())));
+                    .where(partitionKeyEquals(serviceId)));
         } finally {
             timerContext.stop();
         }
+    }
+
+    private String partitionKeyEquals(ServiceId serviceId) {
+        return TableQuery
+                .generateFilterCondition(
+                        TableConstants.PARTITION_KEY,
+                        TableQuery.QueryComparisons.EQUAL,
+                        serviceId.getId());
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities() {
@@ -148,12 +147,38 @@ public class BreakerboxStore {
         try {
             return tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
-                    .where(TableQuery.generateFilterCondition(
-                            TableConstants.PARTITION_KEY,
-                            TableQuery.QueryComparisons.EQUAL,
-                            dependencyId.getId())));
+                    .where(partitionEquals(dependencyId)));
         } finally {
             timerContext.stop();
         }
+    }
+
+    private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
+        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
+        try {
+            return tableClient.search(TableQuery
+                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+                    .where(TableQuery.combineFilters(
+                            partitionEquals(dependencyId),
+                            TableQuery.Operators.AND,
+                            timestampEquals(targetTimeStamp))));
+        } finally {
+            timerContext.stop();
+        }
+    }
+
+    private String timestampEquals(long timestamp) {
+        return TableQuery.generateFilterCondition(
+                TableConstants.ROW_KEY,
+                TableQuery.QueryComparisons.EQUAL,
+                String.valueOf(timestamp)
+        );
+    }
+
+    private String partitionEquals(DependencyId dependencyId) {
+        return TableQuery.generateFilterCondition(
+                TableConstants.PARTITION_KEY,
+                TableQuery.QueryComparisons.EQUAL,
+                dependencyId.getId());
     }
 }

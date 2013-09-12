@@ -16,6 +16,7 @@ import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
+    import com.yammer.breakerbox.service.views.OptionFormPair;
 import com.yammer.dropwizard.auth.Auth;
 import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.views.View;
@@ -23,6 +24,7 @@ import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,18 +90,18 @@ public class ConfigureResource {
                 .getConfiguration().get();
     }
 
-    private ImmutableList<String> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities) {
+    private ImmutableList<Pair<String, String>> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities) {
         final ImmutableList<DependencyEntity> sortedEntities =
                 Ordering.from(new SortRowFirst())
                         .immutableSortedCopy(dependencyEntities);
 
-        final ImmutableList.Builder<String> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Pair<String, String>> builder = ImmutableList.builder();
         if (sortedEntities.size() > 0) {
             for (DependencyEntity entity : sortedEntities) {
-                builder.add(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + entity.getUser());
+                builder.add(new OptionFormPair(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + entity.getUser(), entity.getConfigurationTimestamp()));
             }
         } else {
-            builder.add("Default");
+            builder.add(new OptionFormPair("Default", 0l));
         }
         return builder.build();
     }
@@ -107,7 +109,7 @@ public class ConfigureResource {
     private Optional<Long> getVersion(String version) {
         if (version != null) {
             try {
-                return Optional.of(SimpleDateParser.dateToMillis(version));
+                return Optional.of(Long.parseLong(version));
             } catch (Exception e) {
                 LOG.warn("failed to parse version {}. {}", version, e);
             }
