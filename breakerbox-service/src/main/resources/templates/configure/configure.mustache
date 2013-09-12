@@ -1,11 +1,17 @@
 {{</templates/default}}
 {{$content}}
-<div class="row col-lg-7">
+<div class="container">
+    <div class="col-lg-5 col-lg-offset-3 well">
+        <p class="lead">Synchronized State</p>
+        <i class="icon-spinner icon-spin icon-large lead sync-spinner"></i>
+        <span class="lead sync-spinner">Checking if all services are synchronized...</span>
+        <dl class="dl-horizontal" id="sync-state"></dl>
+    </div>
     <form id="configure-form" method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
         <legend>Select which dependency to configure for {{serviceId}}</legend>
         <div class="form-group">
-            <label for="selectDependency" class="col-lg-4 control-label">Tenacity Dependency</label>
-            <div class="input-group col-lg-6">
+            <label for="selectDependency" class="col-lg-3 control-label">Tenacity Dependency</label>
+            <div class="input-group col-lg-4">
                 <select id="selectDependency" class="form-control" name="dependency">
                     {{#serviceDependencies}}
                         <option value="{{toString}}">{{toString}}</option>
@@ -14,131 +20,150 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="selectConfiguration" class="col-lg-4 control-label">Configuration Version</label>
-            <div class="input-group col-lg-6">
+            <label for="selectConfiguration" class="col-lg-3 control-label">Configuration Version</label>
+            <div class="input-group col-lg-4">
                 <select id="selectConfiguration" class="form-control" name="configurationVersion">
                     {{#configurationVersions}}
                         <option value="{{value}}">{{text}}</option>
                     {{/configurationVersions}}
                 </select>
             </div>
+            <span class="help-block">Default means there are no saved configurations yet.</span>
         </div>
         <legend>Absolute Timeout</legend>
         <div class="form-group">
-            <label for="inputExecutionTimeout" class="col-lg-4 control-label">Execution Timeout</label>
-            <div class="input-group col-lg-4">
+            <label for="inputExecutionTimeout" class="col-lg-3 control-label">Execution Timeout</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputExecutionTimeout" name="executionTimeout" value=
                     {{#tenacityConfiguration}}
                         {{executionIsolationThreadTimeoutInMillis}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">ms</span>
             </div>
+            <span class="help-block">Default: 1000ms. Absolute timeout for the entire operation.
+                <strong>On-call hint: When experiencing timeouts, tuning this higher can help.</strong>
+            </span>
         </div>
         <legend>Circuit Breaker</legend>
         <div class="form-group">
-            <label for="inputRequestVolumeThreshold" class="col-lg-4 control-label">Request Volume Threshold</label>
-            <div class="col-lg-4">
+            <label for="inputRequestVolumeThreshold" class="col-lg-3 control-label">Request Volume Threshold</label>
+            <div class="col-lg-3">
                 <input type="number" class="form-control" id="inputRequestVolumeThreshold" name="requestVolumeThreshold" value=
                     {{#tenacityConfiguration}}
                         {{#circuitBreaker}}{{requestVolumeThreshold}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default: 20. No. of failures within a stat window in order to open a circuit.
+                <strong>Tuning this higher will help short-circuits, but tuning exec-timeout/core-size higher is often a better solution.</strong>
+            </span>
         </div>
         <div class="form-group">
-            <label for="inputErrorThresholdPercentage" class="col-lg-4 control-label">Error Threshold</label>
-            <div class="input-group col-lg-4">
+            <label for="inputErrorThresholdPercentage" class="col-lg-3 control-label">Error Threshold</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputErrorThresholdPercentage" name="errorThresholdPercentage" value=
                     {{#tenacityConfiguration}}
                         {{#circuitBreaker}}{{errorThresholdPercentage}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">%</span>
             </div>
+            <span class="help-block">Default: 50%. The percentage of requests needed to fail within the statistical window to open a circuit. This also requires that the request volume threshold is exceeded.</span>
         </div>
         <div class="form-group">
-            <label for="inputSleepWindow" class="col-lg-4 control-label">Sleep Window</label>
-            <div class="input-group col-lg-4">
+            <label for="inputSleepWindow" class="col-lg-3 control-label">Sleep Window</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputSleepWindow" name="sleepWindow" value=
                     {{#tenacityConfiguration}}
                         {{#circuitBreaker}}{{sleepWindowInMillis}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">ms</span>
             </div>
+            <span class="help-block">Default 5000ms. How long to wait when a circuit breaker is open before trying again.</span>
         </div>
         <div class="form-group">
-            <label for="inputCircuitBreakerRollingStatisticalWindow" class="col-lg-4 control-label">Statistical Window</label>
-            <div class="input-group col-lg-4">
+            <label for="inputCircuitBreakerRollingStatisticalWindow" class="col-lg-3 control-label">Statistical Window</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputCircuitBreakerRollingStatisticalWindow" name="circuitBreakerstatisticalWindow" value=
                     {{#tenacityConfiguration}}
                         {{#circuitBreaker}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">ms</span>
             </div>
+            <span class="help-block">Default 10000ms.</span>
         </div>
         <div class="form-group">
-            <label for="inputCircuitBreakerStatisticalWindowBuckets" class="col-lg-4 control-label">Statistical Window Buckets</label>
-            <div class="col-lg-4">
+            <label for="inputCircuitBreakerStatisticalWindowBuckets" class="col-lg-3 control-label">Statistical Window Buckets</label>
+            <div class="col-lg-3">
                 <input type="number" class="form-control" id="inputCircuitBreakerStatisticalWindowBuckets" name="circuitBreakerStatisticalWindowBuckets" value=
                     {{#tenacityConfiguration}}
                         {{#circuitBreaker}}{{metricsRollingStatisticalWindowBuckets}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default 10.</span>
         </div>
         <legend>Threadpool</legend>
         <div class="form-group">
-            <label for="inputThreadPoolCoreSize" class="col-lg-4 control-label">Core Size</label>
-            <div class="col-lg-4">
+            <label for="inputThreadPoolCoreSize" class="col-lg-3 control-label">Core Size</label>
+            <div class="col-lg-3">
                 <input type="number" class="form-control" id="inputThreadPoolCoreSize" name="threadPoolCoreSize" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{threadPoolCoreSize}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default 10.
+                <strong>On-call hint: When experiencing rejections, tuning this higher could help.</strong>
+            </span>
         </div>
         <div class="form-group">
-            <label for="inputKeepAliveMinutes" class="col-lg-4 control-label">Keep Alive Time</label>
-            <div class="input-group col-lg-4">
+            <label for="inputKeepAliveMinutes" class="col-lg-3 control-label">Keep Alive Time</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputKeepAliveMinutes" name="keepAliveMinutes" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{keepAliveTimeMinutes}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">mins</span>
             </div>
+            <span class="help-block">Default 1 minute. Unusued at the moment. Probably will be removed.</span>
         </div>
         <div class="form-group">
-            <label for="inputMaxQueueSize" class="col-lg-4 control-label">Max Queue Size</label>
-            <div class="input-group col-lg-4">
+            <label for="inputMaxQueueSize" class="col-lg-3 control-label">Max Queue Size</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputMaxQueueSize" name="maxQueueSize" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{maxQueueSize}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default: -1. -1 is for fail-fast (SynchronousQueue). Non-zero isn't recommended (LinkedBlockingQueue).</span>
         </div>
         <div class="form-group">
-            <label for="inputQueueSizeRejectionThreshold" class="col-lg-4 control-label">Queue Size Rejection Threshold</label>
-            <div class="input-group col-lg-4">
+            <label for="inputQueueSizeRejectionThreshold" class="col-lg-3 control-label">Queue Size Rejection Threshold</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputQueueSizeRejectionThreshold" name="queueSizeRejectionThreshold" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{queueSizeRejectionThreshold}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default 5. When Max Queue Size is non-zero, this allows for a limit on the unbounded queue (LinkedBlockingQueue).</span>
         </div>
         <div class="form-group">
-            <label for="inputThreadpoolRollingStatisticalWindow" class="col-lg-4 control-label">Statistical Window</label>
-            <div class="input-group col-lg-4">
+            <label for="inputThreadpoolRollingStatisticalWindow" class="col-lg-3 control-label">Statistical Window</label>
+            <div class="input-group col-lg-3">
                 <input type="number" class="form-control" id="inputThreadpoolRollingStatisticalWindow" name="threadpoolStatisticalWindow" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{metricsRollingStatisticalWindowInMilliseconds}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">ms</span>
             </div>
+            <span class="help-block">Default 10000ms.</span>
         </div>
         <div class="form-group">
-            <label for="inputThreadpoolStatisticalWindowBuckets" class="col-lg-4 control-label">Statistical Window Buckets</label>
-            <div class="col-lg-4">
+            <label for="inputThreadpoolStatisticalWindowBuckets" class="col-lg-3 control-label">Statistical Window Buckets</label>
+            <div class="col-lg-3">
                 <input type="number" class="form-control" id="inputThreadpoolStatisticalWindowBuckets" name="threadpoolStatisticalWindowBuckets" value=
                     {{#tenacityConfiguration}}
                         {{#threadpool}}{{metricsRollingStatisticalWindowBuckets}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
             </div>
+            <span class="help-block">Default 10.</span>
         </div>
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-4">
@@ -146,14 +171,6 @@
             </div>
         </div>
     </form>
-</div>
-<div class="row col-lg-5">
-    <div class="well">
-        <p class="lead">Synchronized State</p>
-        <i class="icon-spinner icon-spin icon-large lead sync-spinner"></i>
-        <span class="lead sync-spinner">Checking if all services are synchronized...</span>
-        <dl class="dl-horizontal" id="sync-state"></dl>
-    </div>
 </div>
 {{/content}}
 {{$moreScripts}}
