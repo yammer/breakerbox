@@ -1,19 +1,19 @@
 package com.yammer.breakerbox.service.views;
 
+import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class ConfigureView extends NavbarView {
     private final ServiceId serviceId;
     private final Iterable<String> serviceDependencies;
     private final TenacityConfiguration tenacityConfiguration;
-    private final Iterable<Pair<String,String>> configurationVersions;
+    private final Iterable<OptionItem> configurationVersions;
 
     public ConfigureView(ServiceId serviceId,
                          Iterable<String> serviceDependencies,
                          TenacityConfiguration tenacityConfiguration,
-                         Iterable<Pair<String, String>> dependencyEntities) {
+                         ImmutableList<OptionItem> dependencyEntities) {
         super("/templates/configure/configure.mustache");
         this.serviceId = serviceId;
         this.serviceDependencies = serviceDependencies;
@@ -33,7 +33,7 @@ public class ConfigureView extends NavbarView {
         return tenacityConfiguration;
     }
 
-    public Iterable<Pair<String, String>> getConfigurationVersions() {
+    public Iterable<OptionItem> getConfigurationVersions() {
         return configurationVersions;
     }
 
