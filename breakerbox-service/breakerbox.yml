@@ -1,9 +1,9 @@
 breakerbox:
-  urls: file:///Users/pshaw/gitrepos/breakerbox/breakerbox-service/config.properties,http://localhost:8080/v1/archaius/mock
+  urls: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties,http://localhost:8080/v1/archaius/breakerbox
   initialDelay: 10s
   delay: 60s
 
-configProperties: file:///Users/pshaw/gitrepos/breakerbox/breakerbox-service/config.properties
+configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
 
 azure:
   accountName: breakerboxtest
@@ -24,7 +24,7 @@ ldapConfiguration:
 http:
   port: 8080
   adminPort: 8081
-  maxIdleTime: 5s
+  maxIdleTime: 300s
   requestLog:
     console:
       enabled: true
