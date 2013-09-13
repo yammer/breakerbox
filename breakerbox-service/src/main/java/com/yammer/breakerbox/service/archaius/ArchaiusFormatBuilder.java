@@ -13,6 +13,11 @@ public class ArchaiusFormatBuilder {
         return new ArchaiusFormatBuilder();
     }
 
+    public ArchaiusFormatBuilder hystrixMetricsStreamServletMaxConnections(int value) {
+        appender("hystrix.stream.maxConcurrentConnections", value);
+        return this;
+    }
+
     public ArchaiusFormatBuilder with(TenacityPropertyKey key,
                                       TenacityConfiguration configuration) {
         executionIsolationThreadTimeoutInMilliseconds(key, configuration);

@@ -35,6 +35,7 @@ public class ArchaiusResource {
                 archaiusBuilder.with(propertyKey.getDependencyId(), dependencyEntity.get().getConfiguration().or(DependencyEntity.defaultConfiguration()));
             }
         }
+        archaiusBuilder.hystrixMetricsStreamServletMaxConnections(10);
         return archaiusBuilder.build();
     }
 }
