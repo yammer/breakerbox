@@ -88,10 +88,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
-        //TODO: clean this up when removing the archaius !V1 resource
-        final ArchaiusResourceV1 archaiusResource = new ArchaiusResourceV1(breakerboxStore);
-        environment.addResource(archaiusResource);
-        environment.addResource(new ArchaiusResource(archaiusResource));
+        environment.addResource(new ArchaiusResource(breakerboxStore));
         environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore));
         environment.addResource(new DashboardResource());
         environment.addResource(new InSyncResource(syncComparator));

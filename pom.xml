@@ -30,7 +30,7 @@
     <properties>
         <dropwizard.version>0.6.2</dropwizard.version>
         <windowsazure.version>0.4.4</windowsazure.version>
-        <tenacity.version>0.0.11</tenacity.version>
+        <tenacity.version>0.1.2</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-authenticator-ldap.version>0.0.10</dropwizard-authenticator-ldap.version>
     </properties>
@@ -69,8 +69,6 @@
             <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots</url>
         </repository>
     </repositories>
-
-
 
     <build>
         <plugins>
