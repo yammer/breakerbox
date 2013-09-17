@@ -51,7 +51,7 @@ public class ConfigureResource {
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
                 .first();
         if (firstDependencyKey.isPresent()) {
-            return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<Long>absent(), creds.getUsername());
+            return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<Long>absent());
         } else {
             return new NoPropertyKeysView(serviceId);
         }
@@ -63,30 +63,32 @@ public class ConfigureResource {
                                 @PathParam("service") String serviceName,
                                 @PathParam("dependency") String dependencyName,
                                 @QueryParam("version") String version) {
-        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), getVersion(version), creds.getUsername());
+        return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), getVersion(version));
     }
 
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId,
-                                 Optional<Long> version,
-                                 String username) {
-        final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listConfigurations(dependencyId);
+                                 Optional<Long> version) {
+        final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listConfigurations(dependencyId, serviceId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
                 Ordering.from(new SortKeyFirst(dependencyId))
                         .immutableSortedCopy(propertyKeys),
-                getConfiguration(dependencyId, version, username),
+                getConfiguration(dependencyId, version, serviceId),
                 getDependencyVersionNameList(dependencyEntities));
     }
 
-    private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, String username) {
+    private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, ServiceId serviceId) {
         final Optional<DependencyEntity> dependencyEntity = version.isPresent()
-                ? breakerboxStore.retrieve(dependencyId, version.get())
-                : breakerboxStore.retrieveLatest(dependencyId);
+                ? breakerboxStore.retrieve(dependencyId, version.get(), serviceId)
+                : breakerboxStore.retrieveLatest(dependencyId, serviceId);
 
-        return dependencyEntity.or(DependencyEntity.build(dependencyId, username))
-                .getConfiguration().get();
+        if (dependencyEntity.isPresent()) {
+            return dependencyEntity.get().getConfiguration().get();
+        } else {
+            return new TenacityConfiguration();
+        }
     }
 
     private ImmutableList<OptionItem> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities) {
@@ -95,12 +97,12 @@ public class ConfigureResource {
                         .immutableSortedCopy(dependencyEntities);
 
         final ImmutableList.Builder<OptionItem> builder = ImmutableList.builder();
-        if (sortedEntities.size() > 0) {
+        if (sortedEntities.isEmpty()) {
+            builder.add(new OptionItem("Default", 0l));
+        } else {
             for (DependencyEntity entity : sortedEntities) {
                 builder.add(new OptionItem(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + entity.getUser(), entity.getConfigurationTimestamp()));
             }
-        } else {
-            builder.add(new OptionItem("Default", 0l));
         }
         return builder.build();
     }
@@ -120,7 +122,7 @@ public class ConfigureResource {
     @Path("/{dependency}")
     public TenacityConfiguration get(@PathParam("service") String serviceName,
                                      @PathParam("dependency") String dependencyName) {
-        final Optional<DependencyEntity> entity = breakerboxStore.retrieveLatest(DependencyId.from(dependencyName));
+        final Optional<DependencyEntity> entity = breakerboxStore.retrieveLatest(DependencyId.from(dependencyName), ServiceId.from(serviceName));
         if (entity.isPresent()) {
             return entity.get().getConfiguration().or(DependencyEntity.defaultConfiguration());
         }

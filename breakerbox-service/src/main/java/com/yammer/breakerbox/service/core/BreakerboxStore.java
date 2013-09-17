@@ -4,12 +4,13 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.UnmodifiableIterator;
+import com.google.common.collect.Ordering;
 import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.service.azure.DependencyEntityByTimestamp;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.metrics.Metrics;
@@ -42,17 +43,20 @@ public class BreakerboxStore {
     public boolean store(ServiceId serviceId, DependencyId dependencyId, TenacityConfiguration tenacityConfiguration, String username) {
         return store(serviceId, dependencyId)
                 &&
-                store(dependencyId, System.currentTimeMillis(), tenacityConfiguration, username);
+                storeDependency(serviceId, dependencyId, tenacityConfiguration, username);
     }
 
-    public boolean store(DependencyId dependencyId, long timestamp, TenacityConfiguration tenacityConfiguration, String username) {
-        return tableClient.insertOrReplace(DependencyEntity.build(dependencyId, timestamp, username, tenacityConfiguration));
+    public boolean storeDependency(ServiceId serviceId,
+                                   DependencyId dependencyId,
+                                   TenacityConfiguration tenacityConfiguration,
+                                   String username) {
+        return tableClient.insertOrReplace(DependencyEntity.build(dependencyId, username, tenacityConfiguration, serviceId));
     }
 
     public boolean store(ServiceId serviceId, DependencyId dependencyId) {
         ServiceEntity serviceEntity = ServiceEntity.build(serviceId, dependencyId);
         listDependenciesCache.invalidate(serviceEntity.getServiceId());
-        return tableClient  .insertOrReplace(serviceEntity);
+        return tableClient.insertOrReplace(serviceEntity);
     }
 
     public boolean remove(TableType tableType) {
@@ -64,35 +68,33 @@ public class BreakerboxStore {
     }
 
     //TODO short ttl cache around this
-    public Optional<DependencyEntity> retrieveLatest(DependencyId dependencyId) {
-        final ImmutableList<DependencyEntity> dependencyEntities = listConfigurations(dependencyId);
-        if (dependencyEntities.size() == 0) return Optional.absent();
-        return Optional.of(fetchLatest(dependencyEntities));
+    public Optional<DependencyEntity> retrieveLatest(DependencyId dependencyId, ServiceId serviceId) {
+        return fetchLatest(listConfigurations(dependencyId, serviceId));
     }
 
-    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp) {
-        return fetchByTimestamp(dependencyId, timestamp);
+    public Optional<DependencyEntity> retrieve(DependencyId dependencyId, long timestamp, ServiceId serviceId) {
+        return fetchByTimestamp(dependencyId, timestamp, serviceId);
     }
 
-    private DependencyEntity fetchLatest(ImmutableList<DependencyEntity> dependencyEntities) {
-        //TODO: This feels clunky - having an off day. Find a smoother way of doing this. FluentIterable?
-        final UnmodifiableIterator<DependencyEntity> iterator = dependencyEntities.iterator();
-        DependencyEntity latestEntity = iterator.next();
-        while (iterator.hasNext()) {
-            final DependencyEntity next = iterator.next();
-            if (next.getConfigurationTimestamp() > latestEntity.getConfigurationTimestamp()) {
-                latestEntity = next;
-            }
+    private Optional<DependencyEntity> fetchLatest(ImmutableList<DependencyEntity> dependencyEntities) {
+        if (dependencyEntities.isEmpty()) {
+            return Optional.absent();
+        } else {
+            return Optional.of(Ordering
+                    .from(new DependencyEntityByTimestamp())
+                    .reverse()
+                    .immutableSortedCopy(dependencyEntities)
+                    .get(0));
         }
-        return latestEntity;
     }
 
-    private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp) {
-        final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp);
-        if (dependencyEntities.size() >= 1) {
+    private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp, ServiceId serviceId) {
+        final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp, serviceId);
+        if (dependencyEntities.isEmpty()) {
+            return Optional.absent();
+        } else {
             return Optional.of(dependencyEntities.get(0));
         }
-        return Optional.absent();
     }
 
     public ImmutableList<ServiceEntity> listServices() {
@@ -142,18 +144,7 @@ public class BreakerboxStore {
         }
     }
 
-    public ImmutableList<DependencyEntity> listConfigurations(DependencyId dependencyId) {
-        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
-        try {
-            return tableClient.search(TableQuery
-                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
-                    .where(partitionEquals(dependencyId)));
-        } finally {
-            timerContext.stop();
-        }
-    }
-
-    private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
+    public ImmutableList<DependencyEntity> listConfigurations(DependencyId dependencyId, ServiceId serviceId) {
         final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
         try {
             return tableClient.search(TableQuery
@@ -161,10 +152,34 @@ public class BreakerboxStore {
                     .where(TableQuery.combineFilters(
                             partitionEquals(dependencyId),
                             TableQuery.Operators.AND,
-                            timestampEquals(targetTimeStamp))));
+                            serviceIdEquals(serviceId))));
         } finally {
             timerContext.stop();
         }
+    }
+
+    private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp, ServiceId serviceId) {
+        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
+        try {
+            return tableClient.search(TableQuery
+                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+                    .where(TableQuery.combineFilters(
+                            TableQuery.combineFilters(
+                                partitionEquals(dependencyId),
+                                TableQuery.Operators.AND,
+                                timestampEquals(targetTimeStamp)),
+                            TableQuery.Operators.AND,
+                            serviceIdEquals(serviceId))));
+        } finally {
+            timerContext.stop();
+        }
+    }
+
+    private String serviceIdEquals(ServiceId serviceId) {
+        return TableQuery.generateFilterCondition(
+                "ServiceName",
+                TableQuery.QueryComparisons.EQUAL,
+                serviceId.getId());
     }
 
     private String timestampEquals(long timestamp) {

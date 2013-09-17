@@ -28,9 +28,10 @@ public class ArchaiusResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String getServiceConfigurations(@PathParam("service") String service) {
         final ArchaiusFormatBuilder archaiusBuilder = ArchaiusFormatBuilder.builder();
-        final ImmutableList<ServiceEntity> propertyKeys = breakerboxStore.listDependencies(ServiceId.from(service));
+        final ServiceId serviceId = ServiceId.from(service);
+        final ImmutableList<ServiceEntity> propertyKeys = breakerboxStore.listDependencies(serviceId);
         for (ServiceEntity propertyKey : propertyKeys) {
-            final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieveLatest(propertyKey.getDependencyId());
+            final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieveLatest(propertyKey.getDependencyId(), serviceId);
             if (dependencyEntity.isPresent()) {
                 archaiusBuilder.with(propertyKey.getDependencyId(), dependencyEntity.get().getConfiguration().or(DependencyEntity.defaultConfiguration()));
             }

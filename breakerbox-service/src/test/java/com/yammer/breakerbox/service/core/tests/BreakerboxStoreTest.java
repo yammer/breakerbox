@@ -18,7 +18,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
     private BreakerboxStore breakerboxStore;
@@ -41,7 +41,8 @@ public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
     @After
     public void teardown() {
         removeEntryIfPresent(breakerboxStore.retrieve(testServiceId, testDependencyId));
-        removeEntryIfPresent(breakerboxStore.retrieve(testDependencyId, timestamp));
+        removeEntryIfPresent(breakerboxStore.retrieve(testDependencyId, timestamp, testServiceId));
+        removeEntryIfPresent(breakerboxStore.retrieveLatest(testDependencyId, testServiceId));
     }
 
     private void removeEntryIfPresent(Optional<? extends TableType> service) {
@@ -68,11 +69,55 @@ public class BreakerboxStoreTest extends AbstractTestWithConfiguration {
 
     @Test
     public void testGetDependencyConfigurations(){
-        assertTrue(breakerboxStore.store(testDependencyId, timestamp, dependencyConfiguration, user));
-        assertThat(breakerboxStore.listConfigurations(testDependencyId))
-                .contains(DependencyEntity.build(testDependencyId, timestamp, user, dependencyConfiguration));
-        assertThat(breakerboxStore.listConfigurations(DependencyId.from(UUID.randomUUID().toString())))
+        final DependencyEntity dependencyEntity = DependencyEntity.build(testDependencyId, timestamp, user, dependencyConfiguration, testServiceId);
+        assertTrue(tableClient.insertOrReplace(dependencyEntity));
+        assertEquals(breakerboxStore.retrieve(testDependencyId, timestamp, testServiceId), Optional.of(dependencyEntity));
+        assertEquals(breakerboxStore.retrieveLatest(testDependencyId, testServiceId), Optional.of(dependencyEntity));
+        assertThat(breakerboxStore.listConfigurations(testDependencyId, testServiceId))
+                .contains(DependencyEntity.build(testDependencyId, timestamp, user, dependencyConfiguration, testServiceId));
+        assertThat(breakerboxStore.listConfigurations(
+                DependencyId.from(UUID.randomUUID().toString()),
+                ServiceId.from(UUID.randomUUID().toString())))
                 .isEmpty();
+    }
+
+    @Test
+    public void canStoreSameDependencyIdWithTwoDifferentServiceIds() {
+        final DependencyId dependencyIdOne = DependencyId.from(UUID.randomUUID().toString());
+        final DependencyId dependencyIdTwo = DependencyId.from(UUID.randomUUID().toString());
+
+        try {
+            final DependencyEntity dependencyEntityOne = DependencyEntity.build(dependencyIdOne, timestamp, user, dependencyConfiguration, testServiceId);
+            final DependencyEntity dependencyEntityTwo = DependencyEntity.build(dependencyIdTwo, timestamp, user, DependencyEntity.defaultConfiguration(), testServiceId);
+            assertTrue(tableClient.insertOrReplace(dependencyEntityOne));
+            assertTrue(tableClient.insertOrReplace(dependencyEntityTwo));
+            assertThat(breakerboxStore.listConfigurations(dependencyIdOne, testServiceId))
+                    .contains(dependencyEntityOne)
+                    .doesNotContain(dependencyEntityTwo);
+            assertThat(breakerboxStore.listConfigurations(dependencyIdTwo, testServiceId))
+                    .contains(dependencyEntityTwo)
+                    .doesNotContain(dependencyEntityOne);
+        } finally {
+            removeEntryIfPresent(breakerboxStore.retrieveLatest(dependencyIdOne, testServiceId));
+            removeEntryIfPresent(breakerboxStore.retrieveLatest(dependencyIdTwo, testServiceId));
+        }
+    }
+
+    @Test
+    public void storeUpdatesBothEntities() {
+        assertTrue(breakerboxStore.store(testServiceId, testDependencyId, new TenacityConfiguration(), user));
+        assertEquals(breakerboxStore.retrieve(testServiceId, testDependencyId), Optional.of(ServiceEntity.build(testServiceId, testDependencyId)));
+        final Optional<DependencyEntity> dependencyEntity = breakerboxStore.retrieveLatest(testDependencyId, testServiceId);
+        assertNotEquals(dependencyEntity, Optional.absent());
+        assertEquals(dependencyEntity.get(),
+                DependencyEntity.build(
+                        testDependencyId,
+                        dependencyEntity.get().getConfigurationTimestamp(),
+                        user,
+                        new TenacityConfiguration(),
+                        testServiceId));
+        assertEquals(breakerboxStore.retrieve(testDependencyId, dependencyEntity.get().getConfigurationTimestamp(), testServiceId),
+                dependencyEntity);
     }
 
 

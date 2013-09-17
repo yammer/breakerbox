@@ -10,6 +10,7 @@ import com.yammer.azure.core.AzureTableName;
 import com.yammer.azure.core.TableKey;
 import com.yammer.azure.core.TableType;
 import com.yammer.breakerbox.service.core.DependencyId;
+import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -28,32 +29,41 @@ public class DependencyEntity extends TableType implements TableKey {
 
     private String tenacityConfigurationAsString;
     private String user;
+    private String serviceName;
 
-    private DependencyEntity(DependencyId dependencyId, long timeStamp, String userName, String configuration) {
+    private DependencyEntity(DependencyId dependencyId,
+                             long timeStamp,
+                             String userName,
+                             String configuration,
+                             ServiceId serviceId) {
         super(TableId.DEPENDENCY);
         this.partitionKey = dependencyId.getId();
         this.rowKey = String.valueOf(timeStamp);
         this.tenacityConfigurationAsString = configuration;
         this.user = userName;
+        this.serviceName = serviceId.getId();
     }
 
     @VisibleForTesting
-    static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName) {
-        return build(dependencyId, timeStamp, userName, new TenacityConfiguration());
+    static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName, ServiceId serviceId) {
+        return build(dependencyId, timeStamp, userName, new TenacityConfiguration(), serviceId);
     }
 
-    public static DependencyEntity build(DependencyId dependencyId, String username) {
-        return build(dependencyId, System.currentTimeMillis(), username);
+    public static DependencyEntity build(DependencyId dependencyId,
+                                         String username,
+                                         TenacityConfiguration tenacityConfiguration,
+                                         ServiceId serviceId) {
+        return build(dependencyId, System.currentTimeMillis(), username, tenacityConfiguration, serviceId);
     }
 
-    public static DependencyEntity build(DependencyId dependencyId, long timestamp) {
-        return build(dependencyId, timestamp, "", new TenacityConfiguration());
-    }
-
-    public static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName, TenacityConfiguration configuration) {
+    public static DependencyEntity build(DependencyId dependencyId,
+                                         long timeStamp,
+                                         String userName,
+                                         TenacityConfiguration configuration,
+                                         ServiceId serviceId) {
         try {
             final String configurationAsString = OBJECTMAPPER.writeValueAsString(configuration);
-            return new DependencyEntity(dependencyId, timeStamp, userName, configurationAsString);
+            return new DependencyEntity(dependencyId, timeStamp, userName, configurationAsString, serviceId);
         } catch (JsonProcessingException err) {
             LOGGER.warn("Could not convert TenacityConfiguration to json", err);
             throw new RuntimeException(err);
@@ -72,7 +82,6 @@ public class DependencyEntity extends TableType implements TableKey {
             LOGGER.warn("Failed to parse TenacityConfiguration", err);
         }
         return Optional.absent();
-
     }
 
     public long getConfigurationTimestamp() {
@@ -81,6 +90,14 @@ public class DependencyEntity extends TableType implements TableKey {
 
     public static TenacityConfiguration defaultConfiguration() {
         return new TenacityConfiguration();
+    }
+
+    public ServiceId getServiceId() {
+        return ServiceId.from(serviceName);
+    }
+
+    public DependencyId getDependencyId() {
+        return DependencyId.from(partitionKey);
     }
 
     @Override
@@ -101,8 +118,10 @@ public class DependencyEntity extends TableType implements TableKey {
 
         DependencyEntity that = (DependencyEntity) o;
 
-        if (!tenacityConfigurationAsString.equals(that.tenacityConfigurationAsString)) return false;
-        if (!user.equals(that.user)) return false;
+        if (serviceName != null ? !serviceName.equals(that.serviceName) : that.serviceName != null) return false;
+        if (tenacityConfigurationAsString != null ? !tenacityConfigurationAsString.equals(that.tenacityConfigurationAsString) : that.tenacityConfigurationAsString != null)
+            return false;
+        if (user != null ? !user.equals(that.user) : that.user != null) return false;
 
         return true;
     }
@@ -110,8 +129,9 @@ public class DependencyEntity extends TableType implements TableKey {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + tenacityConfigurationAsString.hashCode();
-        result = 31 * result + user.hashCode();
+        result = 31 * result + (tenacityConfigurationAsString != null ? tenacityConfigurationAsString.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
         return result;
     }
 
@@ -132,6 +152,16 @@ public class DependencyEntity extends TableType implements TableKey {
     @Deprecated
     public void setTenacityConfigurationAsString(String tenacityConfigurationAsString) {
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
+    }
+
+    @Deprecated
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    @Deprecated
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     /**
