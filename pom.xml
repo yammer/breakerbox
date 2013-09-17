@@ -31,7 +31,7 @@
     <properties>
         <dropwizard.version>0.6.2</dropwizard.version>
         <windowsazure.version>0.4.5</windowsazure.version>
-        <tenacity.version>0.1.4</tenacity.version>
+        <tenacity.version>0.1.5</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-authenticator-ldap.version>0.0.10</dropwizard-authenticator-ldap.version>
     </properties>
