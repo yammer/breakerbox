@@ -15,11 +15,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/archaius/{service}")
-public class ArchaiusResource {
+//TODO: remove after legacy services no longer are pointing at this resource
+@Deprecated
+@Path("/v1/archaius/{service}")
+public class DeprecatedArchaiusResource {
     private final BreakerboxStore breakerboxStore;
 
-    public ArchaiusResource(BreakerboxStore breakerboxStore) {
+    public DeprecatedArchaiusResource(BreakerboxStore breakerboxStore) {
         this.breakerboxStore = breakerboxStore;
     }
 
