@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.service.archaius.ArchaiusFormatBuilder;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.service.config.ArchaiusOverrideConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.metrics.annotation.Timed;
@@ -17,9 +18,12 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/archaius/{service}")
 public class ArchaiusResource {
+    private final ArchaiusOverrideConfiguration archaiusOverride;
     private final BreakerboxStore breakerboxStore;
 
-    public ArchaiusResource(BreakerboxStore breakerboxStore) {
+    public ArchaiusResource(ArchaiusOverrideConfiguration archaiusOverride,
+                            BreakerboxStore breakerboxStore) {
+        this.archaiusOverride = archaiusOverride;
         this.breakerboxStore = breakerboxStore;
     }
 
@@ -36,7 +40,8 @@ public class ArchaiusResource {
                 archaiusBuilder.with(propertyKey.getDependencyId(), dependencyEntity.get().getConfiguration().or(DependencyEntity.defaultConfiguration()));
             }
         }
-        archaiusBuilder.hystrixMetricsStreamServletMaxConnections(10);
+        archaiusBuilder.hystrixMetricsStreamServletMaxConnections(archaiusOverride.getHystrixMetricsStreamServletMaxConnections());
+        archaiusBuilder.turbineHostRetryMillis(archaiusOverride.getTurbineHostRetryMillis());
         return archaiusBuilder.build();
     }
 }

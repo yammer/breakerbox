@@ -5,6 +5,10 @@ breakerbox:
 
 configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
 
+archaiusOverride:
+  turbineHostRetryMillis: 30000
+  hystrixMetricsStreamServletMaxConnections: 10
+
 azure:
   accountName: breakerboxtest
   accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==

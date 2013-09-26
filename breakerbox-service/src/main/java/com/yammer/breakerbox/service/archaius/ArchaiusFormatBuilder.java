@@ -18,6 +18,12 @@ public class ArchaiusFormatBuilder {
         return this;
     }
 
+    public ArchaiusFormatBuilder turbineHostRetryMillis(int value) {
+        //This mispelling of retry is on purpose. Unfortunate feature relying on a bug.
+        appender("turbine.InstanceMonitor.hostRertyMillis", value);
+        return this;
+    }
+
     public ArchaiusFormatBuilder with(TenacityPropertyKey key,
                                       TenacityConfiguration configuration) {
         executionIsolationThreadTimeoutInMilliseconds(key, configuration);
