@@ -4,7 +4,7 @@
 
     <groupId>com.yammer.breakerbox</groupId>
     <artifactId>breakerbox-parent</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Breakerbox Project</name>
 
@@ -20,7 +20,7 @@
         <connection>scm:git:git://github.int.yammer.com/yammer/breakerbox.git</connection>
         <developerConnection>scm:git:git@github.int.yammer.com:yammer/breakerbox.git</developerConnection>
         <url>http://github.int.yammer.com/yammer/breakerbox/</url>
-    <tag>v0.0.8</tag>
+    <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
