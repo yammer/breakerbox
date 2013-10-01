@@ -20,30 +20,45 @@ var Breakerbox = {
         opts = opts || {};
 
         this.serviceId = opts.serviceId;
-        this.selectDependencyObj = opts.selectDependencyObj;
-        this.dependencyConfigVersion = opts.dependencyConfigVersion
+        this.dependencyId = opts.dependencyId;
+        this.dependencyConfigVersion = opts.dependencyConfigVersion;
         this.formObj = opts.formObj;
 
-        this.registerDependencyChange();
         this.registerConfigVersionChange();
         this.registerSubmit();
+    },
+
+    ActivePropertyKey: function(opts) {
+        opts = opts || {};
+
+        var propertyKey = this.parseKey(opts.uri);
+        if (propertyKey) {
+            this.propertyKey = propertyKey;
+        } else {
+            this.propertyKey = this.firstPropertyKey();
+        }
     }
 };
 
-Breakerbox.ConfigureForm.prototype.registerDependencyChange = function() {
-    var serviceId = this.serviceId;
-    this.selectDependencyObj.change(function() {
-        window.location.href = '/configure/' + serviceId + '/' + $(this).val();
-    });
-}
+Breakerbox.ActivePropertyKey.prototype.parseKey = function(uri) {
+    return uri.split('/')[3];
+};
+
+Breakerbox.ActivePropertyKey.prototype.firstPropertyKey = function() {
+    return $('.list-group-item > p').first().parent()[0].id;
+};
+
+Breakerbox.ActivePropertyKey.prototype.highlightActive = function() {
+    $('#' + this.propertyKey).addClass('active');
+};
 
 Breakerbox.ConfigureForm.prototype.registerConfigVersionChange = function() {
     var serviceId = this.serviceId;
-    var dependency = this.selectDependencyObj.val()
+    var dependency = this.dependencyId;
     this.dependencyConfigVersion.change(function() {
         window.location.href = '/configure/' + serviceId + '/' + dependency + '?version=' + $(this).val();
     });
-}
+};
 
 Breakerbox.ConfigureForm.prototype.registerSubmit = function() {
     var self = this;
@@ -57,11 +72,11 @@ Breakerbox.ConfigureForm.prototype.registerSubmit = function() {
             type: "POST",
             timeout: 5000,
             data: $(this).serialize(),
-            url: '/configure/' + self.serviceId,
+            url: '/configure/' + self.serviceId + '/' + self.dependencyId,
             success: function() {
                 buttonSelector.button('complete');
                 setTimeout(function() {
-                    window.location.href = '/configure/' + self.serviceId + '/' + self.selectDependencyObj.val();
+                    window.location.href = '/configure/' + self.serviceId + '/' + self.dependencyId;
                 }, 1000);
             },
             error: function() {
@@ -69,23 +84,23 @@ Breakerbox.ConfigureForm.prototype.registerSubmit = function() {
             }
         });
     });
-}
+};
 
 Breakerbox.SyncState.prototype.showSpinner = function() {
     $('.' + this.syncSpinnerId).show();
-}
+};
 
 Breakerbox.SyncState.prototype.hideSpinner = function() {
     $('.' + this.syncSpinnerId).hide();
-}
+};
 
 Breakerbox.SyncState.prototype.showDom = function() {
     $('#' + this.domId).show();
-}
+};
 
 Breakerbox.SyncState.prototype.hideDom = function() {
     $('#' + this.domId).hide();
-}
+};
 
 Breakerbox.SyncState.prototype.inSync = function() {
     this.showSpinner();
@@ -125,10 +140,10 @@ Breakerbox.SyncState.prototype.createDom = function(jsonData) {
     });
 
     return htmlAcc;
-}
+};
 
 Breakerbox.SyncState.prototype.createErrorDom = function() {
     return '<dt><span class="glyphicon glyphicon-question-sign"></dt>' +
            '<dd>Unable to determine synchronized status</dd>';
 
-}
+};

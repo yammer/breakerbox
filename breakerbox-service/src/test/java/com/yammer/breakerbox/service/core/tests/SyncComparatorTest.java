@@ -38,68 +38,68 @@ public class SyncComparatorTest {
         mockFetcher = mock(TenacityConfigurationFetcher.class);
     }
 
-    private ImmutableList<SyncState> unsynchronized() {
+    private ImmutableList<SyncServiceHostState> unsynchronized() {
         return FluentIterable
                 .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncState>() {
+                .transform(new Function<URI, SyncServiceHostState>() {
                     @Override
-                    public SyncState apply(URI input) {
-                        return SyncState.createUnsynchronized(input);
+                    public SyncServiceHostState apply(URI input) {
+                        return SyncServiceHostState.createUnsynchronized(input);
                     }
                 })
                 .toList();
     }
 
-    private ImmutableList<SyncState> allSynchronized() {
+    private ImmutableList<SyncServiceHostState> allSynchronized() {
         return FluentIterable
                 .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncState>() {
+                .transform(new Function<URI, SyncServiceHostState>() {
                     @Override
-                    public SyncState apply(URI input) {
-                        return SyncState.createSynchronized(input);
+                    public SyncServiceHostState apply(URI input) {
+                        return SyncServiceHostState.createSynchronized(input);
                     }
                 })
                 .toList();
     }
 
-    private ImmutableList<SyncState> unknown() {
+    private ImmutableList<SyncServiceHostState> unknown() {
         return FluentIterable
                 .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncState>() {
+                .transform(new Function<URI, SyncServiceHostState>() {
                     @Override
-                    public SyncState apply(URI input) {
-                        return SyncState.createUnknown(input);
+                    public SyncServiceHostState apply(URI input) {
+                        return SyncServiceHostState.createUnknown(input);
                     }
                 })
                 .toList();
     }
 
-    private ImmutableList<SyncState> allSynchronizedExceptUnknown(final URI uri) {
+    private ImmutableList<SyncServiceHostState> allSynchronizedExceptUnknown(final URI uri) {
         return FluentIterable
                 .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncState>() {
+                .transform(new Function<URI, SyncServiceHostState>() {
                     @Override
-                    public SyncState apply(URI input) {
+                    public SyncServiceHostState apply(URI input) {
                         if (input.equals(uri)) {
-                            return SyncState.createUnknown(input);
+                            return SyncServiceHostState.createUnknown(input);
                         } else {
-                            return SyncState.createSynchronized(input);
+                            return SyncServiceHostState.createSynchronized(input);
                         }
                     }
                 })
                 .toList();
     }
 
-    private ImmutableList<SyncState> allSynchronizedExcept(final URI uri) {
+    private ImmutableList<SyncServiceHostState> allSynchronizedExcept(final URI uri) {
         return FluentIterable
                 .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncState>() {
+                .transform(new Function<URI, SyncServiceHostState>() {
                     @Override
-                    public SyncState apply(URI input) {
+                    public SyncServiceHostState apply(URI input) {
                         if (input.equals(uri)) {
-                            return SyncState.createUnsynchronized(input);
+                            return SyncServiceHostState.createUnsynchronized(input);
                         } else {
-                            return SyncState.createSynchronized(input);
+                            return SyncServiceHostState.createSynchronized(input);
                         }
                     }
                 })

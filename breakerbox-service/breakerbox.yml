@@ -1,6 +1,6 @@
 breakerbox:
   urls: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties,http://localhost:8080/archaius/breakerbox
-  initialDelay: 10s
+  initialDelay: 3s
   delay: 60s
 
 configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties

@@ -33,31 +33,31 @@ public class SyncComparator {
         };
     }
 
-    private Function<InstanceConfiguration, SyncState> funComputeSyncState(final TenacityConfiguration tenacityConfiguration) {
-        return new Function<InstanceConfiguration, SyncState>() {
+    private Function<InstanceConfiguration, SyncServiceHostState> funComputeSyncState(final TenacityConfiguration tenacityConfiguration) {
+        return new Function<InstanceConfiguration, SyncServiceHostState>() {
             @Override
-            public SyncState apply(InstanceConfiguration instanceConfiguration) {
+            public SyncServiceHostState apply(InstanceConfiguration instanceConfiguration) {
                 try {
                     if (instanceConfiguration.getTenacityConfiguration().isPresent()) {
                         if (instanceConfiguration.getTenacityConfiguration().get().equals(tenacityConfiguration)) {
-                            return SyncState.createSynchronized(instanceConfiguration.getUri());
+                            return SyncServiceHostState.createSynchronized(instanceConfiguration.getUri());
                         } else {
-                            return SyncState.createUnsynchronized(instanceConfiguration.getUri());
+                            return SyncServiceHostState.createUnsynchronized(instanceConfiguration.getUri());
                         }
                     }
                 } catch (InterruptedException | ExecutionException err) {
                     LOGGER.warn("Failed to comparing configurations", err);
                 }
-                return SyncState.createUnknown(instanceConfiguration.getUri());
+                return SyncServiceHostState.createUnknown(instanceConfiguration.getUri());
             }
         };
     }
 
-    private Function<InstanceConfiguration, SyncState> funUnsynchronized() {
-        return new Function<InstanceConfiguration, SyncState>() {
+    private Function<InstanceConfiguration, SyncServiceHostState> funUnsynchronized() {
+        return new Function<InstanceConfiguration, SyncServiceHostState>() {
             @Override
-            public SyncState apply(InstanceConfiguration input) {
-                return SyncState.createUnsynchronized(input.getUri());
+            public SyncServiceHostState apply(InstanceConfiguration input) {
+                return SyncServiceHostState.createUnsynchronized(input.getUri());
             }
         };
     }
@@ -69,7 +69,7 @@ public class SyncComparator {
                 .toList();
     }
 
-    public ImmutableList<SyncState> inSync(ServiceId serviceId, DependencyId dependencyId) {
+    public ImmutableList<SyncServiceHostState> inSync(ServiceId serviceId, DependencyId dependencyId) {
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
         final Optional<DependencyEntity> entityOptional = breakerboxStore.retrieveLatest(dependencyId, serviceId);
         if (entityOptional.isPresent()) {
@@ -89,6 +89,31 @@ public class SyncComparator {
                 .from(configurations)
                 .transform(funUnsynchronized())
                 .toList();
+    }
+
+    public ImmutableList<SyncPropertyKeyState> allInSync(ServiceId serviceId, Iterable<String> propertyKeys) {
+        final ImmutableList.Builder<SyncPropertyKeyState> propertyKeyStateBuilder = ImmutableList.builder();
+        for (String propertyKey : propertyKeys) {
+            propertyKeyStateBuilder.add(propertyKeySyncStatus(propertyKey, serviceId, DependencyId.from(propertyKey)));
+        }
+        return propertyKeyStateBuilder.build();
+    }
+
+    private SyncPropertyKeyState propertyKeySyncStatus(String propertyKey,
+                                                       ServiceId serviceId,
+                                                       DependencyId dependencyId) {
+        for (SyncServiceHostState syncServiceHostState : inSync(serviceId, dependencyId)) {
+            switch (syncServiceHostState.getSyncStatus()) {
+                case UNSYNCHRONIZED:
+                    return SyncPropertyKeyState.createUnsynchronized(propertyKey);
+                case UNKNOWN:
+                    return SyncPropertyKeyState.createUnknown(propertyKey);
+                case SYNCHRONIZED:
+                    break;
+
+            }
+        }
+        return SyncPropertyKeyState.createSynchronized(propertyKey);
     }
 
     private static class InstanceConfiguration {

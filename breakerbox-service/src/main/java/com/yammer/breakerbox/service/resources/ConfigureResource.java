@@ -6,12 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.comparable.SortKeyFirst;
 import com.yammer.breakerbox.service.comparable.SortRowFirst;
-import com.yammer.breakerbox.service.core.BreakerboxStore;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.Instances;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.core.*;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.breakerbox.service.views.ConfigureView;
@@ -38,14 +34,18 @@ public class ConfigureResource {
 
     private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
+    private final SyncComparator syncComparator;
 
-    public ConfigureResource(BreakerboxStore breakerboxStore, TenacityPropertyKeysStore tenacityPropertyKeysStore) {
+    public ConfigureResource(BreakerboxStore breakerboxStore,
+                             TenacityPropertyKeysStore tenacityPropertyKeysStore,
+                             SyncComparator syncComparator) {
         this.breakerboxStore = breakerboxStore;
         this.tenacityPropertyKeysStore = tenacityPropertyKeysStore;
+        this.syncComparator = syncComparator;
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
-    public View render(@Auth BasicCredentials creds, @PathParam("service") String serviceName) {
+    public View render(@PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
         final Optional<String> firstDependencyKey = FluentIterable
                 .from(tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)))
@@ -59,8 +59,7 @@ public class ConfigureResource {
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
     @Path("/{dependency}")
-    public ConfigureView render(@Auth BasicCredentials creds,
-                                @PathParam("service") String serviceName,
+    public ConfigureView render(@PathParam("service") String serviceName,
                                 @PathParam("dependency") String dependencyName,
                                 @QueryParam("version") String version) {
         return create(ServiceId.from(serviceName), DependencyId.from(dependencyName), getVersion(version));
@@ -73,8 +72,7 @@ public class ConfigureResource {
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
-                Ordering.from(new SortKeyFirst(dependencyId))
-                        .immutableSortedCopy(propertyKeys),
+                syncComparator.allInSync(serviceId, propertyKeys),
                 getConfiguration(dependencyId, version, serviceId),
                 getDependencyVersionNameList(dependencyEntities));
     }
@@ -131,9 +129,10 @@ public class ConfigureResource {
 
 
     @POST @Timed @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("/{dependency}")
     public Response configure(@Auth BasicCredentials creds,
                               @PathParam("service") String serviceName,
-                              @FormParam("dependency") String dependencyName,
+                              @PathParam("dependency") String dependencyName,
                               @FormParam("executionTimeout") Integer executionTimeout,
                               @FormParam("requestVolumeThreshold") Integer requestVolumeThreshold,
                               @FormParam("errorThresholdPercentage") Integer errorThresholdPercentage,
