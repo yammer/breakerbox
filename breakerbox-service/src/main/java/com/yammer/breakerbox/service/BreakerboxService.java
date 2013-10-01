@@ -92,9 +92,9 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 
         environment.addResource(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
-        environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore));
+        environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
         environment.addResource(new DashboardResource());
-        environment.addResource(new InSyncResource(syncComparator));
+        environment.addResource(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
         registerProperties(configuration);
 

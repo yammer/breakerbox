@@ -2,11 +2,11 @@ package com.yammer.breakerbox.service.core;
 
 import java.net.URI;
 
-public class SyncState {
+public class SyncServiceHostState {
     private final URI uri;
     private final SyncStatus syncStatus;
 
-    private SyncState(URI uri, SyncStatus syncStatus) {
+    private SyncServiceHostState(URI uri, SyncStatus syncStatus) {
         this.uri = uri;
         this.syncStatus = syncStatus;
     }
@@ -19,16 +19,16 @@ public class SyncState {
         return syncStatus;
     }
 
-    public static SyncState createSynchronized(URI uri) {
-        return new SyncState(uri, SyncStatus.SYNCHRONIZED);
+    public static SyncServiceHostState createSynchronized(URI uri) {
+        return new SyncServiceHostState(uri, SyncStatus.SYNCHRONIZED);
     }
 
-    public static SyncState createUnsynchronized(URI uri) {
-        return new SyncState(uri, SyncStatus.UNSYNCHRONIZED);
+    public static SyncServiceHostState createUnsynchronized(URI uri) {
+        return new SyncServiceHostState(uri, SyncStatus.UNSYNCHRONIZED);
     }
 
-    public static SyncState createUnknown(URI uri) {
-        return new SyncState(uri, SyncStatus.UNKNOWN);
+    public static SyncServiceHostState createUnknown(URI uri) {
+        return new SyncServiceHostState(uri, SyncStatus.UNKNOWN);
     }
 
     @Override
@@ -36,10 +36,10 @@ public class SyncState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SyncState syncState = (SyncState) o;
+        SyncServiceHostState syncServiceHostState = (SyncServiceHostState) o;
 
-        if (syncStatus != syncState.syncStatus) return false;
-        if (!uri.equals(syncState.uri)) return false;
+        if (syncStatus != syncServiceHostState.syncStatus) return false;
+        if (!uri.equals(syncServiceHostState.uri)) return false;
 
         return true;
     }
@@ -53,7 +53,7 @@ public class SyncState {
 
     @Override
     public String toString() {
-        return "SyncState{" +
+        return "SyncServiceHostState{" +
                 "uri=" + uri +
                 ", syncStatus=" + syncStatus +
                 '}';

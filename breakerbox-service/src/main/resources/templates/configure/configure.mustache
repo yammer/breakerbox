@@ -1,24 +1,43 @@
 {{</templates/default}}
 {{$content}}
-<div class="container">
-    <div class="col-lg-8 col-lg-offset-2 well">
-        <p class="lead">Synchronized State</p>
-        <i class="icon-spinner icon-spin icon-large lead sync-spinner"></i>
-        <span class="lead sync-spinner">Checking if all services are synchronized...</span>
-        <dl class="dl-horizontal" id="sync-state"></dl>
-    </div>
-    <form id="configure-form" method="POST" class="form-horizontal" action="/configure/{{serviceId}}">
-        <legend>Select which dependency to configure for {{serviceId}}</legend>
-        <div class="form-group">
-            <label for="selectDependency" class="col-lg-3 control-label">Tenacity Dependency</label>
-            <div class="input-group col-lg-4">
-                <select id="selectDependency" class="form-control" name="dependency">
-                    {{#serviceDependencies}}
-                        <option value="{{toString}}">{{toString}}</option>
-                    {{/serviceDependencies}}
-                </select>
-            </div>
+<div class="col-lg-3">
+    <div class="well well-sm">
+        <div class="list-group">
+            <a href="#" class="list-group-item">
+                <h5 class="list-group-item-heading">PROPERTY KEYS</h5>
+            </a>
+            {{#syncPropertyKeyStates}}
+                <a href="/configure/{{serviceId}}/{{propertyKey}}" class="list-group-item" id="{{propertyKey}}">
+                    <p class="list-group-item-text" style="font-size: 0.7em">{{propertyKey}}
+                        {{#isSynchronized}}
+                            <span class="glyphicon glyphicon-ok-sign" style="float: right"></span>
+                        {{/isSynchronized}}
+                        {{#isUnsynchronized}}
+                            <span class="glyphicon glyphicon-exclamation-sign" style="float: right"></span>
+                        {{/isUnsynchronized}}
+                        {{#isUnknown}}
+                            <span class="glyphicon glyphicon-question-sign" style="float: right"></span>
+                        {{/isUnknown}}
+                    </p>
+                </a>
+            {{/syncPropertyKeyStates}}
         </div>
+    </div>
+</div>
+<div class="col-lg-9">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Synchronization State</h3>
+        </div>
+        <div class="panel-body">
+            <i class="icon-spinner icon-spin icon-large lead sync-spinner"></i>
+            <span class="lead sync-spinner">Checking ...</span>
+            <dl class="dl-horizontal" id="sync-state"></dl>
+        </div>
+    </div>
+
+    <form id="configure-form" class="form-horizontal">
+        <legend>Configuration Versions</legend>
         <div class="form-group">
             <label for="selectConfiguration" class="col-lg-3 control-label">Configuration Version</label>
             <div class="input-group col-lg-4">
@@ -40,9 +59,9 @@
                     {{/tenacityConfiguration}}>
                 <span class="input-group-addon">ms</span>
             </div>
-            <span class="help-block">Default: 1000ms. Absolute timeout for the entire operation.
-                <strong>On-call hint: When experiencing timeouts, tuning this higher can help.</strong>
-            </span>
+        <span class="help-block">Default: 1000ms. Absolute timeout for the entire operation.
+            <strong>On-call hint: When experiencing timeouts, tuning this higher can help.</strong>
+        </span>
         </div>
         <legend>Circuit Breaker</legend>
         <div class="form-group">
@@ -53,9 +72,9 @@
                         {{#circuitBreaker}}{{requestVolumeThreshold}}{{/circuitBreaker}}
                     {{/tenacityConfiguration}}>
             </div>
-            <span class="help-block">Default: 20. No. of failures within a stat window in order to open a circuit.
-                <strong>Tuning this higher will help short-circuits, but tuning exec-timeout/core-size higher is often a better solution.</strong>
-            </span>
+        <span class="help-block">Default: 20. No. of failures within a stat window in order to open a circuit.
+            <strong>Tuning this higher will help short-circuits, but tuning exec-timeout/core-size higher is often a better solution.</strong>
+        </span>
         </div>
         <div class="form-group">
             <label for="inputErrorThresholdPercentage" class="col-lg-3 control-label">Error Threshold</label>
@@ -109,9 +128,9 @@
                         {{#threadpool}}{{threadPoolCoreSize}}{{/threadpool}}
                     {{/tenacityConfiguration}}>
             </div>
-            <span class="help-block">Default 10.
-                <strong>On-call hint: When experiencing rejections, tuning this higher could help.</strong>
-            </span>
+        <span class="help-block">Default 10.
+            <strong>On-call hint: When experiencing rejections, tuning this higher could help.</strong>
+        </span>
         </div>
         <div class="form-group">
             <label for="inputKeepAliveMinutes" class="col-lg-3 control-label">Keep Alive Time</label>
@@ -175,20 +194,26 @@
 {{/content}}
 {{$moreScripts}}
 <script type="text/javascript">
-    var selectDependencySelector = $('#selectDependency'); //pulls value from selectDependency form
+    $(function() {
+        var activePropertyKey = new Breakerbox.ActivePropertyKey({
+            uri: window.location.pathname
+        });
 
-    var configureForm = new Breakerbox.ConfigureForm({
-        serviceId: '{{serviceId}}',
-        selectDependencyObj: selectDependencySelector,
-        dependencyConfigVersion: $('#selectConfiguration'),
-        formObj: $('#configure-form')
-    });
+        activePropertyKey.highlightActive();
 
-    var syncState = new Breakerbox.SyncState({
-        serviceId: '{{serviceId}}',
-        dependencyId: selectDependencySelector.val(),
-        syncSpinnerId: 'sync-spinner',
-        domId: 'sync-state'
+        new Breakerbox.ConfigureForm({
+            serviceId: '{{serviceId}}',
+            dependencyId: activePropertyKey.propertyKey,
+            dependencyConfigVersion: $('#selectConfiguration'),
+            formObj: $('#configure-form')
+        });
+
+        new Breakerbox.SyncState({
+            serviceId: '{{serviceId}}',
+            dependencyId: activePropertyKey.propertyKey,
+            syncSpinnerId: 'sync-spinner',
+            domId: 'sync-state'
+        });
     });
 </script>
 {{/moreScripts}}
