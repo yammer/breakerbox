@@ -110,7 +110,7 @@ public class TableClient {
         } catch (URISyntaxException e) {
             LOG.warn("Invalid Azure table URL specified {}", azureTableName, e);
         } catch (StorageException e) {
-            LOG.warn("Error accessing azure table", e);
+            LOG.warn("Error accessing com.yammer.azureold table", e);
         }
         throw new IllegalStateException("Error verifying if table " + azureTableName + " exists");
     }
