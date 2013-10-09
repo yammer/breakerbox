@@ -3,7 +3,6 @@ package com.yammer.azure;
 import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount;
 import com.microsoft.windowsazure.services.core.storage.RetryLinearRetry;
 import com.microsoft.windowsazure.services.table.client.CloudTableClient;
-import com.yammer.azure.config.AzureTableConfiguration;
 
 import java.net.URISyntaxException;
 

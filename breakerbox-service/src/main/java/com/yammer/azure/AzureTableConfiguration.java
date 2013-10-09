@@ -1,4 +1,4 @@
-package com.yammer.azure.config;
+package com.yammer.azure;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;

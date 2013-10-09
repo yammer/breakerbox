@@ -3,7 +3,7 @@ package com.yammer.breakerbox.service.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
-import com.yammer.azure.config.AzureTableConfiguration;
+import com.yammer.azure.AzureTableConfiguration;
 import com.yammer.dropwizard.client.JerseyClientConfiguration;
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -38,7 +38,7 @@ public class BreakerboxConfiguration extends Configuration {
     private ArchaiusOverrideConfiguration archaiusOverride;
 
     @JsonCreator
-    public BreakerboxConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
+    public BreakerboxConfiguration(@JsonProperty("com.yammer.azureold") AzureTableConfiguration azure,
                                    @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
                                    @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
                                    @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
