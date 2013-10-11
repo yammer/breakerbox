@@ -26,15 +26,16 @@ import com.yammer.dropwizard.auth.CachingAuthenticator;
 import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
 import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
+import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
+import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
-import com.yammer.dropwizard.authenticator.resources.ResourceAuthenticator;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientFactory;
+import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundle;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
-import com.yammer.tenacity.core.properties.ArchaiusPropertyRegister;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
 import com.yammer.tenacity.dashboard.bundle.TenacityDashboardBundle;
@@ -60,9 +61,9 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     private static void registerProperties(BreakerboxConfiguration configuration) {
         new TenacityPropertyRegister(ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
                 BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, configuration.getBreakerboxServicesPropertyKeys(),
-                BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, configuration.getBreakerboxServicesConfiguration()),
-                configuration.getBreakerboxConfiguration(),
-                new ArchaiusPropertyRegister())
+                BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, configuration.getBreakerboxServicesConfiguration(),
+                BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, configuration.getLdapConfiguration().getTenacity()),
+                configuration.getBreakerboxConfiguration())
                 .register();
     }
 
@@ -108,10 +109,16 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
 
     private static void setupAuth(LdapConfiguration ldapConfiguration, Environment environment) {
         final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration.getHostAndPort());
-        final CachingAuthenticator<BasicCredentials, BasicCredentials> resourceAuthenticator =
-                CachingAuthenticator.wrap(new ResourceAuthenticator(ldapAuthenticator), ldapConfiguration.getCache());
+        final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
+                new LdapCanAuthenticate(ldapConfiguration.getHostAndPort()));
+        final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
+                CachingAuthenticator.wrap(
+                        TenacityAuthenticator.wrap(
+                                new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
+                        ldapConfiguration.getCache());
 
-        environment.addHealthCheck(new LdapHealthCheck(ldapAuthenticator));
-        environment.addResource(new BasicAuthProvider<>(resourceAuthenticator, "breakerbox"));
+        environment.addHealthCheck(new LdapHealthCheck(TenacityAuthenticator
+                .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
+        environment.addResource(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
     }
 }

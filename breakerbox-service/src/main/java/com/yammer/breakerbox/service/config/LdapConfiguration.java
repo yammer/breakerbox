@@ -2,6 +2,7 @@ package com.yammer.breakerbox.service.config;
 
 import com.google.common.cache.CacheBuilderSpec;
 import com.google.common.net.HostAndPort;
+import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
@@ -17,6 +18,8 @@ public class LdapConfiguration {
     private final Integer port = null;
     @NotNull @Valid
     private final CacheBuilderSpec cache = null;
+    @NotNull @Valid
+    private final TenacityConfiguration tenacity = new TenacityConfiguration();
 
     private LdapConfiguration() { /* Jackson */ }
 
@@ -34,5 +37,9 @@ public class LdapConfiguration {
 
     public HostAndPort getHostAndPort() {
         return HostAndPort.fromParts(getHost(), getPort());
+    }
+
+    public TenacityConfiguration getTenacity() {
+        return tenacity;
     }
 }
