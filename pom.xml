@@ -125,15 +125,6 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>com.atlassian.maven.plugins</groupId>-->
-                <!--<artifactId>maven-clover2-plugin</artifactId>-->
-                <!--<version>3.1.10.1</version>-->
-                <!--<configuration>-->
-                    <!--<generateHistorical>true</generateHistorical>-->
-                    <!--<historyDir>${project.basedir}/clover/history/${project.artifact}</historyDir>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
