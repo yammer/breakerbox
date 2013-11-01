@@ -6,7 +6,7 @@ breakerbox:
 configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
 
 archaiusOverride:
-  turbineHostRetryMillis: 30000
+  turbineHostRetry: 30s
   hystrixMetricsStreamServletMaxConnections: 10
 
 azure:

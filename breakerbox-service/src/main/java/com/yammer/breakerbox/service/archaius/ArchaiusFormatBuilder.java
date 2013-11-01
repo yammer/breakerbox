@@ -18,9 +18,19 @@ public class ArchaiusFormatBuilder {
         return this;
     }
 
-    public ArchaiusFormatBuilder turbineHostRetryMillis(int value) {
+    public ArchaiusFormatBuilder turbineHostRetryMillis(long value) {
         //This mispelling of retry is on purpose. Unfortunate feature relying on a bug.
         appender("turbine.InstanceMonitor.hostRertyMillis", value);
+        return this;
+    }
+
+    public ArchaiusFormatBuilder turbineInstanceMonitorLatencyThreshold(long value) {
+        appender("turbine.InstanceMonitor.eventStream.skipLineLogic.latencyThreshold", value);
+        return this;
+    }
+
+    public ArchaiusFormatBuilder turbineInstanceMonitorSkipLineDelay(long value) {
+        appender("turbine.InstanceMonitor.eventStream.skipLineLogic.delay", value);
         return this;
     }
 

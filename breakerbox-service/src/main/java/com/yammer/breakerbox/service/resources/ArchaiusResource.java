@@ -41,7 +41,9 @@ public class ArchaiusResource {
             }
         }
         archaiusBuilder.hystrixMetricsStreamServletMaxConnections(archaiusOverride.getHystrixMetricsStreamServletMaxConnections());
-        archaiusBuilder.turbineHostRetryMillis(archaiusOverride.getTurbineHostRetryMillis());
+        archaiusBuilder.turbineHostRetryMillis(archaiusOverride.getTurbineHostRetry().toMilliseconds());
+        archaiusBuilder.turbineInstanceMonitorLatencyThreshold(archaiusOverride.getTurbineLatencyThreshold().toMilliseconds());
+        archaiusBuilder.turbineInstanceMonitorSkipLineDelay(archaiusOverride.getTurbineSkipLineDelay().toMilliseconds());
         return archaiusBuilder.build();
     }
 }
