@@ -20,4 +20,6 @@ the port at which your service is running (e.g. 8080).
 
 2. If your service addition is in the production environment, consider adding it to the meta-dashboard `turbine.ConfigPropertyBasedDiscovery.production.instances`.
 
+3. Then add your {serviceName} to the `turbine.aggregator.clusterConfig`.
+
 Then commit, push, repackage, and redeploy the latest version of `breakerbox`!
