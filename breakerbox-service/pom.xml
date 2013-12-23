@@ -37,9 +37,9 @@
             <version>${tenacity.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.yammer.tenacity</groupId>
-            <artifactId>tenacity-dashboard</artifactId>
-            <version>${tenacity.version}</version>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-dashboard</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.tenacity</groupId>

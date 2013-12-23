@@ -6,6 +6,7 @@ import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
+import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.service.azure.TableId;
 import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
 import com.yammer.breakerbox.service.config.LdapConfiguration;
@@ -38,7 +39,6 @@ import com.yammer.tenacity.core.bundle.TenacityBundle;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
-import com.yammer.tenacity.dashboard.bundle.TenacityDashboardBundle;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +53,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     public void initialize(Bootstrap<BreakerboxConfiguration> bootstrap) {
         bootstrap.setName("Breakerbox");
         bootstrap.addBundle(new TenacityBundle(new BreakerboxDependencyKeyFactory(), BreakerboxDependencyKey.values()));
-        bootstrap.addBundle(new TenacityDashboardBundle());
+        bootstrap.addBundle(new BreakerboxDashboardBundle());
 
         TurbineInit.init();
     }
