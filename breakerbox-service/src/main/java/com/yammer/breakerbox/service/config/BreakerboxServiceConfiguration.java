@@ -33,7 +33,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private final URI configProperties;
 
-    @NotNull @Valid
+    @NotNull @Valid @JsonProperty("ldap")
     private LdapConfiguration ldapConfiguration = new LdapConfiguration();
 
     @NotNull @Valid
@@ -46,7 +46,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
                                           @JsonProperty("breakerbox") BreakerboxConfiguration breakerboxConfiguration,
                                           @JsonProperty("configProperties") URI configProperties,
-                                          @JsonProperty("ldapConfiguration") LdapConfiguration ldapConfiguration,
+                                          @JsonProperty("ldap") LdapConfiguration ldapConfiguration,
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride) {
         this.azure = azure;
         this.tenacityClient = tenacityClientConfiguration;
@@ -74,7 +74,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return breakerboxServicesConfiguration;
     }
 
-    public com.yammer.tenacity.core.config.BreakerboxConfiguration getBreakerboxConfiguration() {
+    public BreakerboxConfiguration getBreakerboxConfiguration() {
         return breakerboxConfiguration;
     }
 
@@ -82,6 +82,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return configProperties;
     }
 
+    @JsonProperty("ldap")
     public LdapConfiguration getLdapConfiguration() {
         return ldapConfiguration;
     }
