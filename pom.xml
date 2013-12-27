@@ -35,7 +35,6 @@
         <tenacity.version>0.1.12</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-authenticator-ldap.version>0.0.12</dropwizard-authenticator-ldap.version>
-        <legacy.dropwizard.version>0.5.1</legacy.dropwizard.version>
     </properties>
 
     <developers>
