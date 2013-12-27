@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.yammer.azure.AzureTableConfiguration;
+import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.client.JerseyClientConfiguration;
 import com.yammer.dropwizard.config.Configuration;
+import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 
-public class BreakerboxConfiguration extends Configuration {
+public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private final AzureTableConfiguration azure;
 
@@ -26,26 +28,26 @@ public class BreakerboxConfiguration extends Configuration {
     private final TenacityConfiguration breakerboxServicesConfiguration;
 
     @NotNull @Valid
-    private final com.yammer.tenacity.core.config.BreakerboxConfiguration breakerboxConfiguration;
+    private final BreakerboxConfiguration breakerboxConfiguration;
 
     @NotNull @Valid
     private final URI configProperties;
 
     @NotNull @Valid
-    private final LdapConfiguration ldapConfiguration;
+    private LdapConfiguration ldapConfiguration = new LdapConfiguration();
 
     @NotNull @Valid
     private ArchaiusOverrideConfiguration archaiusOverride;
 
     @JsonCreator
-    public BreakerboxConfiguration(@JsonProperty("com.yammer.azureold") AzureTableConfiguration azure,
-                                   @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
-                                   @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
-                                   @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
-                                   @JsonProperty("breakerbox") com.yammer.tenacity.core.config.BreakerboxConfiguration breakerboxConfiguration,
-                                   @JsonProperty("configProperties") URI configProperties,
-                                   @JsonProperty("ldapConfiguration") LdapConfiguration ldapConfiguration,
-                                   @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride) {
+    public BreakerboxServiceConfiguration(@JsonProperty("com.yammer.azureold") AzureTableConfiguration azure,
+                                          @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
+                                          @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
+                                          @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
+                                          @JsonProperty("breakerbox") BreakerboxConfiguration breakerboxConfiguration,
+                                          @JsonProperty("configProperties") URI configProperties,
+                                          @JsonProperty("ldapConfiguration") LdapConfiguration ldapConfiguration,
+                                          @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride) {
         this.azure = azure;
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -92,12 +94,16 @@ public class BreakerboxConfiguration extends Configuration {
         this.archaiusOverride = archaiusOverride;
     }
 
+    public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+        this.ldapConfiguration = ldapConfiguration;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BreakerboxConfiguration that = (BreakerboxConfiguration) o;
+        BreakerboxServiceConfiguration that = (BreakerboxServiceConfiguration) o;
 
         if (!archaiusOverride.equals(that.archaiusOverride)) return false;
         if (!azure.equals(that.azure)) return false;

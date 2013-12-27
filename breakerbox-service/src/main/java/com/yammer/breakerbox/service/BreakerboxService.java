@@ -8,8 +8,7 @@ import com.yammer.azure.TableClientFactory;
 import com.yammer.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.service.azure.TableId;
-import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
-import com.yammer.breakerbox.service.config.LdapConfiguration;
+import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
@@ -28,6 +27,7 @@ import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
 import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
+import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
 import com.yammer.dropwizard.config.Bootstrap;
@@ -42,7 +42,7 @@ import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
 
 import java.util.concurrent.TimeUnit;
 
-public class BreakerboxService extends Service<BreakerboxConfiguration> {
+public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     public static void main(String[] args) throws Exception {
         new BreakerboxService().run(args);
     }
@@ -50,7 +50,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     private BreakerboxService() {}
 
     @Override
-    public void initialize(Bootstrap<BreakerboxConfiguration> bootstrap) {
+    public void initialize(Bootstrap<BreakerboxServiceConfiguration> bootstrap) {
         bootstrap.setName("Breakerbox");
         bootstrap.addBundle(new TenacityBundle(new BreakerboxDependencyKeyFactory(), BreakerboxDependencyKey.values()));
         bootstrap.addBundle(new BreakerboxDashboardBundle());
@@ -58,11 +58,11 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
         TurbineInit.init();
     }
     
-    private static void registerProperties(BreakerboxConfiguration configuration) {
+    private static void registerProperties(BreakerboxServiceConfiguration configuration) {
         new TenacityPropertyRegister(ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
                 BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, configuration.getBreakerboxServicesPropertyKeys(),
                 BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, configuration.getBreakerboxServicesConfiguration(),
-                BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, configuration.getLdapConfiguration().getTenacity()),
+                BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, new TenacityConfiguration()),
                 configuration.getBreakerboxConfiguration())
                 .register();
     }
@@ -74,7 +74,7 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     }
 
     @Override
-    public void run(BreakerboxConfiguration configuration, Environment environment) throws Exception {
+    public void run(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
         setupAuth(configuration.getLdapConfiguration(), environment);
 
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
@@ -108,14 +108,14 @@ public class BreakerboxService extends Service<BreakerboxConfiguration> {
     }
 
     private static void setupAuth(LdapConfiguration ldapConfiguration, Environment environment) {
-        final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration.getHostAndPort());
+        final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration);
         final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
-                new LdapCanAuthenticate(ldapConfiguration.getHostAndPort()));
+                new LdapCanAuthenticate(ldapConfiguration));
         final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
                 CachingAuthenticator.wrap(
                         TenacityAuthenticator.wrap(
                                 new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
-                        ldapConfiguration.getCache());
+                        ldapConfiguration.getCachePolicy());
 
         environment.addHealthCheck(new LdapHealthCheck(TenacityAuthenticator
                 .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));

@@ -28,8 +28,8 @@
         </dependency>
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
-            <artifactId>dropwizard-authenticator-ldap</artifactId>
-            <version>${dropwizard-authenticator-ldap.version}</version>
+            <artifactId>dropwizard-auth-ldap</artifactId>
+            <version>${dropwizard-auth-ldap.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.tenacity</groupId>

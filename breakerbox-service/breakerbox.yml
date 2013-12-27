@@ -20,10 +20,10 @@ tenacityClient:
   connectionTimeout: 500ms
   timeout: 1000ms
 
-ldapConfiguration:
-  host: ldap.sjc1.yammer.com
-  port: 636
-  cache: maximumSize = 10000, expireAfterAccess = 5m
+ldap:
+  uri: ldaps://ldap.sjc1.yammer.com:636
+  cachePolicy: maximumSize=10000, expireAfterAccess=10m
+  securityPrincipal: cn=%s,ou=people,dc=yammer,dc=com
 
 http:
   port: 8080

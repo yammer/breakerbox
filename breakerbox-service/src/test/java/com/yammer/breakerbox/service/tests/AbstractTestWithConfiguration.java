@@ -4,7 +4,7 @@ import com.google.common.io.Resources;
 import com.yammer.azure.TableClient;
 import com.yammer.azure.TableClientFactory;
 import com.yammer.breakerbox.service.azure.TableId;
-import com.yammer.breakerbox.service.config.BreakerboxConfiguration;
+import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.dropwizard.config.ConfigurationFactory;
 import com.yammer.dropwizard.validation.Validator;
 import org.junit.Before;
@@ -12,13 +12,13 @@ import org.junit.Before;
 import java.io.File;
 
 public abstract class AbstractTestWithConfiguration {
-    protected BreakerboxConfiguration breakerboxConfiguration;
+    protected BreakerboxServiceConfiguration breakerboxConfiguration;
     protected TableClient tableClient;
 
     @Before
     public void setupTest() throws Exception {
         breakerboxConfiguration = ConfigurationFactory
-                .forClass(BreakerboxConfiguration.class, new Validator())
+                .forClass(BreakerboxServiceConfiguration.class, new Validator())
                 .build(new File(Resources.getResource("test.yml").toURI()));
         tableClient = new TableClientFactory(breakerboxConfiguration.getAzure()).create();
 
