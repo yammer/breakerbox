@@ -1,13 +1,9 @@
 Breakerbox
-========
+==========
 
-What is it?
------------
-A dashboard of Tenacity circuit-breakers displayed in real-time and the ability to configure these circuit-breakers on-the-fly.
+A dashboard of [Tenacity](https://github.com/yammer/tenacity) circuit-breakers and threadpools displayed in real-time and the ability to configure them on-the-fly.
 
-What is Tenacity?
------------------
-https://github.int.yammer.com/yammer/tenacity
+[Tenacity](https://github.com/yammer/tenacity) is a [Dropwizard](http://www.dropwizard.io)-module that brings together [Dropwizard](http://www.dropwizard.io)+[Hystrix](https://github.com/Netflix/Hystrix).
 
 How do I add a service to Breakerbox?
 -------------------------------------
