@@ -3,8 +3,6 @@ breakerbox:
   initialDelay: 3s
   delay: 60s
 
-configProperties: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties
-
 archaiusOverride:
   turbineHostRetry: 30s
   hystrixMetricsStreamServletMaxConnections: 10

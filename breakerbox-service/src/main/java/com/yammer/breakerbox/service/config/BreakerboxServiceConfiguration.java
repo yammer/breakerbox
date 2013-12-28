@@ -12,7 +12,6 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
 
 public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
@@ -30,8 +29,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private final BreakerboxConfiguration breakerboxConfiguration;
 
-    @NotNull @Valid
-    private final URI configProperties;
 
     @NotNull @Valid @JsonProperty("ldap")
     private LdapConfiguration ldapConfiguration = new LdapConfiguration();
@@ -45,7 +42,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
                                           @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,
                                           @JsonProperty("breakerbox") BreakerboxConfiguration breakerboxConfiguration,
-                                          @JsonProperty("configProperties") URI configProperties,
                                           @JsonProperty("ldap") LdapConfiguration ldapConfiguration,
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride) {
         this.azure = azure;
@@ -53,7 +49,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
         this.breakerboxServicesConfiguration = Optional.fromNullable(breakerboxServicesConfiguration).or(new TenacityConfiguration());
         this.breakerboxConfiguration = breakerboxConfiguration;
-        this.configProperties = configProperties;
         this.ldapConfiguration = ldapConfiguration;
         this.archaiusOverride = Optional.fromNullable(archaiusOverride).or(new ArchaiusOverrideConfiguration());
     }
@@ -76,10 +71,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     public BreakerboxConfiguration getBreakerboxConfiguration() {
         return breakerboxConfiguration;
-    }
-
-    public URI getConfigProperties() {
-        return configProperties;
     }
 
     @JsonProperty("ldap")
@@ -111,7 +102,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
         if (!breakerboxConfiguration.equals(that.breakerboxConfiguration)) return false;
         if (!breakerboxServicesConfiguration.equals(that.breakerboxServicesConfiguration)) return false;
         if (!breakerboxServicesPropertyKeys.equals(that.breakerboxServicesPropertyKeys)) return false;
-        if (!configProperties.equals(that.configProperties)) return false;
         if (!ldapConfiguration.equals(that.ldapConfiguration)) return false;
         if (!tenacityClient.equals(that.tenacityClient)) return false;
 
@@ -125,7 +115,6 @@ public class BreakerboxServiceConfiguration extends Configuration {
         result = 31 * result + breakerboxServicesPropertyKeys.hashCode();
         result = 31 * result + breakerboxServicesConfiguration.hashCode();
         result = 31 * result + breakerboxConfiguration.hashCode();
-        result = 31 * result + configProperties.hashCode();
         result = 31 * result + ldapConfiguration.hashCode();
         result = 31 * result + archaiusOverride.hashCode();
         return result;
