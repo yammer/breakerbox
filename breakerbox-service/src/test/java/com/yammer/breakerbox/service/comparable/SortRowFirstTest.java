@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import org.junit.Test;
 
 import java.util.ArrayList;

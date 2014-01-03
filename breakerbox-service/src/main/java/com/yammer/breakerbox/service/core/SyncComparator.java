@@ -6,6 +6,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,11 +1,12 @@
-package com.yammer.breakerbox.service.azure;
+package com.yammer.breakerbox.service.azure.tests;
 
 import com.google.common.base.Optional;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.core.tests.TableClientTestUtils;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
@@ -40,11 +41,11 @@ public class DependencyEntityTest extends AbstractTestWithConfiguration {
 
     @Test
     public void testCanInsert() throws Exception {
-        final DependencyEntity entity = DependencyEntity.build(dependencyId, testTimeStamp, user, serviceId);
+        final DependencyEntity entity = DependencyEntity.build(dependencyId, testTimeStamp, user, new TenacityConfiguration(), serviceId);
         final boolean success = tableClient.insert(entity);
         assertTrue(success);
 
-        final Optional<TableServiceEntity> retrieve = tableClient.retrieve(DependencyEntity.build(dependencyId, testTimeStamp, user, serviceId));
+        final Optional<TableServiceEntity> retrieve = tableClient.retrieve(DependencyEntity.build(dependencyId, testTimeStamp, user, new TenacityConfiguration(), serviceId));
         assertTrue(retrieve.isPresent());
         assertThat(retrieve.get()).isEqualTo(entity);
     }

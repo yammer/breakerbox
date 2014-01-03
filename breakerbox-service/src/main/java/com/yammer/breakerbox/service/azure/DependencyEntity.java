@@ -2,15 +2,14 @@ package com.yammer.breakerbox.service.azure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
 import com.yammer.azure.core.AzureTableName;
 import com.yammer.azure.core.TableKey;
 import com.yammer.azure.core.TableType;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.validation.Validator;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -42,11 +41,6 @@ public class DependencyEntity extends TableType implements TableKey {
         this.tenacityConfigurationAsString = configuration;
         this.user = userName;
         this.serviceName = serviceId.getId();
-    }
-
-    @VisibleForTesting
-    static DependencyEntity build(DependencyId dependencyId, long timeStamp, String userName, ServiceId serviceId) {
-        return build(dependencyId, timeStamp, userName, new TenacityConfiguration(), serviceId);
     }
 
     public static DependencyEntity build(DependencyId dependencyId,

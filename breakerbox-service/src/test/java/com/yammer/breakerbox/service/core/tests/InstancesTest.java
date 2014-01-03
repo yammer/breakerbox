@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.core.Instances;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.ServiceId;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

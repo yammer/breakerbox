@@ -13,6 +13,8 @@ import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.DependencyEntityByTimestamp;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.azure.TableId;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;

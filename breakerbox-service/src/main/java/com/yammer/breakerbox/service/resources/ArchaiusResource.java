@@ -7,7 +7,7 @@ import com.yammer.breakerbox.service.azure.DependencyEntity;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.config.ArchaiusOverrideConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.metrics.annotation.Timed;
 
 import javax.ws.rs.GET;

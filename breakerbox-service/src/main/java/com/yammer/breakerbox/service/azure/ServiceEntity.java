@@ -4,8 +4,8 @@ import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
 import com.yammer.azure.core.AzureTableName;
 import com.yammer.azure.core.TableKey;
 import com.yammer.azure.core.TableType;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

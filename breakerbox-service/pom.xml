@@ -11,6 +11,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-store</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>

@@ -1,13 +1,11 @@
-package com.yammer.breakerbox.service.store;
+package com.yammer.breakerbox.store;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
-import com.yammer.breakerbox.service.model.DependencyModel;
-import com.yammer.breakerbox.service.model.ServiceModel;
+import com.yammer.breakerbox.store.model.DependencyModel;
+import com.yammer.breakerbox.store.model.ServiceModel;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import org.joda.time.DateTime;

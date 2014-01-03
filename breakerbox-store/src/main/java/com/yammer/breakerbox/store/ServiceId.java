@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.core;
+package com.yammer.breakerbox.store;
 
 public class ServiceId {
     private final String id;

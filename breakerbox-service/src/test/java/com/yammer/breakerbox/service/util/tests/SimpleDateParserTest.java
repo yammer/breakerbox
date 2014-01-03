@@ -1,11 +1,11 @@
-package com.yammer.breakerbox.service.util;
+package com.yammer.breakerbox.service.util.tests;
 
+import com.yammer.breakerbox.service.util.SimpleDateParser;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 
 import java.util.Date;
-
-import static org.fest.assertions.api.Assertions.assertThat;
 
 public class SimpleDateParserTest {
 
@@ -14,6 +14,6 @@ public class SimpleDateParserTest {
 
     @Test
     public void testToDate() throws Exception {
-        assertThat(SimpleDateParser.millisToDate(String.valueOf(testDateEpoch))).isEqualTo(DateFormatUtils.format(new Date(testDateEpoch), SimpleDateParser.DATE_FORMAT));
+        Assertions.assertThat(SimpleDateParser.millisToDate(String.valueOf(testDateEpoch))).isEqualTo(DateFormatUtils.format(new Date(testDateEpoch), SimpleDateParser.DATE_FORMAT));
     }
 }

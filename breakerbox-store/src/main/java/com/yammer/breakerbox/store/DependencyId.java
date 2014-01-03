@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.core;
+package com.yammer.breakerbox.store;
 
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 

@@ -1,8 +1,8 @@
 package com.yammer.breakerbox.service.views;
 
 import com.google.common.collect.ImmutableList;
-import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.breakerbox.service.core.SyncPropertyKeyState;
+import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 
 public class ConfigureView extends NavbarView {

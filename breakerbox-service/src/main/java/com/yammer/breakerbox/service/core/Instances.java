@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.netflix.turbine.discovery.ConfigPropertyBasedDiscovery;
 import com.netflix.turbine.discovery.Instance;
+import com.yammer.breakerbox.store.ServiceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

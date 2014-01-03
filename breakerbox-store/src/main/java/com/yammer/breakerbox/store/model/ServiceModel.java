@@ -1,7 +1,7 @@
-package com.yammer.breakerbox.service.model;
+package com.yammer.breakerbox.store.model;
 
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 
 public class ServiceModel {
     private final ServiceId serviceId;

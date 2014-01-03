@@ -1,6 +1,6 @@
 package com.yammer.breakerbox.service.views;
 
-import com.yammer.breakerbox.service.core.ServiceId;
+import com.yammer.breakerbox.store.ServiceId;
 
 public class NoPropertyKeysView extends NavbarView {
     private final ServiceId serviceId;

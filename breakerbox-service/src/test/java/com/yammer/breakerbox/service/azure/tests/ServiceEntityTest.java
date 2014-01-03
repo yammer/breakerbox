@@ -2,13 +2,10 @@ package com.yammer.breakerbox.service.azure.tests;
 
 import com.google.common.base.Optional;
 import com.yammer.breakerbox.service.azure.ServiceEntity;
-import com.yammer.breakerbox.service.core.DependencyId;
-import com.yammer.breakerbox.service.core.ServiceId;
 import com.yammer.breakerbox.service.core.tests.TableClientTestUtils;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
-import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
-import com.yammer.tenacity.core.config.TenacityConfiguration;
-import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
+import com.yammer.breakerbox.store.DependencyId;
+import com.yammer.breakerbox.store.ServiceId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
