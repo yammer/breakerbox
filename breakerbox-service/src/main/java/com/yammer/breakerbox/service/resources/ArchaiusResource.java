@@ -2,9 +2,9 @@ package com.yammer.breakerbox.service.resources;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
+import com.yammer.breakerbox.azure.model.ServiceEntity;
 import com.yammer.breakerbox.service.archaius.ArchaiusFormatBuilder;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.azure.ServiceEntity;
 import com.yammer.breakerbox.service.config.ArchaiusOverrideConfiguration;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.store.ServiceId;

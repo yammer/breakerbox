@@ -2,7 +2,7 @@ package com.yammer.breakerbox.service.azure.tests;
 
 import com.google.common.base.Optional;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.core.tests.TableClientTestUtils;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
 import com.yammer.breakerbox.store.DependencyId;

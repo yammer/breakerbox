@@ -1,6 +1,6 @@
 package com.yammer.breakerbox.service.comparable;
 
-import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;

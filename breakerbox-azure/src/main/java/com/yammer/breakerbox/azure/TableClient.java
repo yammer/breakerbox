@@ -1,12 +1,12 @@
-package com.yammer.azure;
+package com.yammer.breakerbox.azure;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.core.storage.StorageException;
 import com.microsoft.windowsazure.services.table.client.*;
-import com.yammer.azure.core.AzureTableName;
-import com.yammer.azure.core.TableKey;
-import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.azure.core.AzureTableName;
+import com.yammer.breakerbox.azure.core.TableKey;
+import com.yammer.breakerbox.azure.core.TableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

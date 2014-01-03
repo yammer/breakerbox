@@ -1,9 +1,9 @@
 package com.yammer.breakerbox.service.tests;
 
 import com.google.common.io.Resources;
-import com.yammer.azure.TableClient;
-import com.yammer.azure.TableClientFactory;
-import com.yammer.breakerbox.service.azure.TableId;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.TableClientFactory;
+import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.dropwizard.config.ConfigurationFactory;
 import com.yammer.dropwizard.validation.Validator;

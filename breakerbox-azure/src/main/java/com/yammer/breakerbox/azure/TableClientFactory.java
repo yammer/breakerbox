@@ -1,4 +1,4 @@
-package com.yammer.azure;
+package com.yammer.breakerbox.azure;
 
 import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount;
 import com.microsoft.windowsazure.services.core.storage.RetryLinearRetry;

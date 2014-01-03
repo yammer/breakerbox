@@ -1,13 +1,14 @@
-package com.yammer.breakerbox.service.azure;
+package com.yammer.breakerbox.azure.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
-import com.yammer.azure.core.AzureTableName;
-import com.yammer.azure.core.TableKey;
-import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.azure.core.AzureTableName;
+import com.yammer.breakerbox.azure.core.TableId;
+import com.yammer.breakerbox.azure.core.TableKey;
+import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.dropwizard.json.ObjectMapperFactory;

@@ -1,4 +1,4 @@
-package com.yammer.azure.core;
+package com.yammer.breakerbox.azure.core;
 
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
 

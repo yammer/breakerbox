@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.azure;
+package com.yammer.breakerbox.azure.model;
 
 import com.google.common.primitives.Longs;
 

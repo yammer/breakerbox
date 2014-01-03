@@ -3,7 +3,7 @@ package com.yammer.breakerbox.service.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
-import com.yammer.azure.AzureTableConfiguration;
+import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.client.JerseyClientConfiguration;
 import com.yammer.dropwizard.config.Configuration;

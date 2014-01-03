@@ -3,7 +3,7 @@ package com.yammer.breakerbox.service.comparable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import org.junit.Test;

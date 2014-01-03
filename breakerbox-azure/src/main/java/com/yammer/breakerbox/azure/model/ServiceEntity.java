@@ -1,9 +1,10 @@
-package com.yammer.breakerbox.service.azure;
+package com.yammer.breakerbox.azure.model;
 
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
-import com.yammer.azure.core.AzureTableName;
-import com.yammer.azure.core.TableKey;
-import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.azure.core.AzureTableName;
+import com.yammer.breakerbox.azure.core.TableId;
+import com.yammer.breakerbox.azure.core.TableKey;
+import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import org.slf4j.Logger;

@@ -1,9 +1,9 @@
-package com.yammer.azure.healthchecks.test;
+package com.yammer.breakerbox.azure.healthchecks.test;
 
 import com.google.common.collect.ImmutableList;
-import com.yammer.azure.TableClient;
-import com.yammer.azure.healthchecks.TableClientHealthcheck;
-import com.yammer.breakerbox.service.azure.TableId;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.core.TableId;
+import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.metrics.core.HealthCheck;
 import org.junit.Test;
 

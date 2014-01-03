@@ -1,9 +1,9 @@
 package com.yammer.breakerbox.service.core.tests;
 
 import com.google.common.base.Optional;
-import com.yammer.azure.core.TableType;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
-import com.yammer.breakerbox.service.azure.ServiceEntity;
+import com.yammer.breakerbox.azure.core.TableType;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
+import com.yammer.breakerbox.azure.model.ServiceEntity;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.tests.AbstractTestWithConfiguration;
 import com.yammer.breakerbox.store.DependencyId;

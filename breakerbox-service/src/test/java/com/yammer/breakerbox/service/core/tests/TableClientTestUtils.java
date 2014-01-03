@@ -1,9 +1,9 @@
 package com.yammer.breakerbox.service.core.tests;
 
 import com.google.common.base.Optional;
-import com.yammer.azure.TableClient;
-import com.yammer.azure.core.TableKey;
-import com.yammer.azure.core.TableType;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.core.TableKey;
+import com.yammer.breakerbox.azure.core.TableType;
 
 import static org.junit.Assert.assertTrue;
 

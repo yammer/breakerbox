@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.yammer.breakerbox</groupId>
-            <artifactId>breakerbox-store</artifactId>
+            <artifactId>breakerbox-azure</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -55,11 +55,6 @@
             <groupId>com.netflix.turbine</groupId>
             <artifactId>turbine-core</artifactId>
             <version>${turbine.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.windowsazure</groupId>
-            <artifactId>microsoft-windowsazure-api</artifactId>
-            <version>${windowsazure.version}</version>
         </dependency>
     </dependencies>
 

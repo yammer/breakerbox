@@ -1,7 +1,7 @@
-package com.yammer.azure.healthchecks;
+package com.yammer.breakerbox.azure.healthchecks;
 
 import com.google.common.collect.Iterables;
-import com.yammer.azure.TableClient;
+import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.metrics.core.HealthCheck;
 
 import static com.google.common.base.Preconditions.checkNotNull;

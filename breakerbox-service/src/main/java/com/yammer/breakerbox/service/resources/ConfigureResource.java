@@ -5,7 +5,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-import com.yammer.breakerbox.service.azure.DependencyEntity;
+import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.Instances;
