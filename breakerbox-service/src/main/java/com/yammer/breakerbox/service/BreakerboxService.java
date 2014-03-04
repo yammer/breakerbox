@@ -35,7 +35,7 @@ import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientFactory;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
-import com.yammer.tenacity.core.bundle.TenacityBundle;
+import com.yammer.tenacity.core.bundle.TenacityBundleBuilder;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
@@ -52,7 +52,12 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     @Override
     public void initialize(Bootstrap<BreakerboxServiceConfiguration> bootstrap) {
         bootstrap.setName("Breakerbox");
-        bootstrap.addBundle(new TenacityBundle(new BreakerboxDependencyKeyFactory(), BreakerboxDependencyKey.values()));
+        bootstrap.addBundle(TenacityBundleBuilder
+                .newBuilder()
+                .propertyKeyFactory(new BreakerboxDependencyKeyFactory())
+                .propertyKeys(BreakerboxDependencyKey.values())
+                .mapAllHystrixRuntimeExceptionsTo(429)
+                .build());
         bootstrap.addBundle(new BreakerboxDashboardBundle());
 
         TurbineInit.init();
