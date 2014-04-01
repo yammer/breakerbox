@@ -37,7 +37,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private ArchaiusOverrideConfiguration archaiusOverride;
 
     @JsonCreator
-    public BreakerboxServiceConfiguration(@JsonProperty("com.yammer.azureold") AzureTableConfiguration azure,
+    public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
                                           @JsonProperty("breakerboxServicesPropertyKeys") TenacityConfiguration breakerboxServicesPropertyKeys,
                                           @JsonProperty("breakerboxServicesConfiguration") TenacityConfiguration breakerboxServicesConfiguration,

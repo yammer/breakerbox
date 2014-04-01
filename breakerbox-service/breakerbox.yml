@@ -21,7 +21,13 @@ tenacityClient:
 ldap:
   uri: ldaps://ldap.sjc1.yammer.com:636
   cachePolicy: maximumSize=10000, expireAfterAccess=10m
-  securityPrincipal: cn=%s,ou=people,dc=yammer,dc=com
+  userFilter: ou=people,dc=yammer,dc=com
+  groupFilter: ou=groups,dc=yourcompany,dc=com
+  userNameAttribute: cn
+  groupNameAttribute: cn
+  groupMembershipAttribute: memberUid
+  connectTimeout: 500ms
+  readTimeout: 500ms
 
 http:
   port: 8080

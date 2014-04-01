@@ -10,7 +10,7 @@ public class TableClientHealthcheck extends HealthCheck {
     private final TableClient tableClient;
 
     public TableClientHealthcheck(TableClient tableClient) {
-        super("com.yammer.azureold-table");
+        super("azure");
         this.tableClient = checkNotNull(tableClient, "tableClient cannot be null");
     }
 
