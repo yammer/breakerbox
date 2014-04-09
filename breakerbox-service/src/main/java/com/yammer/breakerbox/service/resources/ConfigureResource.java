@@ -9,7 +9,6 @@ import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
-import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
 import com.yammer.breakerbox.service.views.OptionItem;
@@ -26,6 +25,8 @@ import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,19 @@ import java.net.URI;
 public class ConfigureResource {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigureResource.class);
 
+    private final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+        .appendYear(4, Integer.MAX_VALUE)
+        .appendLiteral('-')
+        .appendMonthOfYear(2)
+        .appendLiteral('-')
+        .appendDayOfMonth(2)
+        .appendLiteral(' ')
+        .appendHourOfDay(2)
+        .appendLiteral(':')
+        .appendMinuteOfHour(2)
+        .appendLiteral(':')
+        .appendSecondOfMinute(2)
+        .toFormatter();
     private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
     private final SyncComparator syncComparator;
@@ -106,8 +120,7 @@ public class ConfigureResource {
             builder.add(new OptionItem("Default", 0l));
         } else {
             for (DependencyModel entity : sortedEntities) {
-                //TODO: leverage DateTime#toString facilities instead of SimpleDateParser
-                builder.add(new OptionItem(SimpleDateParser.millisToDate(String.valueOf(entity.getDateTime().getMillis())) + " - " + entity.getUser(), entity.getDateTime().getMillis()));
+                builder.add(new OptionItem(entity.getDateTime().toString() + " by " + entity.getUser(), entity.getDateTime().getMillis()));
             }
         }
         return builder.build();
