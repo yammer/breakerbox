@@ -25,8 +25,6 @@ import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +36,6 @@ import java.net.URI;
 @Path("/configure/{service}")
 public class ConfigureResource {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigureResource.class);
-
-    private final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
-        .appendYear(4, Integer.MAX_VALUE)
-        .appendLiteral('-')
-        .appendMonthOfYear(2)
-        .appendLiteral('-')
-        .appendDayOfMonth(2)
-        .appendLiteral(' ')
-        .appendHourOfDay(2)
-        .appendLiteral(':')
-        .appendMinuteOfHour(2)
-        .appendLiteral(':')
-        .appendSecondOfMinute(2)
-        .toFormatter();
     private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
     private final SyncComparator syncComparator;
