@@ -5,13 +5,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
+import com.google.common.primitives.Longs;
 import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
-import com.yammer.breakerbox.azure.model.DependencyEntityByTimestamp;
 import com.yammer.breakerbox.azure.model.ServiceEntity;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
@@ -22,6 +22,7 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +84,12 @@ public class BreakerboxStore {
             return Optional.absent();
         } else {
             return Optional.of(Ordering
-                    .from(new DependencyEntityByTimestamp())
+                    .from(new Comparator<DependencyEntity>() {
+                        @Override
+                        public int compare(DependencyEntity o1, DependencyEntity o2) {
+                            return Longs.compare(o1.getConfigurationTimestamp(), o2.getConfigurationTimestamp());
+                        }
+                    })
                     .reverse()
                     .immutableSortedCopy(dependencyEntities)
                     .get(0));

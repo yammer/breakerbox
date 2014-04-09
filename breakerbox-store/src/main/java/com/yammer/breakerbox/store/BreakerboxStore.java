@@ -29,8 +29,10 @@ public abstract class BreakerboxStore {
     public abstract boolean store(ServiceModel serviceModel);
     public abstract boolean delete(ServiceModel serviceModel);
     public abstract boolean delete(DependencyModel dependencyModel);
+    public abstract boolean delete(ServiceId serviceId, DependencyId dependencyId);
+    public abstract boolean delete(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId);
     public abstract Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId);
-    public abstract Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime);
+    public abstract Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId);
     public abstract Optional<DependencyModel> retrieveLatest(DependencyId dependencyId, ServiceId serviceId);
     public abstract Iterable<ServiceModel> allServiceModels();
     public abstract Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId);
