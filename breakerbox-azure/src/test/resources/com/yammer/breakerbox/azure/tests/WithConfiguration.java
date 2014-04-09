@@ -19,7 +19,7 @@ public abstract class WithConfiguration {
     public void setupTest() throws Exception {
         azureTableConfiguration = ConfigurationFactory
                 .forClass(AzureTableConfiguration.class, new Validator())
-                .build(new File(Resources.getResource("test.yml").toURI()));
+                .build(new File(Resources.getResource("azure-test.yml").toURI()));
         tableClient = new TableClientFactory(azureTableConfiguration).create();
 
         for (TableId id : TableId.values()) {
