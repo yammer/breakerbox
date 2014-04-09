@@ -1,14 +1,13 @@
 package com.yammer.breakerbox.service.comparable;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.store.model.DependencyModel;
+import org.joda.time.DateTime;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -18,23 +17,24 @@ public class SortRowFirstTest {
     public void testOrdering() throws Exception {
         final DependencyId dependencyId = DependencyId.from("foo");
         final ServiceId serviceId = ServiceId.from("testService");
-        final ArrayList<DependencyEntity> items = Lists.newArrayList(
-                DependencyEntity.build(dependencyId, 10, "testUser", DependencyEntity.defaultConfiguration(), serviceId),
-                DependencyEntity.build(dependencyId, 8, "testUser", DependencyEntity.defaultConfiguration(), serviceId),
-                DependencyEntity.build(dependencyId, 12, "testUser", DependencyEntity.defaultConfiguration(), serviceId),
-                DependencyEntity.build(dependencyId, 14, "testUser", DependencyEntity.defaultConfiguration(), serviceId),
-                DependencyEntity.build(dependencyId, 13, "testUser", DependencyEntity.defaultConfiguration(), serviceId),
-                DependencyEntity.build(dependencyId, 200, "testUser", DependencyEntity.defaultConfiguration(), serviceId));
+        final ImmutableList<DependencyModel> items = ImmutableList.of(
+                new DependencyModel(dependencyId, new DateTime(10), DependencyEntity.defaultConfiguration(), "testUser", serviceId),
+                new DependencyModel(dependencyId, new DateTime(8), DependencyEntity.defaultConfiguration(), "testUser", serviceId),
+                new DependencyModel(dependencyId, new DateTime(12), DependencyEntity.defaultConfiguration(), "testUser", serviceId),
+                new DependencyModel(dependencyId, new DateTime(14), DependencyEntity.defaultConfiguration(), "testUser", serviceId),
+                new DependencyModel(dependencyId, new DateTime(13), DependencyEntity.defaultConfiguration(), "testUser", serviceId),
+                new DependencyModel(dependencyId, new DateTime(200), DependencyEntity.defaultConfiguration(), "testUser", serviceId));
 
-        final ImmutableList<DependencyEntity> sortedItems = Ordering.from(new SortRowFirst())
+        final ImmutableList<DependencyModel> sortedItems = Ordering.from(new SortRowFirst())
+                .reverse()
                 .immutableSortedCopy(items);
 
         assertThat(sortedItems.size()).isEqualTo(items.size());
-        assertThat(Long.valueOf(sortedItems.get(0).getRowKey())).isEqualTo(200);
-        assertThat(Long.valueOf(sortedItems.get(1).getRowKey())).isEqualTo(14);
-        assertThat(Long.valueOf(sortedItems.get(2).getRowKey())).isEqualTo(13);
-        assertThat(Long.valueOf(sortedItems.get(3).getRowKey())).isEqualTo(12);
-        assertThat(Long.valueOf(sortedItems.get(4).getRowKey())).isEqualTo(10);
-        assertThat(Long.valueOf(sortedItems.get(5).getRowKey())).isEqualTo(8);
+        assertThat(sortedItems.get(0).getDateTime()).isEqualTo(new DateTime(200));
+        assertThat(sortedItems.get(1).getDateTime()).isEqualTo(new DateTime(14));
+        assertThat(sortedItems.get(2).getDateTime()).isEqualTo(new DateTime(13));
+        assertThat(sortedItems.get(3).getDateTime()).isEqualTo(new DateTime(12));
+        assertThat(sortedItems.get(4).getDateTime()).isEqualTo(new DateTime(10));
+        assertThat(sortedItems.get(5).getDateTime()).isEqualTo(new DateTime(8));
     }
 }

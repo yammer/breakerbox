@@ -4,10 +4,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
+import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,18 +74,14 @@ public class SyncComparator {
 
     public ImmutableList<SyncServiceHostState> inSync(ServiceId serviceId, DependencyId dependencyId) {
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
-        final Optional<DependencyEntity> entityOptional = breakerboxStore.retrieveLatest(dependencyId, serviceId);
+        final Optional<DependencyModel> entityOptional = breakerboxStore.retrieveLatest(dependencyId, serviceId);
         if (entityOptional.isPresent()) {
 
-            final DependencyEntity entity = entityOptional.get();
-            if (entity.getConfiguration().isPresent()) {
-                return FluentIterable
-                        .from(configurations)
-                        .transform(funComputeSyncState(entity.getConfiguration().get()))
-                        .toList();
-            } else {
-                throw new IllegalStateException("Unable to determine in sync state because of corrupted stored TenacityConfiguration");
-            }
+            final DependencyModel entity = entityOptional.get();
+            return FluentIterable
+                    .from(configurations)
+                    .transform(funComputeSyncState(entity.getTenacityConfiguration()))
+                    .toList();
         }
         //TODO 08-28-13 cgray: What if services are in sync with each other, but there is no breakerbox configuration?
         return FluentIterable

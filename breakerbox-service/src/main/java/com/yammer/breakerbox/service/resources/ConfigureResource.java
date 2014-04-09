@@ -5,9 +5,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.comparable.SortRowFirst;
-import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
@@ -15,8 +13,11 @@ import com.yammer.breakerbox.service.util.SimpleDateParser;
 import com.yammer.breakerbox.service.views.ConfigureView;
 import com.yammer.breakerbox.service.views.NoPropertyKeysView;
 import com.yammer.breakerbox.service.views.OptionItem;
+import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.store.model.DependencyModel;
+import com.yammer.breakerbox.store.model.ServiceModel;
 import com.yammer.dropwizard.auth.Auth;
 import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.views.View;
@@ -24,6 +25,7 @@ import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +74,7 @@ public class ConfigureResource {
     private ConfigureView create(ServiceId serviceId,
                                  DependencyId dependencyId,
                                  Optional<Long> version) {
-        final ImmutableList<DependencyEntity> dependencyEntities = breakerboxStore.listConfigurations(dependencyId, serviceId);
+        final Iterable<DependencyModel> dependencyEntities = breakerboxStore.allDependenciesFor(dependencyId, serviceId);
         final ImmutableSet<String> propertyKeys = tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
         return new ConfigureView(
                 serviceId,
@@ -82,28 +84,30 @@ public class ConfigureResource {
     }
 
     private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, ServiceId serviceId) {
-        final Optional<DependencyEntity> dependencyEntity = version.isPresent()
-                ? breakerboxStore.retrieve(dependencyId, version.get(), serviceId)
+        final Optional<DependencyModel> dependencyModel = version.isPresent()
+                ? breakerboxStore.retrieve(dependencyId, new DateTime(version.get()), serviceId)
                 : breakerboxStore.retrieveLatest(dependencyId, serviceId);
 
-        if (dependencyEntity.isPresent()) {
-            return dependencyEntity.get().getConfiguration().get();
+        if (dependencyModel.isPresent()) {
+            return dependencyModel.get().getTenacityConfiguration();
         } else {
             return new TenacityConfiguration();
         }
     }
 
-    private ImmutableList<OptionItem> getDependencyVersionNameList(ImmutableList<DependencyEntity> dependencyEntities) {
-        final ImmutableList<DependencyEntity> sortedEntities =
+    private ImmutableList<OptionItem> getDependencyVersionNameList(Iterable<DependencyModel> dependencyModels) {
+        final ImmutableList<DependencyModel> sortedEntities =
                 Ordering.from(new SortRowFirst())
-                        .immutableSortedCopy(dependencyEntities);
+                        .reverse()
+                        .immutableSortedCopy(dependencyModels);
 
         final ImmutableList.Builder<OptionItem> builder = ImmutableList.builder();
         if (sortedEntities.isEmpty()) {
             builder.add(new OptionItem("Default", 0l));
         } else {
-            for (DependencyEntity entity : sortedEntities) {
-                builder.add(new OptionItem(SimpleDateParser.millisToDate(entity.getRowKey()) + " - " + entity.getUser(), entity.getConfigurationTimestamp()));
+            for (DependencyModel entity : sortedEntities) {
+                //TODO: leverage DateTime#toString facilities instead of SimpleDateParser
+                builder.add(new OptionItem(SimpleDateParser.millisToDate(String.valueOf(entity.getDateTime().getMillis())) + " - " + entity.getUser(), entity.getDateTime().getMillis()));
             }
         }
         return builder.build();
@@ -124,9 +128,9 @@ public class ConfigureResource {
     @Path("/{dependency}")
     public TenacityConfiguration get(@PathParam("service") String serviceName,
                                      @PathParam("dependency") String dependencyName) {
-        final Optional<DependencyEntity> entity = breakerboxStore.retrieveLatest(DependencyId.from(dependencyName), ServiceId.from(serviceName));
+        final Optional<DependencyModel> entity = breakerboxStore.retrieveLatest(DependencyId.from(dependencyName), ServiceId.from(serviceName));
         if (entity.isPresent()) {
-            return entity.get().getConfiguration().or(DependencyEntity.defaultConfiguration());
+            return entity.get().getTenacityConfiguration();
         }
         throw new WebApplicationException();
     }
@@ -164,7 +168,10 @@ public class ConfigureResource {
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
                 executionTimeout);
-        if (breakerboxStore.store(ServiceId.from(serviceName), DependencyId.from(dependencyName), tenacityConfiguration, creds.getUsername())) {
+        final ServiceId serviceId = ServiceId.from(serviceName);
+        final DependencyId dependencyId = DependencyId.from(dependencyName);
+        if (breakerboxStore.store(new ServiceModel(serviceId, dependencyId)) &&
+            breakerboxStore.store(new DependencyModel(dependencyId, DateTime.now(), tenacityConfiguration, creds.getUsername(), serviceId))) {
             return Response
                     .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
                     .build();

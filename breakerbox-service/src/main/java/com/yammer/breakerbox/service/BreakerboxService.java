@@ -3,13 +3,13 @@ package com.yammer.breakerbox.service;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
+import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
-import com.yammer.breakerbox.service.core.BreakerboxStore;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
@@ -21,6 +21,7 @@ import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKey;
 import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKeyFactory;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
+import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.auth.CachingAuthenticator;
 import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
@@ -83,7 +84,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
         setupAuth(configuration.getLdapConfiguration(), environment);
 
         final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
-        final BreakerboxStore breakerboxStore = new BreakerboxStore(tableClient);
+        final BreakerboxStore breakerboxStore = new AzureStore(tableClient);
         final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
                 new TenacityPoller.Factory(tenacityClient));
