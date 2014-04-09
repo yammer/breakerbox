@@ -1,8 +1,6 @@
 package com.yammer.breakerbox.azure;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -12,6 +10,7 @@ import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.azure.model.DependencyModelByTimestamp;
+import com.yammer.breakerbox.azure.model.Entities;
 import com.yammer.breakerbox.azure.model.ServiceEntity;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.DependencyId;
@@ -23,7 +22,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -37,93 +35,28 @@ public class AzureStore extends BreakerboxStore {
         this.tableClient = checkNotNull(tableClient);
     }
 
-    private static ServiceEntity from(ServiceModel serviceModel) {
-        return ServiceEntity.build(serviceModel.getServiceId(), serviceModel.getDependencyId());
-    }
-
-    private static ImmutableList<ServiceModel> toServiceModelList(Iterable<ServiceEntity> serviceEntities) {
-        return FluentIterable
-                .from(serviceEntities)
-                .transform(new Function<ServiceEntity, ServiceModel>() {
-                    @Nullable
-                    @Override
-                    public ServiceModel apply(@Nullable ServiceEntity input) {
-                        return to(input);
-                    }
-                })
-                .toList();
-    }
-
-    private static Optional<ServiceModel> toServiceModel(Optional<ServiceEntity> serviceEntity) {
-        if (serviceEntity.isPresent()) {
-            return Optional.of(to(serviceEntity.get()));
-        }
-        return Optional.absent();
-    }
-
-    private static ServiceModel to(ServiceEntity serviceEntity) {
-        return new ServiceModel(serviceEntity.getServiceId(), serviceEntity.getDependencyId());
-    }
-
-    private static DependencyEntity from(DependencyModel dependencyModel) {
-        return DependencyEntity.build(
-                dependencyModel.getDependencyId(),
-                dependencyModel.getUser(),
-                dependencyModel.getTenacityConfiguration(),
-                dependencyModel.getServiceId());
-    }
-
-    private static ImmutableList<DependencyModel> toDependencyModelList(Iterable<DependencyEntity> dependencyEntities) {
-        return FluentIterable
-                .from(dependencyEntities)
-                .transform(new Function<DependencyEntity, DependencyModel>() {
-                    @Nullable
-                    @Override
-                    public DependencyModel apply(@Nullable DependencyEntity input) {
-                        return to(input);
-                    }
-                })
-                .toList();
-    }
-
-    private static Optional<DependencyModel> toDependencyModel(Optional<DependencyEntity> dependencyEntity) {
-        if (dependencyEntity.isPresent()) {
-            return Optional.of(to(dependencyEntity.get()));
-        }
-        return Optional.absent();
-    }
-
-    private static DependencyModel to(DependencyEntity dependencyEntity) {
-        return new DependencyModel(
-                dependencyEntity.getDependencyId(),
-                new DateTime(dependencyEntity.getConfigurationTimestamp()),
-                dependencyEntity.getConfiguration().get(),
-                dependencyEntity.getUser(),
-                dependencyEntity.getServiceId());
-    }
-
     private <T extends TableType> boolean delete(Optional<T> tableType) {
         return !tableType.isPresent() || tableClient.remove(tableType.get());
     }
 
     @Override
     public boolean store(DependencyModel dependencyModel) {
-        return tableClient.insertOrReplace(from(dependencyModel));
+        return tableClient.insertOrReplace(Entities.from(dependencyModel));
     }
 
     @Override
     public boolean store(ServiceModel serviceModel) {
-        return tableClient.insertOrReplace(from(serviceModel));
+        return tableClient.insertOrReplace(Entities.from(serviceModel));
     }
 
     @Override
     public boolean delete(ServiceModel serviceModel) {
-        return delete(tableClient.<ServiceEntity>retrieve(from(serviceModel)));
+        return delete(tableClient.<ServiceEntity>retrieve(Entities.from(serviceModel)));
     }
 
     @Override
     public boolean delete(DependencyModel dependencyModel) {
-        return delete(tableClient.<DependencyEntity>retrieve(from(dependencyModel)));
+        return delete(tableClient.<DependencyEntity>retrieve(Entities.from(dependencyModel)));
     }
 
     @Override
@@ -138,12 +71,12 @@ public class AzureStore extends BreakerboxStore {
 
     @Override
     public Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId) {
-        return toServiceModel(tableClient.<ServiceEntity>retrieve(ServiceEntity.build(serviceId, dependencyId)));
+        return Entities.toServiceModel(tableClient.<ServiceEntity>retrieve(ServiceEntity.build(serviceId, dependencyId)));
     }
 
     @Override
     public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
-        return toDependencyModel(fetchByTimestamp(dependencyId, dateTime.getMillis(), serviceId));
+        return Entities.toDependencyModel(fetchByTimestamp(dependencyId, dateTime.getMillis(), serviceId));
     }
 
     @Override
@@ -153,7 +86,7 @@ public class AzureStore extends BreakerboxStore {
 
     @Override
     public Iterable<ServiceModel> allServiceModels() {
-        return toServiceModelList(allServiceEntities());
+        return Entities.toServiceModelList(allServiceEntities());
     }
 
     @Override
@@ -162,7 +95,7 @@ public class AzureStore extends BreakerboxStore {
             return listDependenciesCache.get(serviceId, new Callable<ImmutableList<ServiceModel>>() {
                 @Override
                 public ImmutableList<ServiceModel> call() throws Exception {
-                    return toServiceModelList(allServiceEntities(serviceId));
+                    return Entities.toServiceModelList(allServiceEntities(serviceId));
                 }
             });
         } catch (ExecutionException err) {
@@ -175,7 +108,7 @@ public class AzureStore extends BreakerboxStore {
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
         final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
         try {
-            return toDependencyModelList(tableClient.search(TableQuery
+            return Entities.toDependencyModelList(tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
                     .where(TableQuery.combineFilters(
                             partitionEquals(dependencyId),
