@@ -5,6 +5,8 @@ import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
+import com.yammer.breakerbox.service.auth.NullAuthProvider;
+import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
@@ -71,7 +73,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
 
     @Override
     public void run(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
-        setupAuth(configuration.getLdapConfiguration(), environment);
+        setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = new AzureStore(configuration.getAzure(), environment);
         breakerboxStore.initialize();
@@ -99,7 +101,19 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                         TimeUnit.MINUTES);
     }
 
-    private static void setupAuth(LdapConfiguration ldapConfiguration, Environment environment) {
+    private static void setupAuth(BreakerboxServiceConfiguration configuration, Environment environment) {
+        if (configuration.getLdapConfiguration().isPresent()) {
+            setupLdapAuth(configuration.getLdapConfiguration().get(), environment);
+        } else {
+            setupNullAuth(environment);
+        }
+    }
+
+    private static void setupNullAuth(Environment environment) {
+        environment.addProvider(new NullAuthProvider<>(new NullAuthenticator()));
+    }
+
+    private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
         final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration);
         final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
                 new LdapCanAuthenticate(ldapConfiguration));
@@ -111,6 +125,6 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
 
         environment.addHealthCheck(new LdapHealthCheck(TenacityAuthenticator
                 .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
-        environment.addResource(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
+        environment.addProvider(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
     }
 }

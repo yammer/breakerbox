@@ -31,7 +31,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
 
     @NotNull @Valid @JsonProperty("ldap")
-    private LdapConfiguration ldapConfiguration = new LdapConfiguration();
+    private Optional<LdapConfiguration> ldapConfiguration = Optional.absent();
 
     @NotNull @Valid
     private ArchaiusOverrideConfiguration archaiusOverride;
@@ -49,7 +49,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
         this.breakerboxServicesConfiguration = Optional.fromNullable(breakerboxServicesConfiguration).or(new TenacityConfiguration());
         this.breakerboxConfiguration = breakerboxConfiguration;
-        this.ldapConfiguration = ldapConfiguration;
+        this.ldapConfiguration = Optional.fromNullable(ldapConfiguration);
         this.archaiusOverride = Optional.fromNullable(archaiusOverride).or(new ArchaiusOverrideConfiguration());
     }
 
@@ -74,7 +74,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
 
     @JsonProperty("ldap")
-    public LdapConfiguration getLdapConfiguration() {
+    public Optional<LdapConfiguration> getLdapConfiguration() {
         return ldapConfiguration;
     }
 
@@ -86,7 +86,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.archaiusOverride = archaiusOverride;
     }
 
-    public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+    public void setLdapConfiguration(Optional<LdapConfiguration> ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
     }
 
