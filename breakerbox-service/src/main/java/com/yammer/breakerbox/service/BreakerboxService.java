@@ -4,10 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
-import com.yammer.breakerbox.azure.TableClient;
-import com.yammer.breakerbox.azure.TableClientFactory;
-import com.yammer.breakerbox.azure.core.TableId;
-import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -73,28 +69,18 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                 .register();
     }
 
-    private static void initializeAzureTables(TableClient tableClient) {
-        for (TableId tableId : TableId.values()) {
-            tableClient.create(tableId);
-        }
-    }
-
     @Override
     public void run(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
         setupAuth(configuration.getLdapConfiguration(), environment);
 
-        final TableClient tableClient = new TableClientFactory(configuration.getAzure()).create();
-        final BreakerboxStore breakerboxStore = new AzureStore(tableClient);
+        final BreakerboxStore breakerboxStore = new AzureStore(configuration.getAzure(), environment);
+        breakerboxStore.initialize();
         final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
                 new TenacityPoller.Factory(tenacityClient));
         final SyncComparator syncComparator = new SyncComparator(
                 new TenacityConfigurationFetcher.Factory(tenacityClient),
                 breakerboxStore);
-
-        initializeAzureTables(tableClient);
-        
-        environment.addHealthCheck(new TableClientHealthcheck(tableClient));
 
         environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
 

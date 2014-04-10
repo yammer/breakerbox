@@ -6,6 +6,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
+import com.yammer.dropwizard.config.Environment;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import org.joda.time.DateTime;
@@ -23,8 +24,10 @@ public abstract class BreakerboxStore {
     protected static final Timer LIST_SERVICE = Metrics.newTimer(BreakerboxStore.class, "list-service");
     protected static final Timer DEPENDENCY_CONFIGS = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
 
-    protected BreakerboxStore() {}
+    @SuppressWarnings("unused")
+    protected <StoreConfiguration> BreakerboxStore(StoreConfiguration storeConfiguration, Environment environment) {}
 
+    public abstract boolean initialize();
     public abstract boolean store(DependencyModel dependencyModel);
     public abstract boolean store(ServiceModel serviceModel);
     public abstract boolean delete(ServiceModel serviceModel);

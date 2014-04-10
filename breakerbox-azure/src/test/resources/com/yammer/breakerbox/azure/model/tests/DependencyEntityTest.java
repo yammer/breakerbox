@@ -2,6 +2,8 @@ package com.yammer.breakerbox.azure.model.tests;
 
 import com.google.common.base.Optional;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.azure.tests.TableClientTester;
 import com.yammer.breakerbox.azure.tests.WithConfiguration;
@@ -24,6 +26,7 @@ public class DependencyEntityTest extends WithConfiguration {
     private ServiceId serviceId;
     private long testTimeStamp;
     private String user;
+    private TableClient tableClient;
     private TableClientTester tableClientTester;
 
     @Before
@@ -32,6 +35,7 @@ public class DependencyEntityTest extends WithConfiguration {
         serviceId = ServiceId.from(UUID.randomUUID().toString());
         testTimeStamp = System.currentTimeMillis();
         user = "USER";
+        tableClient = new TableClientFactory(azureTableConfiguration).create();
         tableClientTester = new TableClientTester(tableClient);
     }
 

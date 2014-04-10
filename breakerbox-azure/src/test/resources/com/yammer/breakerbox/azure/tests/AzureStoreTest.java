@@ -2,6 +2,8 @@ package com.yammer.breakerbox.azure.tests;
 
 import com.google.common.base.Optional;
 import com.yammer.breakerbox.azure.AzureStore;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.azure.model.Entities;
 import com.yammer.breakerbox.store.BreakerboxStore;
@@ -9,6 +11,7 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
+import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
@@ -21,9 +24,11 @@ import java.util.UUID;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class AzureStoreTest extends WithConfiguration {
     private BreakerboxStore breakerboxStore;
+    private TableClient tableClient;
     private ServiceId testServiceId;
     private DependencyId testDependencyId;
     private TenacityConfiguration dependencyConfiguration;
@@ -32,7 +37,9 @@ public class AzureStoreTest extends WithConfiguration {
 
     @Before
     public void setup() {
-        breakerboxStore = new AzureStore(tableClient);
+        tableClient = new TableClientFactory(azureTableConfiguration).create();
+        breakerboxStore = new AzureStore(azureTableConfiguration, mock(Environment.class));
+        assertTrue(breakerboxStore.initialize());
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
         timestamp = 1345938944000l;
@@ -43,6 +50,7 @@ public class AzureStoreTest extends WithConfiguration {
     @After
     public void teardown() {
         assertTrue(breakerboxStore.delete(new ServiceModel(testServiceId, testDependencyId)));
+        assertTrue(breakerboxStore.delete(testServiceId, testDependencyId));
         assertTrue(breakerboxStore.delete(testDependencyId, new DateTime(timestamp), testServiceId));
         removeDependencyModel(breakerboxStore.retrieveLatest(testDependencyId, testServiceId));
     }

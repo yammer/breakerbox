@@ -1,6 +1,8 @@
 package com.yammer.breakerbox.azure.model.tests;
 
 import com.google.common.base.Optional;
+import com.yammer.breakerbox.azure.TableClient;
+import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.model.ServiceEntity;
 import com.yammer.breakerbox.azure.tests.TableClientTester;
 import com.yammer.breakerbox.azure.tests.WithConfiguration;
@@ -18,12 +20,14 @@ import static org.junit.Assert.assertTrue;
 public class ServiceEntityTest extends WithConfiguration {
     private ServiceId testServiceId;
     private DependencyId testDependencyId;
+    private TableClient tableClient;
     private TableClientTester tableClientTester;
 
     @Before
     public void setup() {
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
+        tableClient = new TableClientFactory(azureTableConfiguration).create();
         tableClientTester = new TableClientTester(tableClient);
     }
 

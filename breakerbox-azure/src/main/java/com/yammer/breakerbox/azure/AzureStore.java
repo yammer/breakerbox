@@ -8,6 +8,7 @@ import com.microsoft.windowsazure.services.table.client.TableConstants;
 import com.microsoft.windowsazure.services.table.client.TableQuery;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableType;
+import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.azure.model.DependencyModelByTimestamp;
 import com.yammer.breakerbox.azure.model.Entities;
@@ -17,6 +18,7 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
+import com.yammer.dropwizard.config.Environment;
 import com.yammer.metrics.core.TimerContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -25,18 +27,26 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class AzureStore extends BreakerboxStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzureStore.class);
     private final TableClient tableClient;
 
-    public AzureStore(TableClient tableClient) {
-        this.tableClient = checkNotNull(tableClient);
+    public AzureStore(AzureTableConfiguration azureTableConfiguration, Environment environment) {
+        super(azureTableConfiguration, environment);
+        this.tableClient = new TableClientFactory(azureTableConfiguration).create();
+        environment.addHealthCheck(new TableClientHealthcheck(tableClient));
     }
 
     private <T extends TableType> boolean delete(Optional<T> tableType) {
         return !tableType.isPresent() || tableClient.remove(tableType.get());
+    }
+
+    @Override
+    public boolean initialize() {
+        for (TableId tableId : TableId.values()) {
+            tableClient.create(tableId);
+        }
+        return true;
     }
 
     @Override
