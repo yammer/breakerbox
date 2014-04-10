@@ -17,6 +17,7 @@
         <module>breakerbox-dashboard</module>
         <module>breakerbox-azure</module>
         <module>breakerbox-store</module>
+        <module>breakerbox-jdbi</module>
     </modules>
 
     <scm>
@@ -37,6 +38,7 @@
         <tenacity.version>0.2.2</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-auth-ldap.version>0.0.19</dropwizard-auth-ldap.version>
+        <postgresql.version>9.3-1101-jdbc41</postgresql.version>
     </properties>
 
     <developers>

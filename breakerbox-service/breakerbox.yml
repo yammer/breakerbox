@@ -7,6 +7,16 @@ archaiusOverride:
   turbineHostRetry: 30s
   hystrixMetricsStreamServletMaxConnections: 10
 
+database:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost/breakerbox
+  user: breakerbox
+  password: breakerboxpass
+  maxSize: 20
+  minSize: 5
+  checkConnectionWhileIdle: true
+  checkConnectionHealthWhenIdleFor: 1s
+
 azure:
   accountName: breakerboxtest
   accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==

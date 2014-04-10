@@ -5,6 +5,7 @@ import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
+import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.service.auth.NullAuthProvider;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
@@ -31,6 +32,9 @@ import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
+import com.yammer.dropwizard.db.DatabaseConfiguration;
+import com.yammer.dropwizard.jdbi.bundles.DBIExceptionsBundle;
+import com.yammer.dropwizard.migrations.MigrationsBundle;
 import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientFactory;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
@@ -51,6 +55,13 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     @Override
     public void initialize(Bootstrap<BreakerboxServiceConfiguration> bootstrap) {
         bootstrap.setName("Breakerbox");
+        bootstrap.addBundle(new DBIExceptionsBundle());
+        bootstrap.addBundle(new MigrationsBundle<BreakerboxServiceConfiguration>() {
+            @Override
+            public DatabaseConfiguration getDatabaseConfiguration(BreakerboxServiceConfiguration configuration) {
+                return configuration.getJdbiConfiguration().or(new JdbiConfiguration());
+            }
+        });
         bootstrap.addBundle(TenacityBundleBuilder
                 .newBuilder()
                 .propertyKeyFactory(new BreakerboxDependencyKeyFactory())
