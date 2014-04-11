@@ -39,6 +39,7 @@
         <turbine.version>0.4</turbine.version>
         <dropwizard-auth-ldap.version>0.0.19</dropwizard-auth-ldap.version>
         <postgresql.version>9.3-1101-jdbc41</postgresql.version>
+        <h2.version>1.3.176</h2.version>
     </properties>
 
     <developers>

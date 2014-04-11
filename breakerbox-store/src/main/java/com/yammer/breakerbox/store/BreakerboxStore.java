@@ -27,7 +27,7 @@ public abstract class BreakerboxStore {
     @SuppressWarnings("unused")
     protected <StoreConfiguration> BreakerboxStore(StoreConfiguration storeConfiguration, Environment environment) {}
 
-    public abstract boolean initialize();
+    public abstract boolean initialize() throws Exception;
     public abstract boolean store(DependencyModel dependencyModel);
     public abstract boolean store(ServiceModel serviceModel);
     public abstract boolean delete(ServiceModel serviceModel);
