@@ -1,8 +1,10 @@
 package com.yammer.breakerbox.jdbi;
 
 import com.google.common.base.Optional;
+import com.yammer.breakerbox.jdbi.args.DateTimeArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.DependencyIdArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.ServiceIdArgumentFactory;
+import com.yammer.breakerbox.jdbi.args.TenacityConfigurationArgumentFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
@@ -20,6 +22,7 @@ public class JdbiStore extends BreakerboxStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbiStore.class);
     private final DBI database;
     private final ServiceDB serviceDB;
+    private final DependencyDB dependencyDB;
 
     public JdbiStore(JdbiConfiguration storeConfiguration, Environment environment) throws Exception {
         this(storeConfiguration, environment, new DBIFactory().build(environment, storeConfiguration, "breakerbox"));
@@ -30,7 +33,10 @@ public class JdbiStore extends BreakerboxStore {
         this.database = database;
         this.database.registerArgumentFactory(new DependencyIdArgumentFactory());
         this.database.registerArgumentFactory(new ServiceIdArgumentFactory());
+        this.database.registerArgumentFactory(new TenacityConfigurationArgumentFactory());
+        this.database.registerArgumentFactory(new DateTimeArgumentFactory());
 
+        dependencyDB = database.onDemand(DependencyDB.class);
         serviceDB = database.onDemand(ServiceDB.class);
     }
 
@@ -41,7 +47,12 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean store(DependencyModel dependencyModel) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return dependencyDB.insert(dependencyModel) == 1;
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to store: {}", dependencyModel, err);
+            return false;
+        }
     }
 
     @Override
@@ -66,7 +77,12 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean delete(DependencyModel dependencyModel) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return dependencyDB.delete(dependencyModel.getDependencyId(), dependencyModel.getDateTime()) >= 0;
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to delete: {}", dependencyModel, err);
+            return false;
+        }
     }
 
     @Override
@@ -76,7 +92,12 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean delete(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return dependencyDB.delete(dependencyId, dateTime, serviceId) >= 0;
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to delete: {}, {}, {}", dependencyId, dateTime, serviceId, err);
+            return false;
+        }
     }
 
     @Override
@@ -91,7 +112,12 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return Optional.fromNullable(dependencyDB.find(dependencyId, dateTime, serviceId));
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to retrieve {}, {}, {}", dependencyId, dateTime.getMillis(), serviceId);
+            return Optional.absent();
+        }
     }
 
     @Override

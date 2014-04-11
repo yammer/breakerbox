@@ -20,12 +20,6 @@ public class ServiceDBTest extends H2Test {
         serviceDB = database.onDemand(ServiceDB.class);
     }
 
-    private static ServiceModel serviceModel() {
-        return new ServiceModel(
-                ServiceId.from(UUID.randomUUID().toString()),
-                DependencyId.from(UUID.randomUUID().toString()));
-    }
-
     @Test
     public void simpleStoreAndRetrieve() {
         final ServiceModel serviceModel = serviceModel();
