@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.jdbi;
 
 import com.yammer.breakerbox.store.DependencyId;
-import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.sqlobject.BindBean;
@@ -14,11 +13,6 @@ public interface DependencyDB {
     @SqlQuery("select * from dependency where name = :dependency.id and timestamp = :timestamp.millis")
     public DependencyModel find(@BindBean("dependency") DependencyId dependencyId, @BindBean("timestamp") DateTime timestamp);
 
-    @SqlQuery("select * from dependency where name = :dependency.id and timestamp = :timestamp.millis and service = :service.id")
-    public DependencyModel find(@BindBean("dependency") DependencyId dependencyId,
-                                @BindBean("timestamp") DateTime timestamp,
-                                @BindBean("service") ServiceId serviceId);
-
     @SqlUpdate("insert into dependency (name, timestamp, tenacityConfiguration, user, service) values " +
                "(:dependency.dependencyId, :dependency.dateTime, :dependency.tenacityConfiguration," +
                " :dependency.user, :dependency.serviceId)")
@@ -26,9 +20,4 @@ public interface DependencyDB {
 
     @SqlUpdate("delete from dependency where name = :dependency.id and timestamp = :timestamp.millis")
     public int delete(@BindBean("dependency") DependencyId dependencyId, @BindBean("timestamp") DateTime timestamp);
-
-    @SqlUpdate("delete from dependency where name = :dependency.id and timestamp = :timestamp.millis and service = :service.id")
-    public int delete(@BindBean("dependency") DependencyId dependencyId,
-                      @BindBean("timestamp") DateTime timestamp,
-                      @BindBean("service") ServiceId serviceId);
 }
