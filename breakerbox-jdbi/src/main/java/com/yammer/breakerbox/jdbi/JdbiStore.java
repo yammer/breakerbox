@@ -46,13 +46,22 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean store(ServiceModel serviceModel) {
-        serviceDB.insert(serviceModel);
-        return true;
+        try {
+            return serviceDB.insert(serviceModel) == 1;
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to store: {}", serviceModel, err);
+            return false;
+        }
     }
 
     @Override
     public boolean delete(ServiceModel serviceModel) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return serviceDB.delete(serviceModel) >= 0;
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to delete: {}", serviceModel, err);
+            return false;
+        }
     }
 
     @Override
@@ -62,7 +71,7 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean delete(ServiceId serviceId, DependencyId dependencyId) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return delete(new ServiceModel(serviceId, dependencyId));
     }
 
     @Override
@@ -73,7 +82,7 @@ public class JdbiStore extends BreakerboxStore {
     @Override
     public Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId) {
         try {
-            return Optional.of(serviceDB.find(new ServiceModel(serviceId, dependencyId)));
+            return Optional.fromNullable(serviceDB.find(new ServiceModel(serviceId, dependencyId)));
         } catch (DBIException err) {
             LOGGER.warn("Failed to retrieve {}:{}", serviceId, dependencyId, err);
             return Optional.absent();
@@ -92,12 +101,12 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public Iterable<ServiceModel> allServiceModels() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return serviceDB.all();
     }
 
     @Override
     public Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return serviceDB.all(serviceId);
     }
 
     @Override
