@@ -83,7 +83,7 @@ public class ConfigureResource {
 
     private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, ServiceId serviceId) {
         final Optional<DependencyModel> dependencyModel = version.isPresent()
-                ? breakerboxStore.retrieve(dependencyId, new DateTime(version.get()), serviceId)
+                ? breakerboxStore.retrieve(dependencyId, new DateTime(version.get()))
                 : breakerboxStore.retrieveLatest(dependencyId, serviceId);
 
         if (dependencyModel.isPresent()) {

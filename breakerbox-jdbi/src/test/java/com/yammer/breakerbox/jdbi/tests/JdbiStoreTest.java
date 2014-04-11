@@ -38,7 +38,7 @@ public class JdbiStoreTest extends H2Test {
     public void simpleStoreAndRetrieveDependency() {
         final DependencyModel dependencyModel = dependencyModel();
         assertTrue(jdbiStore.store(dependencyModel));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
     }
 
@@ -56,7 +56,7 @@ public class JdbiStoreTest extends H2Test {
         final DependencyModel dependencyModel = dependencyModel();
         assertTrue(jdbiStore.store(dependencyModel));
         assertFalse(jdbiStore.store(dependencyModel));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
     }
 
@@ -74,21 +74,21 @@ public class JdbiStoreTest extends H2Test {
     @Test
     public void simpleDeleteDependency() {
         final DependencyModel dependencyModel = dependencyModel();
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.<DependencyModel>absent());
 
         assertTrue(jdbiStore.store(dependencyModel));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
         assertTrue(jdbiStore.delete(dependencyModel));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.<DependencyModel>absent());
 
         assertTrue(jdbiStore.store(dependencyModel));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
-        assertTrue(jdbiStore.delete(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()));
-        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime(), dependencyModel.getServiceId()))
+        assertTrue(jdbiStore.delete(dependencyModel.getDependencyId(), dependencyModel.getDateTime()));
+        assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.<DependencyModel>absent());
 
     }

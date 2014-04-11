@@ -36,7 +36,7 @@ public class AzureStoreTest extends WithConfiguration {
     private String user;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         tableClient = new TableClientFactory(azureTableConfiguration).create();
         breakerboxStore = new AzureStore(azureTableConfiguration, mock(Environment.class));
         assertTrue(breakerboxStore.initialize());
@@ -51,7 +51,7 @@ public class AzureStoreTest extends WithConfiguration {
     public void teardown() {
         assertTrue(breakerboxStore.delete(new ServiceModel(testServiceId, testDependencyId)));
         assertTrue(breakerboxStore.delete(testServiceId, testDependencyId));
-        assertTrue(breakerboxStore.delete(testDependencyId, new DateTime(timestamp), testServiceId));
+        assertTrue(breakerboxStore.delete(testDependencyId, new DateTime(timestamp)));
         removeDependencyModel(breakerboxStore.retrieveLatest(testDependencyId, testServiceId));
     }
 
@@ -82,7 +82,7 @@ public class AzureStoreTest extends WithConfiguration {
         final DependencyEntity dependencyEntity = DependencyEntity.build(testDependencyId, timestamp, user, dependencyConfiguration, testServiceId);
         final Optional<DependencyModel> expectedModel = Optional.of(Entities.toModel(dependencyEntity));
         assertTrue(tableClient.insertOrReplace(dependencyEntity));
-        assertEquals(breakerboxStore.retrieve(testDependencyId, new DateTime(timestamp), testServiceId), expectedModel);
+        assertEquals(breakerboxStore.retrieve(testDependencyId, new DateTime(timestamp)), expectedModel);
         assertEquals(breakerboxStore.retrieveLatest(testDependencyId, testServiceId), expectedModel);
         assertThat(breakerboxStore.allDependenciesFor(testDependencyId, testServiceId))
                 .contains(expectedModel.get());
@@ -127,7 +127,7 @@ public class AzureStoreTest extends WithConfiguration {
                 new TenacityConfiguration(),
                 user,
                 testServiceId));
-        assertEquals(breakerboxStore.retrieve(testDependencyId, dependencyModel.get().getDateTime(), testServiceId),
+        assertEquals(breakerboxStore.retrieve(testDependencyId, dependencyModel.get().getDateTime()),
                 dependencyModel);
     }
 }

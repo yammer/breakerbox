@@ -91,11 +91,11 @@ public class JdbiStore extends BreakerboxStore {
     }
 
     @Override
-    public boolean delete(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
+    public boolean delete(DependencyId dependencyId, DateTime dateTime) {
         try {
-            return dependencyDB.delete(dependencyId, dateTime, serviceId) >= 0;
+            return dependencyDB.delete(dependencyId, dateTime) >= 0;
         } catch (DBIException err) {
-            LOGGER.warn("Failed to delete: {}, {}, {}", dependencyId, dateTime, serviceId, err);
+            LOGGER.warn("Failed to delete: {}, {}", dependencyId, dateTime, err);
             return false;
         }
     }
@@ -111,11 +111,11 @@ public class JdbiStore extends BreakerboxStore {
     }
 
     @Override
-    public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
+    public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime) {
         try {
-            return Optional.fromNullable(dependencyDB.find(dependencyId, dateTime, serviceId));
+            return Optional.fromNullable(dependencyDB.find(dependencyId, dateTime));
         } catch (DBIException err) {
-            LOGGER.warn("Failed to retrieve {}, {}, {}", dependencyId, dateTime.getMillis(), serviceId);
+            LOGGER.warn("Failed to retrieve {}, {}", dependencyId, dateTime.getMillis());
             return Optional.absent();
         }
     }

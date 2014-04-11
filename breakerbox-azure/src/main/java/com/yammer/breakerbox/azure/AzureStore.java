@@ -75,8 +75,8 @@ public class AzureStore extends BreakerboxStore {
     }
 
     @Override
-    public boolean delete(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
-        return delete(fetchByTimestamp(dependencyId, dateTime.getMillis(), serviceId));
+    public boolean delete(DependencyId dependencyId, DateTime dateTime) {
+        return delete(fetchByTimestamp(dependencyId, dateTime.getMillis()));
     }
 
     @Override
@@ -85,8 +85,8 @@ public class AzureStore extends BreakerboxStore {
     }
 
     @Override
-    public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime, ServiceId serviceId) {
-        return Entities.toDependencyModel(fetchByTimestamp(dependencyId, dateTime.getMillis(), serviceId));
+    public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime) {
+        return Entities.toDependencyModel(fetchByTimestamp(dependencyId, dateTime.getMillis()));
     }
 
     @Override
@@ -141,8 +141,8 @@ public class AzureStore extends BreakerboxStore {
         }
     }
 
-    private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp, ServiceId serviceId) {
-        final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp, serviceId);
+    private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp) {
+        final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp);
         if (dependencyEntities.isEmpty()) {
             return Optional.absent();
         } else {
@@ -179,18 +179,15 @@ public class AzureStore extends BreakerboxStore {
         }
     }
 
-    private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp, ServiceId serviceId) {
+    private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
         final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
         try {
             return tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
                     .where(TableQuery.combineFilters(
-                            TableQuery.combineFilters(
-                                    partitionEquals(dependencyId),
-                                    TableQuery.Operators.AND,
-                                    timestampEquals(targetTimeStamp)),
-                            TableQuery.Operators.AND,
-                            serviceIdEquals(serviceId))));
+                                partitionEquals(dependencyId),
+                                TableQuery.Operators.AND,
+                                timestampEquals(targetTimeStamp))));
         } finally {
             timerContext.stop();
         }
