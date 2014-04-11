@@ -115,14 +115,19 @@ public class JdbiStore extends BreakerboxStore {
         try {
             return Optional.fromNullable(dependencyDB.find(dependencyId, dateTime));
         } catch (DBIException err) {
-            LOGGER.warn("Failed to retrieve {}, {}", dependencyId, dateTime.getMillis());
+            LOGGER.warn("Failed to retrieve {}, {}", dependencyId, dateTime.getMillis(), err);
             return Optional.absent();
         }
     }
 
     @Override
     public Optional<DependencyModel> retrieveLatest(DependencyId dependencyId, ServiceId serviceId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            return Optional.fromNullable(dependencyDB.findLatest(dependencyId, serviceId));
+        } catch (DBIException err) {
+            LOGGER.warn("Failed to retrieve {}, {}", dependencyId, serviceId, err);
+            return Optional.absent();
+        }
     }
 
     @Override
@@ -137,6 +142,6 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return dependencyDB.all(dependencyId, serviceId);
     }
 }

@@ -56,10 +56,10 @@ public class ServiceDBTest extends H2Test {
         assertThat(serviceDB.all()).isEmpty();
         final ServiceModel serviceModel1 = serviceModel();
         assertThat(serviceDB.insert(serviceModel1)).isEqualTo(1);
-        assertThat(serviceDB.all()).contains(serviceModel1);
+        assertThat(serviceDB.all()).containsOnly(serviceModel1);
         final ServiceModel serviceModel2 = serviceModel();
         assertThat(serviceDB.insert(serviceModel2)).isEqualTo(1);
-        assertThat(serviceDB.all()).contains(serviceModel1, serviceModel2);
+        assertThat(serviceDB.all()).containsOnly(serviceModel1, serviceModel2);
     }
 
     @Test
@@ -68,9 +68,11 @@ public class ServiceDBTest extends H2Test {
         assertThat(serviceDB.all(serviceId)).isEmpty();
         final ServiceModel serviceModel1 = new ServiceModel(serviceId, DependencyId.from(UUID.randomUUID().toString()));
         assertThat(serviceDB.insert(serviceModel1)).isEqualTo(1);
-        assertThat(serviceDB.all(serviceId)).contains(serviceModel1);
+        assertThat(serviceDB.all(serviceId)).containsOnly(serviceModel1);
         final ServiceModel serviceModel2 = new ServiceModel(serviceId, DependencyId.from(UUID.randomUUID().toString()));
         assertThat(serviceDB.insert(serviceModel2)).isEqualTo(1);
-        assertThat(serviceDB.all(serviceId)).contains(serviceModel1, serviceModel2);
+        assertThat(serviceDB.all(serviceId)).containsOnly(serviceModel1, serviceModel2);
+        assertThat(serviceDB.insert(serviceModel())).isEqualTo(1);
+        assertThat(serviceDB.all(serviceId)).containsOnly(serviceModel1, serviceModel2);
     }
 }

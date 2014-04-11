@@ -64,4 +64,13 @@ public class H2Test {
                 UUID.randomUUID().toString(),
                 ServiceId.from(UUID.randomUUID().toString()));
     }
+
+    protected static DependencyModel dependencyModel(DateTime dateTime) {
+        return new DependencyModel(
+                DependencyId.from(UUID.randomUUID().toString()),
+                dateTime,
+                new TenacityConfiguration(),
+                UUID.randomUUID().toString(),
+                ServiceId.from(UUID.randomUUID().toString()));
+    }
 }
