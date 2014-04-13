@@ -48,6 +48,7 @@ import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
 import com.yammer.tenacity.dbi.DBIExceptionLogger;
 import com.yammer.tenacity.dbi.SQLExceptionLogger;
 
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
@@ -79,8 +80,6 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                             new DefaultExceptionLogger())))
                 .build());
         bootstrap.addBundle(new BreakerboxDashboardBundle());
-
-        TurbineInit.init();
     }
     
     private static void registerProperties(BreakerboxServiceConfiguration configuration) {
@@ -93,7 +92,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     }
 
     @Override
-    public void run(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
+    public void run(final BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
@@ -113,14 +112,20 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
         environment.addResource(new DashboardResource());
         environment.addResource(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
-        registerProperties(configuration);
+        final ScheduledExecutorService scheduledExecutorService = environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1);
+        scheduledExecutorService.scheduleAtFixedRate(
+                new ScheduledTenacityPoller(tenacityPropertyKeysStore),
+                30,
+                60,
+                TimeUnit.SECONDS);
 
-        environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1)
-                .scheduleAtFixedRate(
-                        new ScheduledTenacityPoller(tenacityPropertyKeysStore),
-                        0,
-                        1,
-                        TimeUnit.MINUTES);
+        scheduledExecutorService.schedule(new Runnable() {
+            @Override
+            public void run() {
+                TurbineInit.init();
+                registerProperties(configuration);
+            }
+        }, 10, TimeUnit.SECONDS);
     }
 
     private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
