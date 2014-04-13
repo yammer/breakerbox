@@ -15,7 +15,7 @@
             <column name="timestamp" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="tenacityConfiguration" type="text">
+            <column name="tenacity_configuration" type="text">
                 <constraints nullable="false"/>
             </column>
             <column name="username" type="text">
