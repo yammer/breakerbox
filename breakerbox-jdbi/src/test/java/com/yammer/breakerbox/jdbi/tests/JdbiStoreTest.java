@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.jdbi.tests;
 
 import com.google.common.base.Optional;
-import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
@@ -24,8 +23,9 @@ public class JdbiStoreTest extends H2Test {
     private JdbiStore jdbiStore;
 
     @Before
-    public void setup() {
-        jdbiStore = new JdbiStore(new JdbiConfiguration(), mock(Environment.class), database);
+    public void setup() throws Exception {
+        jdbiStore = new JdbiStore(hsqlConfig, mock(Environment.class), database);
+        jdbiStore.initialize();
     }
 
     @Test

@@ -6,7 +6,6 @@ import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
-import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.service.auth.NullAuthProvider;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
@@ -65,7 +64,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
         bootstrap.addBundle(new MigrationsBundle<BreakerboxServiceConfiguration>() {
             @Override
             public DatabaseConfiguration getDatabaseConfiguration(BreakerboxServiceConfiguration configuration) {
-                return configuration.getJdbiConfiguration().or(new JdbiConfiguration());
+                return configuration.getJdbiConfiguration().or(new DatabaseConfiguration());
             }
         });
         bootstrap.addBundle(TenacityBundleBuilder
@@ -127,8 +126,10 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
         if (configuration.getJdbiConfiguration().isPresent()) {
             return new JdbiStore(configuration.getJdbiConfiguration().get(), environment);
+        } else if (configuration.getAzure().isPresent()) {
+            return new AzureStore(configuration.getAzure().get(), environment);
         } else {
-            return new AzureStore(configuration.getAzure(), environment);
+            throw new IllegalStateException("A datastore must be specified: either azure or database");
         }
     }
 
