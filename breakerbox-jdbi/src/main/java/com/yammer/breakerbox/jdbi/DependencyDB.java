@@ -15,7 +15,7 @@ public interface DependencyDB {
     @SqlQuery("select * from dependency where name = :dependency.id and timestamp = :timestamp.millis")
     public DependencyModel find(@BindBean("dependency") DependencyId dependencyId, @BindBean("timestamp") DateTime timestamp);
 
-    @SqlUpdate("insert into dependency (name, timestamp, tenacityConfiguration, user, service) values " +
+    @SqlUpdate("insert into dependency (name, timestamp, tenacityConfiguration, username, service) values " +
                "(:dependency.dependencyId, :dependency.dateTime, :dependency.tenacityConfiguration," +
                " :dependency.user, :dependency.serviceId)")
     public int insert(@BindBean("dependency") DependencyModel dependencyModel);

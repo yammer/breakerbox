@@ -38,7 +38,7 @@ public class Mappers {
                     DependencyId.from(r.getString("name")),
                     new DateTime(r.getLong("timestamp")),
                     parseTenacityConfiguration(r.getString("tenacityConfiguration")).get(),
-                    r.getString("user"),
+                    r.getString("username"),
                     ServiceId.from(r.getString("service")));
         }
 
