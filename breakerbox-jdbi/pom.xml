@@ -43,6 +43,11 @@
             <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-jdbi</artifactId>
+            <version>${tenacity.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
             <version>${dropwizard.version}</version>

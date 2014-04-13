@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 public class JdbiStore extends BreakerboxStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbiStore.class);
-    private final DBI database;
     private final ServiceDB serviceDB;
     private final DependencyDB dependencyDB;
 
@@ -30,11 +29,10 @@ public class JdbiStore extends BreakerboxStore {
 
     public JdbiStore(JdbiConfiguration storeConfiguration, Environment environment, DBI database) {
         super(storeConfiguration, environment);
-        this.database = database;
-        this.database.registerArgumentFactory(new DependencyIdArgumentFactory());
-        this.database.registerArgumentFactory(new ServiceIdArgumentFactory());
-        this.database.registerArgumentFactory(new TenacityConfigurationArgumentFactory());
-        this.database.registerArgumentFactory(new DateTimeArgumentFactory());
+        database.registerArgumentFactory(new DependencyIdArgumentFactory());
+        database.registerArgumentFactory(new ServiceIdArgumentFactory());
+        database.registerArgumentFactory(new TenacityConfigurationArgumentFactory());
+        database.registerArgumentFactory(new DateTimeArgumentFactory());
 
         dependencyDB = database.onDemand(DependencyDB.class);
         serviceDB = database.onDemand(ServiceDB.class);
@@ -48,21 +46,23 @@ public class JdbiStore extends BreakerboxStore {
     @Override
     public boolean store(DependencyModel dependencyModel) {
         try {
-            return dependencyDB.insert(dependencyModel) == 1;
+            final Optional<DependencyModel> storedModel = retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime());
+            return storedModel.isPresent() && storedModel.get().equals(dependencyModel) || dependencyDB.insert(dependencyModel) == 1;
         } catch (DBIException err) {
             LOGGER.warn("Failed to store: {}", dependencyModel, err);
-            return false;
         }
+        return false;
     }
 
     @Override
     public boolean store(ServiceModel serviceModel) {
         try {
-            return serviceDB.insert(serviceModel) == 1;
+            return retrieve(serviceModel.getServiceId(), serviceModel.getDependencyId()).isPresent() ||
+                   serviceDB.insert(serviceModel) == 1;
         } catch (DBIException err) {
             LOGGER.warn("Failed to store: {}", serviceModel, err);
-            return false;
         }
+        return false;
     }
 
     @Override

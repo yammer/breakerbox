@@ -1,11 +1,13 @@
 package com.yammer.breakerbox.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
+import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.service.auth.NullAuthProvider;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
@@ -40,8 +42,12 @@ import com.yammer.tenacity.client.TenacityClientFactory;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleBuilder;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
+import com.yammer.tenacity.core.logging.DefaultExceptionLogger;
+import com.yammer.tenacity.core.logging.ExceptionLoggingCommandHook;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
+import com.yammer.tenacity.dbi.DBIExceptionLogger;
+import com.yammer.tenacity.dbi.SQLExceptionLogger;
 
 import java.util.concurrent.TimeUnit;
 
@@ -67,6 +73,11 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                 .propertyKeyFactory(new BreakerboxDependencyKeyFactory())
                 .propertyKeys(BreakerboxDependencyKey.values())
                 .mapAllHystrixRuntimeExceptionsTo(429)
+                .commandExecutionHook(new ExceptionLoggingCommandHook(
+                        ImmutableList.of(
+                            new DBIExceptionLogger(),
+                            new SQLExceptionLogger(),
+                            new DefaultExceptionLogger())))
                 .build());
         bootstrap.addBundle(new BreakerboxDashboardBundle());
 
@@ -86,8 +97,9 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     public void run(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
         setupAuth(configuration, environment);
 
-        final BreakerboxStore breakerboxStore = new AzureStore(configuration.getAzure(), environment);
+        final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
         breakerboxStore.initialize();
+
         final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
                 new TenacityPoller.Factory(tenacityClient));
@@ -110,6 +122,14 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                         0,
                         1,
                         TimeUnit.MINUTES);
+    }
+
+    private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
+        if (configuration.getJdbiConfiguration().isPresent()) {
+            return new JdbiStore(configuration.getJdbiConfiguration().get(), environment);
+        } else {
+            return new AzureStore(configuration.getAzure(), environment);
+        }
     }
 
     private static void setupAuth(BreakerboxServiceConfiguration configuration, Environment environment) {

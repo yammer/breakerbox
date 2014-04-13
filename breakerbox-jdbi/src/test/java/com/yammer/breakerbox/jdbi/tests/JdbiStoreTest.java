@@ -8,6 +8,7 @@ import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import com.yammer.dropwizard.config.Environment;
+import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,19 +45,19 @@ public class JdbiStoreTest extends H2Test {
     }
 
     @Test
-    public void storeServiceTwiceShouldntWork() {
+    public void storeServiceTwiceShouldWork() {
         final ServiceModel serviceModel = serviceModel();
         assertTrue(jdbiStore.store(serviceModel));
-        assertFalse(jdbiStore.store(serviceModel));
+        assertTrue(jdbiStore.store(serviceModel));
         assertThat(jdbiStore.retrieve(serviceModel.getServiceId(), serviceModel.getDependencyId()))
                 .isEqualTo(Optional.of(serviceModel));
     }
 
     @Test
-    public void storeDependencyTwiceShouldntWork() {
+    public void storeDependencyTwiceShouldWork() {
         final DependencyModel dependencyModel = dependencyModel();
         assertTrue(jdbiStore.store(dependencyModel));
-        assertFalse(jdbiStore.store(dependencyModel));
+        assertTrue(jdbiStore.store(dependencyModel));
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
     }
@@ -185,5 +186,18 @@ public class JdbiStoreTest extends H2Test {
         assertTrue(jdbiStore.store(dependencyModel()));
         assertThat(jdbiStore.allDependenciesFor(dependencyModel1.getDependencyId(), dependencyModel1.getServiceId()))
                 .containsOnly(dependencyModel1, dependencyModel2);
+    }
+
+    @Test
+    public void storingSameObjectReturnsTrueOtherwiseFalse() {
+        final DependencyModel dependencyModel = dependencyModel();
+        assertTrue(jdbiStore.store(dependencyModel));
+        assertTrue(jdbiStore.store(dependencyModel));
+        assertFalse(jdbiStore.store(new DependencyModel(
+                dependencyModel.getDependencyId(),
+                dependencyModel.getDateTime(),
+                new TenacityConfiguration(),
+                UUID.randomUUID().toString(),
+                ServiceId.from(UUID.randomUUID().toString()))));
     }
 }
