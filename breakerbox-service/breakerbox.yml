@@ -1,31 +1,17 @@
 breakerbox:
-  urls: file:///Users/cgray/code/breakerbox/breakerbox-service/config.properties,http://localhost:8080/archaius/breakerbox
+  urls: file:config.properties,http://localhost:8080/archaius/breakerbox
   initialDelay: 3s
   delay: 60s
 
-archaiusOverride:
-  turbineHostRetry: 30s
-  hystrixMetricsStreamServletMaxConnections: 10
-
 database:
-  driverClass: org.postgresql.Driver
-  url: jdbc:postgresql://localhost/breakerbox
-#database:
-#  driverClass: org.h2.Driver
-#  url: jdbc:h2:mem:inMemory
+  driverClass: org.h2.Driver
+  url: jdbc:h2:mem:inMemory
   user: breakerbox
   password: breakerboxpass
-  maxSize: 20
-  minSize: 5
+  maxSize: 10
+  minSize: 2
   checkConnectionWhileIdle: true
   checkConnectionHealthWhenIdleFor: 1s
-
-azure:
-  accountName: breakerboxtest
-  accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==
-  connectionTimeout: 500ms
-  retryInterval: 5s
-  retryAttempts: 2
 
 tenacityClient:
   connectionTimeout: 500ms
@@ -46,8 +32,6 @@ http:
 logging:
   level: INFO
   loggers:
-    com.netflix.turbine.monitor.cluster.AggregateClusterMonitor: ERROR
-    com.netflix.turbine.monitor.instance.InstanceMonitor: ERROR
     com.ning.http.client.providers.netty: WARN
   console:
     enabled: true

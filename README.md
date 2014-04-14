@@ -1,51 +1,53 @@
 Breakerbox
 ==========
 
-A dashboard of [Tenacity](https://github.com/yammer/tenacity) circuit-breakers and threadpools displayed in real-time and the ability to configure them on-the-fly.
+Breakerbox is a dashboard and dynamic configuration tool for [Tenacity](https://github.com/yammer/tenacity).
 
-[Tenacity](https://github.com/yammer/tenacity) is a [Dropwizard](http://www.dropwizard.io)-module that brings together [Dropwizard](http://www.dropwizard.io)+[Hystrix](https://github.com/Netflix/Hystrix).
+![Breakerbox Dashboard](http://yammer.github.io/tenacity/breakerbox_latest.png)
+![Breakerbox Configure](http://yammer.github.io/tenacity/breakerbox_configure.png)
 
 Running Breakerbox
 ==================
 
-Download the the latest uber jar here: ???
+__Required:__ Breakerbox requires you to instrument your code with [Tenacity](https://github.com/yammer/tenacity) which is a library to aid
+in resilient design of foreign dependencies.
 
-Then run the following command
+Download a release: ???
+
+Extract the archive and then run the following command
 
 ```bash
-java -jar breakerbox-service.jar breakerbox.yml
+java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service.jar server breakerbox.yml
 ```
 
-Where `breakerbox.yml` is your typical dropwizard configuration.
+Then point your browser at ``http://localhost:8080``. You should see a dashboard
+consisting of the local Breakerbox instance. By default it's backed by an in memory database, so
+any configuration changes you'll make won't be persisted anywhere until your configure it.
 
-Simple Breakerbox Service Configuration
+Configuring Breakerbox
 ---------------------------------------
+
+Here's a very simple bare configuration of Breakerbox. Each section will be described in detail.
 
 ```yaml
 breakerbox:
-  urls: file:///config.properties,http://localhost:8080/archaius/breakerbox
+  urls: file:config.properties,http://localhost:8080/archaius/breakerbox
   initialDelay: 3s
   delay: 60s
 
-archaiusOverride:
-  turbineHostRetry: 30s
-  hystrixMetricsStreamServletMaxConnections: 10
-
-azure:
-  accountName: breakerbox
-  accountKey: secretkey
-  connectionTimeout: 500ms
-  retryInterval: 1s
-  retryAttempts: 1
+database:
+  driverClass: org.h2.Driver
+  url: jdbc:h2:mem:inMemory
+  user: breakerbox
+  password: breakerboxpass
+  maxSize: 10
+  minSize: 2
+  checkConnectionWhileIdle: true
+  checkConnectionHealthWhenIdleFor: 1s
 
 tenacityClient:
   connectionTimeout: 500ms
   timeout: 1000ms
-
-ldap:
-  uri: ldaps://yourldap.com:636
-  cachePolicy: maximumSize=10000, expireAfterAccess=10m
-  securityPrincipal: cn=%s,dc=yourcompany,dc=com
 
 http:
   port: 8080
@@ -62,8 +64,6 @@ http:
 logging:
   level: INFO
   loggers:
-    com.netflix.turbine.monitor.cluster.AggregateClusterMonitor: ERROR
-    com.netflix.turbine.monitor.instance.InstanceMonitor: ERROR
     com.ning.http.client.providers.netty: WARN
   console:
     enabled: true
@@ -74,12 +74,58 @@ logging:
     archivedFileCount: 5
 ```
 
-Simple Breakerbox Dashboard Configuration
------------------------------------------
+Persistence Storage
+-------------------
 
-Along side the service configuration, you will also need to configure which [Tenacity](https://github.com/yammer/tenacity) keys you want to add to the dashboard.
-The following configuration has two dashboards. One specific to breakerbox and the other more inclusive of other services within the `production` dashboard. You'll want to reference
-this configuration in your service yaml `breakerbox urls`.
+You can choose between using an in-memory database, Postgresql (potentially other RDBMSes, I've just only tested with Postgresql for now), and Azure Table.
+
+For Postgresql simply modify the `database` section to:
+
+```yaml
+database:
+  driverClass: org.postgresql.Driver
+  url: jdbc:postgresql://localhost/breakerbox
+```
+
+If you wish to use Azure Table remove the `database` section entirely and add
+
+```yaml
+azure:
+  accountName: your_test_account
+  accountKey: security_key
+  connectionTimeout: 500ms
+  retryInterval: 5s
+  retryAttempts: 2
+```
+
+If you specify both `database` and `azure` it will only leverage the `database` store.
+
+Authentication
+--------------
+By default users that save configuration's will save it under the name `anonymous`.
+
+At the moment it only supports authenticating users via LDAP and HTTP Basic-Auth which is configurable by adding:
+
+```yaml
+ldap:
+  uri: ldaps://ldap.com
+  cachePolicy: maximumSize = 10000, expireAfterAccess = 15m
+  userFilter: ou=users,dc=company,dc=com
+  userNameAttribute: cn
+  connectTimeout: 500ms
+  readTimeout: 500ms
+```
+
+If you need group membership filters you can see the additional documentation on [dropwizard-auth-ldap](https://github.com/yammer/dropwizard-auth-ldap)
+
+Dashboard Configuration
+-----------------------------------------
+The `config.properties` file uses [Turbine's](https://github.com/Netflix/Turbine/wiki/Configuration) configuration syntax.
+
+* `turbine.aggregator.clusterConfig`: specifies all the dashboards you'd like to create. (e.g. production, serviceA, serviceB)
+* `turbine.instanceUrlSuffix=/tenacity/metrics.stream`: use this default because this is where `tenacity` puts the metrics streaming endpoint.
+* `turbine.ConfigPropertyBasedDiscovery.production.instances`: this specifies the individual instances that make up the `production` cluster.
+* `turbine.ConfigPropertyBasedDiscovery.breakerbox.instances`: this specifies the individual instances that make up the `breakerbox` cluster.
 
 ```
 turbine.aggregator.clusterConfig=production,breakerbox
@@ -88,17 +134,54 @@ turbine.ConfigPropertyBasedDiscovery.production.instances=localhost:8080,another
 turbine.ConfigPropertyBasedDiscovery.breakerbox.instances=localhost:8080
 ```
 
-How do I add a service to Breakerbox?
--------------------------------------
-You'll want to clone the `https://github.int.yammer.com/yammer/breakerbox-configuration.git` repository and then edit
-https://github.int.yammer.com/yammer/breakerbox-configuration/blob/master/modules/breakerbox/files/config.properties.
-You'll want to do the two following edits:
+*Note*: Easiest thing to do is make sure `config.properties` is next to jar otherwise keep the `breakerbox#urls` and the `archaius.configurationSource.additionalUrls` system property pointing to the correct location.
+We plan to move this to a better configuration mechanism in the future.
 
-1. Add a new `turbine.ConfigPropertyBasedDiscovery.{serviceName}.instances` where `{serviceName}` is replaced with `completie-prod` or `completie-staging` for example. Please don't forget to include
-the port at which your service is running (e.g. 8080).
+Adding Breakerbox to your Dropwizard+Tenacity Service
+-----------------------
+In any `Tenacity` service to have it poll `Breakerbox` for dynamic configurations add this to your service configuration.
 
-2. If your service addition is in the production environment, consider adding it to the meta-dashboard `turbine.ConfigPropertyBasedDiscovery.production.instances`.
+* `urls`: A comma-delimited list of breakerbox instances. The cluster you added in the `config.properties` is the identifier you want to supply here.
+* `initialDelay`: How long it should wait before the first poll.
+* `delay`: The interval at which to constantly check `Breakerbox` for configuration items. Here we specify every minute we'd like to check for new configurations.
 
-3. Then add your {serviceName} to the `turbine.aggregator.clusterConfig`.
+```yaml
+breakerbox:
+  urls: http://breakerbox:8080/archaius/{the-cluster-you-setup-in-breakerbox}
+  initialDelay: 0s
+  delay: 60s
+```
 
-Then commit, push, repackage, and redeploy the latest version of `breakerbox`!
+There is a configuration hierarchy priority and it's good to understand it especially when using dynamic configurations.
+
+1. Breakerbox
+2. Service configuration YAML
+3. Tenacity defaults
+
+Additional Configuration
+------------------------
+Here's a collection of things we have found very useful to make configurable.
+
+* `hystrixMetricsStreamServletMaxConnections`: The max number of connections any `Dropwizard+Tenacity` service will allow from Breakerbox.
+* `turbineHostRetry`: The interval at which to reconnect to a failed instance. 1s may be a bit fast as a default :)
+
+```yaml
+archaiusOverride:
+  turbineHostRetry: 1s
+  hystrixMetricsStreamServletMaxConnections: 5
+```
+
+The client `Breakerbox` uses to fetch latest property keys and configurations is configurable by
+
+```yaml
+tenacityClient:
+  connectionTimeout: 500ms
+  timeout: 1000ms
+```
+
+Building Breakerbox
+-------------------
+
+`mvn clean package`
+
+The artifact will then be available under `breakerbox-service/target`.
