@@ -32,7 +32,7 @@ Here's a very simple bare configuration of Breakerbox. Each section will be desc
 ```yaml
 breakerbox:
   urls: file:config.properties,http://localhost:8080/archaius/breakerbox
-  initialDelay: 3s
+  initialDelay: 5s
   delay: 60s
 
 database:
@@ -79,7 +79,7 @@ Persistence Storage
 
 You can choose between using an in-memory database, Postgresql (potentially other RDBMSes, I've just only tested with Postgresql for now), and Azure Table.
 
-For Postgresql simply modify the `database` section to:
+For Postgresql simply modify the `database` section to (assumes the database "breakerbox" is created):
 
 ```yaml
 database:
