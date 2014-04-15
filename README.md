@@ -3,8 +3,8 @@ Breakerbox
 
 Breakerbox is a dashboard and dynamic configuration tool for [Tenacity](https://github.com/yammer/tenacity).
 
-![Breakerbox Dashboard](http://yammer.github.io/tenacity/breakerbox_latest.png)
-![Breakerbox Configure](http://yammer.github.io/tenacity/breakerbox_configure.png)
+![Breakerbox Dashboard](https://yammer.github.io/tenacity/breakerbox_latest.png)
+![Breakerbox Configure](https://yammer.github.io/tenacity/breakerbox_configure.png)
 
 Running Breakerbox
 ==================
