@@ -125,7 +125,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                 TurbineInit.init();
                 registerProperties(configuration);
             }
-        }, 10, TimeUnit.SECONDS);
+        }, 3, TimeUnit.SECONDS);
     }
 
     private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
