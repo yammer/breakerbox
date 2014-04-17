@@ -15,28 +15,18 @@
         <dependency>
             <groupId>com.yammer.breakerbox</groupId>
             <artifactId>breakerbox-store</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.windowsazure</groupId>
             <artifactId>microsoft-windowsazure-api</artifactId>
-            <version>${windowsazure.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
-            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-testing</artifactId>
-            <version>${dropwizard.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
