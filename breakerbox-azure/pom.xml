@@ -21,6 +21,12 @@
             <groupId>com.microsoft.windowsazure</groupId>
             <artifactId>microsoft-windowsazure-api</artifactId>
             <version>${windowsazure.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.yammer.dropwizard</groupId>
