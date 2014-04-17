@@ -185,3 +185,8 @@ Building Breakerbox
 `mvn clean package`
 
 The artifact will then be available under `breakerbox-service/target`.
+
+Running Tests
+-------------
+breakerbox-azure doesn't have a mock for Azure Table as it wouldn't be that useful, so it requires a valid Azure Table account
+to run the tests. If you do not supply a valid Azure Table account, these tests will be ignored.
