@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class DependencyEntityTest extends WithConfiguration {
     private DependencyId dependencyId;
@@ -37,6 +38,7 @@ public class DependencyEntityTest extends WithConfiguration {
         user = "USER";
         tableClient = new TableClientFactory(azureTableConfiguration).create();
         tableClientTester = new TableClientTester(tableClient);
+        assumeTrue(validAzureAccount());
     }
 
     @After

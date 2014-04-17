@@ -1,5 +1,5 @@
 accountName: breakerboxtest
 accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==
 connectionTimeout: 500ms
-retryInterval: 5s
-retryAttempts: 2
+retryInterval: 500ms
+retryAttempts: 0

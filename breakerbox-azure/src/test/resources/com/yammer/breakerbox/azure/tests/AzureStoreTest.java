@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
 public class AzureStoreTest extends WithConfiguration {
@@ -39,20 +40,24 @@ public class AzureStoreTest extends WithConfiguration {
     public void setup() throws Exception {
         tableClient = new TableClientFactory(azureTableConfiguration).create();
         breakerboxStore = new AzureStore(azureTableConfiguration, mock(Environment.class));
-        assertTrue(breakerboxStore.initialize());
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
         timestamp = 1345938944000l;
         dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), 6789);
         user = "USER";
+        assumeTrue(validAzureAccount());
+        assertTrue(breakerboxStore.initialize());
     }
 
     @After
     public void teardown() {
-        assertTrue(breakerboxStore.delete(new ServiceModel(testServiceId, testDependencyId)));
-        assertTrue(breakerboxStore.delete(testServiceId, testDependencyId));
-        assertTrue(breakerboxStore.delete(testDependencyId, new DateTime(timestamp)));
-        removeDependencyModel(breakerboxStore.retrieveLatest(testDependencyId, testServiceId));
+        try {
+            assertTrue(breakerboxStore.delete(new ServiceModel(testServiceId, testDependencyId)));
+            assertTrue(breakerboxStore.delete(testServiceId, testDependencyId));
+            assertTrue(breakerboxStore.delete(testDependencyId, new DateTime(timestamp)));
+            removeDependencyModel(breakerboxStore.retrieveLatest(testDependencyId, testServiceId));
+        } catch (Exception err) {
+        }
     }
 
     private void removeDependencyModel(Optional<DependencyModel> dependencyModel) {

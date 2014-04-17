@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class ServiceEntityTest extends WithConfiguration {
     private ServiceId testServiceId;
@@ -29,6 +30,7 @@ public class ServiceEntityTest extends WithConfiguration {
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
         tableClient = new TableClientFactory(azureTableConfiguration).create();
         tableClientTester = new TableClientTester(tableClient);
+        assumeTrue(validAzureAccount());
     }
 
     @After
