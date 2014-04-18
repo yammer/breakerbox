@@ -16,6 +16,8 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class Instances {
     private static final Logger LOGGER = LoggerFactory.getLogger(Instances.class);
 
@@ -23,7 +25,7 @@ public class Instances {
         return new Function<Instance, String>() {
             @Override
             public String apply(Instance input) {
-                return input.getCluster();
+                return checkNotNull(input).getCluster();
             }
         };
     }
@@ -60,6 +62,7 @@ public class Instances {
         return new Function<Instance, URI>() {
             @Override
             public URI apply(Instance input) {
+                checkNotNull(input);
                 final URI original = URI.create("http://" + input.getHostname());
                 try {
                     return new URI(

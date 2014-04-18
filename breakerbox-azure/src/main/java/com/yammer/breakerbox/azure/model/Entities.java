@@ -8,7 +8,7 @@ import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Entities {
     private Entities() {}
@@ -57,10 +57,9 @@ public class Entities {
         return FluentIterable
                 .from(serviceEntities)
                 .transform(new Function<ServiceEntity, ServiceModel>() {
-                    @Nullable
                     @Override
-                    public ServiceModel apply(@Nullable ServiceEntity input) {
-                        return Entities.toModel(input);
+                    public ServiceModel apply(ServiceEntity input) {
+                        return Entities.toModel(checkNotNull(input));
                     }
                 })
                 .toList();
@@ -70,10 +69,9 @@ public class Entities {
         return FluentIterable
                 .from(dependencyEntities)
                 .transform(new Function<DependencyEntity, DependencyModel>() {
-                    @Nullable
                     @Override
-                    public DependencyModel apply(@Nullable DependencyEntity input) {
-                        return Entities.toModel(input);
+                    public DependencyModel apply(DependencyEntity input) {
+                        return Entities.toModel(checkNotNull(input));
                     }
                 })
                 .toList();

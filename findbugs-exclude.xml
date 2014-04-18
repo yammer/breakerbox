@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- checkNotNull isn't correctly understood compared to a if(null) -->
+    <Match>
+        <Class name="com.yammer.breakerbox.azure.model.Entities$1"/>
+        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.breakerbox.azure.model.Entities$2"/>
+        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.breakerbox.service.core.Instances$1"/>
+        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.breakerbox.service.core.Instances$4"/>
+        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+    </Match>
+
+    <!-- Netflix -->
+    <Match>
+        <Class name="com.netflix.hystrix.dashboard.stream.ProxyStreamServlet"/>
+        <Bug pattern="WMI_WRONG_MAP_ITERATOR"/>
+    </Match>
+</FindBugsFilter>
