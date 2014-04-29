@@ -4,11 +4,11 @@ breakerbox:
   delay: 60s
 
 azure:
-  accountName: breakerboxtest
-  accountKey: ys5R+qliOfO4YA6VlfWT8pE/C11MwAuQt/vqfVwPBYG8ZHS5ZvZozyV2UdptIumLcCOaowSsQ9IU70wncuvcPg==
+  accountName: fake
+  accountKey: fake
   connectionTimeout: 500ms
-  retryInterval: 5s
-  retryAttempts: 2
+  retryInterval: 1s
+  retryAttempts: 1
 
 tenacityClient:
   connectionTimeout: 50ms
