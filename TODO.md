@@ -14,4 +14,4 @@ Currently supports H2/Postgres out of the box.
 Azure
 -----
 1. Upgrade Azure client to latest.
-2. Generate a decent Mock for Azure Table. For now they are all @Ignored.
+2. Generate a decent Mock for Azure Table. For now they are all @Ignored if you don't have valid Azure Table credentials.
