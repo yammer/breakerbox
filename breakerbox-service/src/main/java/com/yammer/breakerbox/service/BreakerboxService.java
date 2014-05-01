@@ -6,6 +6,7 @@ import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
+import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.service.auth.NullAuthProvider;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
@@ -22,20 +23,11 @@ import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKeyFactory;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import com.yammer.breakerbox.store.BreakerboxStore;
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.auth.CachingAuthenticator;
-import com.yammer.dropwizard.auth.basic.BasicAuthProvider;
-import com.yammer.dropwizard.auth.basic.BasicCredentials;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.db.DatabaseConfiguration;
-import com.yammer.dropwizard.jdbi.bundles.DBIExceptionsBundle;
-import com.yammer.dropwizard.migrations.MigrationsBundle;
 import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientFactory;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
@@ -47,11 +39,20 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import com.yammer.tenacity.core.properties.TenacityPropertyRegister;
 import com.yammer.tenacity.dbi.DBIExceptionLogger;
 import com.yammer.tenacity.dbi.SQLExceptionLogger;
+import io.dropwizard.Application;
+import io.dropwizard.auth.CachingAuthenticator;
+import io.dropwizard.auth.basic.BasicAuthProvider;
+import io.dropwizard.auth.basic.BasicCredentials;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
+import io.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
+public class BreakerboxService extends Application<BreakerboxServiceConfiguration> {
     public static void main(String[] args) throws Exception {
         new BreakerboxService().run(args);
     }
@@ -60,12 +61,11 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
 
     @Override
     public void initialize(Bootstrap<BreakerboxServiceConfiguration> bootstrap) {
-        bootstrap.setName("Breakerbox");
         bootstrap.addBundle(new DBIExceptionsBundle());
         bootstrap.addBundle(new MigrationsBundle<BreakerboxServiceConfiguration>() {
             @Override
-            public DatabaseConfiguration getDatabaseConfiguration(BreakerboxServiceConfiguration configuration) {
-                return configuration.getJdbiConfiguration().or(new DatabaseConfiguration());
+            public DataSourceFactory getDataSourceFactory(BreakerboxServiceConfiguration configuration) {
+                return configuration.getJdbiConfiguration().or(new JdbiConfiguration()).getDataSourceFactory();
             }
         });
         bootstrap.addBundle(TenacityBundleBuilder
@@ -75,8 +75,8 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                 .mapAllHystrixRuntimeExceptionsTo(429)
                 .commandExecutionHook(new ExceptionLoggingCommandHook(
                         ImmutableList.of(
-                            new DBIExceptionLogger(),
-                            new SQLExceptionLogger(),
+                            new DBIExceptionLogger(bootstrap.getMetricRegistry()),
+                            new SQLExceptionLogger(bootstrap.getMetricRegistry()),
                             new DefaultExceptionLogger())))
                 .build());
         bootstrap.addBundle(new BreakerboxDashboardBundle());
@@ -105,14 +105,18 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
                 new TenacityConfigurationFetcher.Factory(tenacityClient),
                 breakerboxStore);
 
-        environment.addServlet(new TurbineStreamServlet(), "/turbine.stream");
+        environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
-        environment.addResource(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
-        environment.addResource(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
-        environment.addResource(new DashboardResource());
-        environment.addResource(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
+        environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
+        environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
+        environment.jersey().register(new DashboardResource());
+        environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
-        final ScheduledExecutorService scheduledExecutorService = environment.managedScheduledExecutorService("scheduled-tenacity-poller-%d", 1);
+        final ScheduledExecutorService scheduledExecutorService = environment
+                .lifecycle()
+                .scheduledExecutorService("scheduled-tenacity-poller-%d")
+                .threads(1)
+                .build();
         scheduledExecutorService.scheduleAtFixedRate(
                 new ScheduledTenacityPoller(tenacityPropertyKeysStore),
                 30,
@@ -147,7 +151,7 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
     }
 
     private static void setupNullAuth(Environment environment) {
-        environment.addProvider(new NullAuthProvider<>(new NullAuthenticator()));
+        environment.jersey().register(new NullAuthProvider<>(new NullAuthenticator()));
     }
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
@@ -155,13 +159,15 @@ public class BreakerboxService extends Service<BreakerboxServiceConfiguration> {
         final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
                 new LdapCanAuthenticate(ldapConfiguration));
         final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
-                CachingAuthenticator.wrap(
+                new CachingAuthenticator<>(
+                        environment.metrics(),
                         TenacityAuthenticator.wrap(
                                 new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
-                        ldapConfiguration.getCachePolicy());
+                        ldapConfiguration.getCachePolicy()
+                );
 
-        environment.addHealthCheck(new LdapHealthCheck(TenacityAuthenticator
+        environment.healthChecks().register("ldap-auth", new LdapHealthCheck(TenacityAuthenticator
                 .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
-        environment.addProvider(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
+        environment.jersey().register(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
     }
 }

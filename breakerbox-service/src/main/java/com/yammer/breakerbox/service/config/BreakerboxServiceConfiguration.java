@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
+import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
-import com.yammer.dropwizard.client.JerseyClientConfiguration;
-import com.yammer.dropwizard.config.Configuration;
-import com.yammer.dropwizard.db.DatabaseConfiguration;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
+import io.dropwizard.Configuration;
+import io.dropwizard.client.JerseyClientConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,7 +38,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private ArchaiusOverrideConfiguration archaiusOverride;
 
     @NotNull @Valid @JsonProperty("database")
-    private Optional<DatabaseConfiguration> jdbiConfiguration = Optional.absent();
+    private Optional<JdbiConfiguration> jdbiConfiguration = Optional.absent();
 
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
@@ -48,7 +48,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("breakerbox") BreakerboxConfiguration breakerboxConfiguration,
                                           @JsonProperty("ldap") LdapConfiguration ldapConfiguration,
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride,
-                                          @JsonProperty("database") DatabaseConfiguration jdbiConfiguration) {
+                                          @JsonProperty("database") JdbiConfiguration jdbiConfiguration) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -97,11 +97,11 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
 
     @JsonProperty("database")
-    public Optional<DatabaseConfiguration> getJdbiConfiguration() {
+    public Optional<JdbiConfiguration> getJdbiConfiguration() {
         return jdbiConfiguration;
     }
 
-    public void setJdbiConfiguration(Optional<DatabaseConfiguration> jdbiConfiguration) {
+    public void setJdbiConfiguration(Optional<JdbiConfiguration> jdbiConfiguration) {
         this.jdbiConfiguration = jdbiConfiguration;
     }
 

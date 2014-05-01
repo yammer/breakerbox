@@ -1,5 +1,7 @@
 package com.yammer.breakerbox.jdbi;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Optional;
 import com.yammer.breakerbox.jdbi.args.DateTimeArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.DependencyIdArgumentFactory;
@@ -10,10 +12,9 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.db.DatabaseConfiguration;
-import com.yammer.dropwizard.jdbi.DBIFactory;
-import com.yammer.dropwizard.migrations.ManagedLiquibase;
+import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.migrations.CloseableLiquibase;
+import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.exceptions.DBIException;
@@ -22,37 +23,42 @@ import org.slf4j.LoggerFactory;
 
 public class JdbiStore extends BreakerboxStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbiStore.class);
-    private final ServiceDB serviceDB;
-    private final DependencyDB dependencyDB;
-    private final ManagedLiquibase managedLiquibase;
+    protected final ServiceDB serviceDB;
+    protected final DependencyDB dependencyDB;
+    protected JdbiConfiguration configuration;
 
-    public JdbiStore(DatabaseConfiguration storeConfiguration, Environment environment) throws Exception {
-        this(storeConfiguration, environment, new DBIFactory().build(environment, storeConfiguration, "breakerbox"));
+    public JdbiStore(JdbiConfiguration storeConfiguration,
+                     Environment environment) throws Exception {
+        this(storeConfiguration, environment,
+                new DBIFactory().build(environment, storeConfiguration.getDataSourceFactory(), "breakerbox"));
     }
 
-    public JdbiStore(DatabaseConfiguration storeConfiguration, Environment environment, DBI database) {
+    public JdbiStore(JdbiConfiguration storeConfiguration,
+                     Environment environment,
+                     DBI database) {
         super(storeConfiguration, environment);
         database.registerArgumentFactory(new DependencyIdArgumentFactory());
         database.registerArgumentFactory(new ServiceIdArgumentFactory());
-        database.registerArgumentFactory(new TenacityConfigurationArgumentFactory());
+        database.registerArgumentFactory(new TenacityConfigurationArgumentFactory(environment.getObjectMapper()));
         database.registerArgumentFactory(new DateTimeArgumentFactory());
 
         dependencyDB = database.onDemand(DependencyDB.class);
         serviceDB = database.onDemand(ServiceDB.class);
 
-        try {
-            managedLiquibase = new ManagedLiquibase(storeConfiguration);
-            environment.manage(managedLiquibase);
-        } catch (Exception err) {
-            LOGGER.error("Failed to create liquibase", err);
-            throw new IllegalStateException(err);
-        }
+        this.configuration = storeConfiguration;
     }
 
     @Override
     public boolean initialize() throws Exception {
-        managedLiquibase.update("");
-        return true;
+        try (CloseableLiquibase liquibase = new CloseableLiquibase(configuration
+                .getDataSourceFactory()
+                .build(new MetricRegistry(), "liquibase"))) {
+            liquibase.update("");
+            return true;
+        } catch (Exception err) {
+            LOGGER.error("Failed to create liquibase", err);
+            throw new IllegalStateException(err);
+        }
     }
 
     @Override
@@ -144,16 +150,22 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public Iterable<ServiceModel> allServiceModels() {
-        return serviceDB.all();
+        try (Timer.Context timerContext = listServices.time()) {
+            return serviceDB.all();
+        }
     }
 
     @Override
     public Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId) {
-        return serviceDB.all(serviceId);
+        try (Timer.Context timerContext = listService.time()) {
+            return serviceDB.all(serviceId);
+        }
     }
 
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
-        return dependencyDB.all(dependencyId, serviceId);
+        try (Timer.Context timerContext = dependencyConfigs.time()) {
+            return dependencyDB.all(dependencyId, serviceId);
+        }
     }
 }

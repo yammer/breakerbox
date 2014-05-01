@@ -1,9 +1,9 @@
 package com.yammer.breakerbox.dashboard.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import com.yammer.metrics.annotation.Timed;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

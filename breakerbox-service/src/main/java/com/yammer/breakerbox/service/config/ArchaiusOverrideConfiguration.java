@@ -1,7 +1,7 @@
 package com.yammer.breakerbox.service.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.yammer.dropwizard.util.Duration;
+import io.dropwizard.util.Duration;
 
 public class ArchaiusOverrideConfiguration {
     @JsonProperty

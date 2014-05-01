@@ -1,5 +1,6 @@
 package com.yammer.breakerbox.azure;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -18,23 +19,17 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.metrics.core.TimerContext;
+import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 public class AzureStore extends BreakerboxStore {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AzureStore.class);
-    private final TableClient tableClient;
+    protected final TableClient tableClient;
 
-    public AzureStore(AzureTableConfiguration azureTableConfiguration, Environment environment) {
+    public AzureStore(AzureTableConfiguration azureTableConfiguration,
+                      Environment environment) {
         super(azureTableConfiguration, environment);
         this.tableClient = new TableClientFactory(azureTableConfiguration).create();
-        environment.addHealthCheck(new TableClientHealthcheck(tableClient));
+        environment.healthChecks().register("azure", new TableClientHealthcheck(tableClient));
     }
 
     private <T extends TableType> boolean delete(Optional<T> tableType) {
@@ -101,31 +96,18 @@ public class AzureStore extends BreakerboxStore {
 
     @Override
     public Iterable<ServiceModel> listDependenciesFor(final ServiceId serviceId) {
-        try {
-            return listDependenciesCache.get(serviceId, new Callable<ImmutableList<ServiceModel>>() {
-                @Override
-                public ImmutableList<ServiceModel> call() throws Exception {
-                    return Entities.toServiceModelList(allServiceEntities(serviceId));
-                }
-            });
-        } catch (ExecutionException err) {
-            LOGGER.warn("Could not fetch dependencies for {}", serviceId, err);
-        }
-        return ImmutableList.of();
+        return Entities.toServiceModelList(allServiceEntities(serviceId));
     }
 
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
-        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
-        try {
+        try (Timer.Context timerContext = dependencyConfigs.time()) {
             return Entities.toDependencyModelList(tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
                     .where(TableQuery.combineFilters(
                             partitionEquals(dependencyId),
                             TableQuery.Operators.AND,
                             serviceIdEquals(serviceId)))));
-        } finally {
-            timerContext.stop();
         }
     }
 
@@ -151,13 +133,10 @@ public class AzureStore extends BreakerboxStore {
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities(ServiceId serviceId) {
-        final TimerContext timerContext = LIST_SERVICE.time();
-        try {
+        try (Timer.Context timerContext = listService.time()) {
             return tableClient.search(TableQuery
                     .from(TableId.SERVICE.toString(), ServiceEntity.class)
                     .where(partitionKeyEquals(serviceId)));
-        } finally {
-            timerContext.stop();
         }
     }
 
@@ -170,26 +149,20 @@ public class AzureStore extends BreakerboxStore {
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities() {
-        final TimerContext timerContext = LIST_SERVICES.time();
-        try {
+        try (Timer.Context timerContext = listService.time()) {
             return tableClient.search(TableQuery
                     .from(TableId.SERVICE.toString(), ServiceEntity.class));
-        } finally {
-            timerContext.stop();
         }
     }
 
     private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
-        final TimerContext timerContext = DEPENDENCY_CONFIGS.time();
-        try {
+        try (Timer.Context timerContext = dependencyConfigs.time()) {
             return tableClient.search(TableQuery
                     .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
                     .where(TableQuery.combineFilters(
                                 partitionEquals(dependencyId),
                                 TableQuery.Operators.AND,
                                 timestampEquals(targetTimeStamp))));
-        } finally {
-            timerContext.stop();
         }
     }
 

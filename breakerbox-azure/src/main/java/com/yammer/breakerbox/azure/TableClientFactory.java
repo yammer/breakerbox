@@ -27,7 +27,7 @@ public class TableClientFactory {
                     new RetryLinearRetry(
                             (int) azureTableConfiguration.getRetryInterval().toMilliseconds(),
                             azureTableConfiguration.getRetryAttempts()));
-            cloudTableClient.setTimeoutInMs((int) azureTableConfiguration.getConnectionTimeout().toMilliseconds());
+            cloudTableClient.setTimeoutInMs((int) azureTableConfiguration.getTimeout().toMilliseconds());
             return new TableClient(cloudTableClient);
         } catch (URISyntaxException err) {
             LOGGER.error("Failed to create a TableClient", err);

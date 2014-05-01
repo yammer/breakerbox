@@ -1,12 +1,12 @@
 package com.yammer.breakerbox.dashboard;
 
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Configuration;
-import com.yammer.dropwizard.config.Environment;
+import io.dropwizard.Application;
+import io.dropwizard.Configuration;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
-public class BreakerboxDashboardService extends Service<Configuration> {
+public class BreakerboxDashboardService extends Application<Configuration> {
     private BreakerboxDashboardService() {}
 
     public static void main(String[] args) throws Exception {

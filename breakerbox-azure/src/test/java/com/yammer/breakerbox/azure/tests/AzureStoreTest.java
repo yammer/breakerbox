@@ -11,7 +11,6 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
@@ -25,7 +24,6 @@ import java.util.UUID;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Mockito.mock;
 
 public class AzureStoreTest extends WithConfiguration {
     private BreakerboxStore breakerboxStore;
@@ -39,7 +37,7 @@ public class AzureStoreTest extends WithConfiguration {
     @Before
     public void setup() throws Exception {
         tableClient = new TableClientFactory(azureTableConfiguration).create();
-        breakerboxStore = new AzureStore(azureTableConfiguration, mock(Environment.class));
+        breakerboxStore = new AzureStore(azureTableConfiguration, environment());
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
         timestamp = 1345938944000l;

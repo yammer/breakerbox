@@ -1,31 +1,27 @@
 package com.yammer.breakerbox.store;
 
+import com.codahale.metrics.Timer;
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
+import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
 
-import java.util.concurrent.TimeUnit;
+import static com.codahale.metrics.MetricRegistry.name;
 
 
 public abstract class BreakerboxStore {
-    protected final Cache<ServiceId, ImmutableList<ServiceModel>> listDependenciesCache = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .build();
-
-    protected static final Timer LIST_SERVICES = Metrics.newTimer(BreakerboxStore.class, "list-services");
-    protected static final Timer LIST_SERVICE = Metrics.newTimer(BreakerboxStore.class, "list-service");
-    protected static final Timer DEPENDENCY_CONFIGS = Metrics.newTimer(BreakerboxStore.class, "latest-dependency-config");
+    protected final Timer listServices;
+    protected final Timer listService;
+    protected final Timer dependencyConfigs;
 
     @SuppressWarnings("unused")
-    protected <StoreConfiguration> BreakerboxStore(StoreConfiguration storeConfiguration, Environment environment) {}
+    protected <StoreConfiguration> BreakerboxStore(StoreConfiguration storeConfiguration,
+                                                   Environment environment) {
+        this.listServices = environment.metrics().timer(name(BreakerboxStore.class, "list-services"));
+        this.listService = environment.metrics().timer(name(BreakerboxStore.class, "list-service"));
+        this.dependencyConfigs = environment.metrics().timer(name(BreakerboxStore.class, "latest-dependency-config"));
+    }
 
     public abstract boolean initialize() throws Exception;
     public abstract boolean store(DependencyModel dependencyModel);

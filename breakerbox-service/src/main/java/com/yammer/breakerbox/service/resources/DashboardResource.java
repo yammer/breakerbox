@@ -1,7 +1,7 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.yammer.breakerbox.service.views.DashboardView;
-import com.yammer.metrics.annotation.Timed;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

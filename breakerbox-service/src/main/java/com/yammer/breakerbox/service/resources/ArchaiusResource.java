@@ -1,5 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.yammer.breakerbox.service.archaius.ArchaiusFormatBuilder;
 import com.yammer.breakerbox.service.config.ArchaiusOverrideConfiguration;
@@ -7,7 +8,6 @@ import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.metrics.annotation.Timed;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

@@ -3,7 +3,6 @@ package com.yammer.breakerbox.azure.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
 import com.yammer.breakerbox.azure.core.AzureTableName;
 import com.yammer.breakerbox.azure.core.TableId;
@@ -11,11 +10,14 @@ import com.yammer.breakerbox.azure.core.TableKey;
 import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
-import com.yammer.dropwizard.json.ObjectMapperFactory;
-import com.yammer.dropwizard.validation.Validator;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
+import io.dropwizard.jackson.Jackson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.util.Set;
 
 /**
  * Bean to represent the Dependency table.
@@ -23,8 +25,8 @@ import org.slf4j.LoggerFactory;
  * Dependency Key you wish to use before accessing this table.
  */
 public class DependencyEntity extends TableType implements TableKey {
-    private static final ObjectMapper OBJECTMAPPER = new ObjectMapperFactory().build();
-    private static final Validator VALIDATOR = new Validator();
+    private static final ObjectMapper OBJECTMAPPER = Jackson.newObjectMapper();
+    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceEntity.class);
 
     private String tenacityConfigurationAsString;
@@ -68,7 +70,7 @@ public class DependencyEntity extends TableType implements TableKey {
     public Optional<TenacityConfiguration> getConfiguration() {
         try {
             final TenacityConfiguration dependencyConfiguration = OBJECTMAPPER.readValue(tenacityConfigurationAsString, TenacityConfiguration.class);
-            final ImmutableList<String> validationErrors = VALIDATOR.validate(dependencyConfiguration);
+            final Set<?> validationErrors = VALIDATOR.validate(dependencyConfiguration);
             if (!validationErrors.isEmpty()) {
                 LOGGER.warn("Failed to validate TenacityConfiguration", validationErrors.toString());
             }

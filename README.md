@@ -93,9 +93,9 @@ If you wish to use Azure Table remove the `database` section entirely and add
 azure:
   accountName: your_test_account
   accountKey: security_key
-  connectionTimeout: 500ms
-  retryInterval: 5s
-  retryAttempts: 2
+  timeout: 2s
+  retryInterval: 500ms
+  retryAttempts: 1
 ```
 
 If you specify both `database` and `azure` it will only leverage the `database` store.

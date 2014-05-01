@@ -1,5 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -17,13 +18,12 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.auth.Auth;
-import com.yammer.dropwizard.auth.basic.BasicCredentials;
-import com.yammer.dropwizard.views.View;
-import com.yammer.metrics.annotation.Timed;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
+import io.dropwizard.auth.Auth;
+import io.dropwizard.auth.basic.BasicCredentials;
+import io.dropwizard.views.View;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

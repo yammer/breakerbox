@@ -1,5 +1,5 @@
 accountName: fake
 accountKey: fake
-connectionTimeout: 500ms
+timeout: 2s
 retryInterval: 500ms
 retryAttempts: 0

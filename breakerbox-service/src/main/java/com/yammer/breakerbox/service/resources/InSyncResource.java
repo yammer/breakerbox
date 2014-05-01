@@ -1,5 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.core.SyncPropertyKeyState;
@@ -7,7 +8,6 @@ import com.yammer.breakerbox.service.core.SyncServiceHostState;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
-import com.yammer.metrics.annotation.Timed;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

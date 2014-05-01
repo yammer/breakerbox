@@ -6,7 +6,6 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.config.Environment;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -17,15 +16,14 @@ import java.util.UUID;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class JdbiStoreTest extends H2Test {
     private JdbiStore jdbiStore;
 
     @Before
     public void setup() throws Exception {
-        jdbiStore = new JdbiStore(hsqlConfig, mock(Environment.class), database);
-        jdbiStore.initialize();
+        jdbiStore = new JdbiStore(hsqlConfig, environment(), database);
+        assertTrue(jdbiStore.initialize());
     }
 
     @Test

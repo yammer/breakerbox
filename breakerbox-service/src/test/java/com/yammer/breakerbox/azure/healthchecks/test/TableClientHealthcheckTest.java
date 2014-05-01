@@ -1,10 +1,10 @@
 package com.yammer.breakerbox.azure.healthchecks.test;
 
+import com.codahale.metrics.health.HealthCheck;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
-import com.yammer.metrics.core.HealthCheck;
 import org.junit.Test;
 
 import static org.fest.assertions.api.Assertions.assertThat;

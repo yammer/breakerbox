@@ -2,17 +2,16 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
     <changeSet id="1" author="chrisgray">
         <createTable tableName="service">
             <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="text">
+            <column name="name" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="dependency" type="text">
+            <column name="dependency" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
         </createTable>

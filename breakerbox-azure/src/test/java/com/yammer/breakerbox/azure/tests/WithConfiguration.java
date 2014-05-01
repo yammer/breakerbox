@@ -1,13 +1,16 @@
 package com.yammer.breakerbox.azure.tests;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.io.Resources;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.core.TableId;
-import com.yammer.dropwizard.config.ConfigurationFactory;
-import com.yammer.dropwizard.validation.Validator;
+import io.dropwizard.configuration.ConfigurationFactory;
+import io.dropwizard.jackson.Jackson;
+import io.dropwizard.setup.Environment;
 import org.junit.Before;
 
+import javax.validation.Validation;
 import java.io.File;
 
 public abstract class WithConfiguration {
@@ -15,9 +18,11 @@ public abstract class WithConfiguration {
 
     @Before
     public void setupTest() throws Exception {
-        azureTableConfiguration = ConfigurationFactory
-                .forClass(AzureTableConfiguration.class, new Validator())
-                .build(new File(Resources.getResource("azure-test.yml").toURI()));
+        azureTableConfiguration = new ConfigurationFactory<>(
+                AzureTableConfiguration.class,
+                Validation.buildDefaultValidatorFactory().getValidator(),
+                Jackson.newObjectMapper(),
+                "dw.").build(new File(Resources.getResource("azure-test.yml").toURI()));
     }
 
     protected boolean validAzureAccount() {
@@ -27,5 +32,14 @@ public abstract class WithConfiguration {
         } catch (Exception err) {
             return false;
         }
+    }
+
+    protected static Environment environment() {
+        return new Environment(
+                "test",
+                Jackson.newObjectMapper(),
+                Validation.buildDefaultValidatorFactory().getValidator(),
+                new MetricRegistry(),
+                Thread.currentThread().getContextClassLoader());
     }
 }

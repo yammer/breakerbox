@@ -2,22 +2,23 @@ package com.yammer.breakerbox.jdbi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
-import com.yammer.dropwizard.json.ObjectMapperFactory;
-import com.yammer.dropwizard.validation.Validator;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
+import io.dropwizard.jackson.Jackson;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
 public class Mappers {
     public static class ServiceModelMapper implements ResultSetMapper<ServiceModel> {
@@ -29,8 +30,8 @@ public class Mappers {
 
     public static class DependencyModelMapper implements ResultSetMapper<DependencyModel> {
         private static final Logger LOGGER = LoggerFactory.getLogger(DependencyModelMapper.class);
-        private static final ObjectMapper OBJECT_MAPPER = new ObjectMapperFactory().build();
-        private static final Validator VALIDATOR = new Validator();
+        private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper();
+        private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
         @Override
         public DependencyModel map(int index, ResultSet r, StatementContext ctx) throws SQLException {
@@ -45,7 +46,7 @@ public class Mappers {
         private static Optional<TenacityConfiguration> parseTenacityConfiguration(String tenacityString) {
             try {
                 final TenacityConfiguration dependencyConfiguration = OBJECT_MAPPER.readValue(tenacityString, TenacityConfiguration.class);
-                final ImmutableList<String> validationErrors = VALIDATOR.validate(dependencyConfiguration);
+                final Set<?> validationErrors = VALIDATOR.validate(dependencyConfiguration);
                 if (!validationErrors.isEmpty()) {
                     LOGGER.warn("Failed to validate TenacityConfiguration", validationErrors.toString());
                 }

@@ -2,14 +2,13 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
     <changeSet id="1" author="chrisgray">
         <createTable tableName="dependency">
             <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="text">
+            <column name="name" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
             <column name="timestamp" type="bigint">
@@ -18,10 +17,10 @@
             <column name="tenacity_configuration" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="username" type="text">
+            <column name="username" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
-            <column name="service" type="text">
+            <column name="service" type="varchar(1024)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
