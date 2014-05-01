@@ -49,29 +49,27 @@ tenacityClient:
   connectionTimeout: 500ms
   timeout: 1000ms
 
-http:
-  port: 8080
-  adminPort: 8081
-  maxIdleTime: 300s
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
   requestLog:
-    console:
-      enabled: true
-    file:
-      enabled: false
-      currentLogFilename: /var/log/breakerbox/requests.log
-      archivedLogFilenamePattern: /var/log/breakerbox/requests-%d.log.gz
-      archivedFileCount: 5
+    appenders:
+      - type: file
+        currentLogFilename: /var/log/breakerbox/requests.log
+        archivedLogFilenamePattern: /var/log/breakerbox/requests-%d.log
+        archivedFileCount: 5
+
 logging:
   level: INFO
-  loggers:
-    com.ning.http.client.providers.netty: WARN
-  console:
-    enabled: true
-  file:
-    enabled: false
-    currentLogFilename: /var/log/breakerbox/breakerbox.log
-    archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log.gz
-    archivedFileCount: 5
+  appenders:
+    - type: file
+      currentLogFilename: /var/log/breakerbox/breakerbox.log
+      archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log
+      archivedFileCount: 5
 ```
 
 Persistence Storage
