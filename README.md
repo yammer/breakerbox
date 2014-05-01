@@ -56,6 +56,8 @@ server:
   adminConnectors:
     - type: http
       port: 8081
+  gzip:
+    enabled: false
   requestLog:
     appenders:
       - type: file
@@ -71,6 +73,10 @@ logging:
       archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log
       archivedFileCount: 5
 ```
+
+Gzip Disabled
+-------------
+Javascript's EventSource doesn't support gzip encoded streams.
 
 Persistence Storage
 -------------------
