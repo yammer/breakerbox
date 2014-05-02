@@ -18,21 +18,6 @@
         <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
     </Match>
 
-    <!-- try-with-resources has a false positive until maven-findbugs-plugin upgrades to at least 2.0.3 findbugs -->
-    <Match>
-        <Class name="com.yammer.breakerbox.azure.AzureStore"/>
-        <Or>
-            <Method name="allDependenciesFor"/>
-            <Method name="getConfiguration"/>
-        </Or>
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"/>
-    </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.jdbi.JdbiStore"/>
-        <Method name="allDependenciesFor"/>
-        <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"/>
-    </Match>
-
     <!-- Netflix -->
     <Match>
         <Class name="com.netflix.hystrix.dashboard.stream.ProxyStreamServlet"/>
