@@ -16,7 +16,7 @@ tenacityClient:
 
 ldap:
   uri: ldaps://fakeldap.com:636
-  cachePolicy: maximumSize=10000, expireAfterAccess=10m
+  cachePolicy: maximumSize=10000, expireAfterWrite=10m
   userFilter: ou=people,dc=yammer,dc=com
   groupFilter: ou=groups,dc=yourcompany,dc=com
   userNameAttribute: cn
