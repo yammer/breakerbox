@@ -35,7 +35,7 @@
     <properties>
         <dropwizard.version>0.7.0</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>0.3.1</tenacity.version>
+        <tenacity.version>0.3.2</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-auth-ldap.version>0.1.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.3-1101-jdbc41</postgresql.version>
