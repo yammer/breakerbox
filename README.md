@@ -12,7 +12,7 @@ Running Breakerbox
 __Required:__ Breakerbox requires you to instrument your code with [Tenacity](https://github.com/yammer/tenacity) which is a library to aid
 in resilient design of foreign dependencies.
 
-[Download a release](https://github.com/yammer/breakerbox/releases)
+[Download a release](https://github.com/yammer/breakerbox/releases) or build it yourself with [maven](https://github.com/yammer/breakerbox#building-breakerbox)
 
 Extract the archive and then run the following command
 
