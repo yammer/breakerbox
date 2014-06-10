@@ -12,12 +12,12 @@ Running Breakerbox
 __Required:__ Breakerbox requires you to instrument your code with [Tenacity](https://github.com/yammer/tenacity) which is a library to aid
 in resilient design of foreign dependencies.
 
-Download a release: ???
+[Download a release](https://github.com/yammer/breakerbox/releases)
 
 Extract the archive and then run the following command
 
 ```bash
-java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service.jar server breakerbox.yml
+java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service-0.1.0.jar server breakerbox.yml
 ```
 
 Then point your browser at ``http://localhost:8080``. You should see a dashboard
