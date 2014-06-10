@@ -124,7 +124,8 @@ If you need group membership filters you can see the additional documentation on
 
 Dashboard Configuration
 -----------------------------------------
-The `config.properties` file uses [Turbine's](https://github.com/Netflix/Turbine/wiki/Configuration) configuration syntax.
+The `config.properties` file uses [Turbine's](https://github.com/Netflix/Turbine/wiki/Configuration) configuration syntax. This currently assumes a static setup. It isn't hard to add a dynamic host discovery
+system, but this is something that will be added on later.
 
 * `turbine.aggregator.clusterConfig`: specifies all the dashboards you'd like to create. (e.g. production, serviceA, serviceB)
 * `turbine.instanceUrlSuffix=/tenacity/metrics.stream`: use this default because this is where `tenacity` puts the metrics streaming endpoint.
@@ -138,7 +139,7 @@ turbine.ConfigPropertyBasedDiscovery.production.instances=localhost:8080,another
 turbine.ConfigPropertyBasedDiscovery.breakerbox.instances=localhost:8080
 ```
 
-*Note*: Easiest thing to do is make sure `config.properties` is next to jar otherwise keep the `breakerbox#urls` and the `archaius.configurationSource.additionalUrls` system property pointing to the correct location.
+*Note*: Easiest thing to do is make sure `config.properties` is in the same directory as the jar otherwise keep the `breakerbox#urls` and the `archaius.configurationSource.additionalUrls` system property pointing to the correct location.
 We plan to move this to a better configuration mechanism in the future.
 
 Adding Breakerbox to your Dropwizard+Tenacity Service
