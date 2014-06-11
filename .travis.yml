@@ -1,0 +1,13 @@
+language: java
+script: mvn verify deploy --settings maven_deploy_settings.xml
+jdk:
+- oraclejdk7
+- openjdk7
+notifications:
+  email:
+    recipients:
+    - yammer-sonatype@microsoft.com
+env:
+  global:
+  - secure: P1avpF3UPAL8DfFeJZOilraTw2rmD1sqpEDED6YLHZ6yQXocY5OyZep0Ioa6jmbuMeCpkU5IsfkA+U9iTSqWAR9NTVmo09jhiiqavC3Yfe9T+uT4BSSaj3Wiaz+YhEOQ5wu8+TlqjaAEcP8ZQS8XnJzUibTH4QWDlt+6fvEc77g=
+  - secure: Us43LpYvSqg5nvC/hfSdZGlnZOmRxNQcMtquCYMJ15Yu4yFrsMRtn3MyVoR11f6Jj3TlFHM4reIsrATn9/nPkQijb7flYuoTuxXGKDleYn1Tff4SH3wxsWrI6K4n+8pla5pMJtqkz56Cypr4ew20JBKS2rn/aDICT/QWmD0yrl4=

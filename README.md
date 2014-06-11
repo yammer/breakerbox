@@ -1,4 +1,4 @@
-Breakerbox
+Breakerbox [![Build Status](https://travis-ci.org/yammer/breakerbox.png)](https://travis-ci.org/yammer/breakerbox)
 ==========
 
 Breakerbox is a dashboard and dynamic configuration tool for [Tenacity](https://github.com/yammer/tenacity).
