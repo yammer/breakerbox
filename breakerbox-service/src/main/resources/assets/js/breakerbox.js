@@ -13,7 +13,7 @@ var Breakerbox = {
 
         this._ticker = setInterval(function() {
             self.inSync();
-        }, 5000);
+        }, 30000);
     },
 
     ConfigureForm: function(opts) {
