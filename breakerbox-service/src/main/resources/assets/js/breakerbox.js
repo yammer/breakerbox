@@ -111,7 +111,7 @@ Breakerbox.SyncState.prototype.inSync = function() {
         type: 'GET',
         dataType: 'json',
         url: "/sync/" + this.serviceId + '/' + this.dependencyId,
-        timeout: 2000,
+        timeout: 30000,
         success: function(data) {
             $('#' + self.domId)[0].innerHTML = self.createDom(data);
             self.hideSpinner();
