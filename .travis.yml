@@ -1,5 +1,6 @@
 language: java
-script: mvn verify deploy --settings maven_deploy_settings.xml
+script: 
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && mvn verify deploy --settings maven_deploy_settings.xml || mvn test verify --settings maven_deploy_settings.xml'
 jdk:
 - oraclejdk7
 - openjdk7
