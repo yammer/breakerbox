@@ -166,7 +166,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                         ldapConfiguration.getCachePolicy()
                 );
 
-        environment.healthChecks().register("ldap-auth", new LdapHealthCheck(TenacityAuthenticator
+        environment.healthChecks().register("ldap-auth", new LdapHealthCheck<>(TenacityAuthenticator
                 .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
         environment.jersey().register(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
     }
