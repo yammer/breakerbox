@@ -38,7 +38,7 @@
     <properties>
         <dropwizard.version>0.7.1</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>0.3.4-SNAPSHOT</tenacity.version>
+        <tenacity.version>0.3.4</tenacity.version>
         <turbine.version>0.4</turbine.version>
         <dropwizard-auth-ldap.version>0.1.2</dropwizard-auth-ldap.version>
         <postgresql.version>9.3-1102-jdbc41</postgresql.version>
@@ -235,18 +235,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>allow-snapshots</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
-            <repositories>
-                <repository>
-                    <id>snapshots-repo</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                    <releases><enabled>false</enabled></releases>
-                    <snapshots><enabled>true</enabled></snapshots>
-                </repository>
-            </repositories>
         </profile>
     </profiles>
 

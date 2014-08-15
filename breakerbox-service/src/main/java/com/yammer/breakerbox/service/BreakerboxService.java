@@ -126,8 +126,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         scheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
-                TurbineInit.init();
                 registerProperties(configuration);
+                TurbineInit.init();
             }
         }, 3, TimeUnit.SECONDS);
     }

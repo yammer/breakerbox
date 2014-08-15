@@ -1,6 +1,6 @@
 breakerbox:
   urls: file:config.properties,http://localhost:8080/archaius/breakerbox
-  initialDelay: 5s
+  initialDelay: 0s
   delay: 60s
 
 database:
