@@ -12,6 +12,7 @@ import com.yammer.breakerbox.service.auth.NullAuthProvider;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
+import com.yammer.breakerbox.service.managed.ManagedTurbine;
 import com.yammer.breakerbox.service.resources.ArchaiusResource;
 import com.yammer.breakerbox.service.resources.ConfigureResource;
 import com.yammer.breakerbox.service.resources.DashboardResource;
@@ -122,6 +123,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 30,
                 60,
                 TimeUnit.SECONDS);
+
+        environment.lifecycle().manage(new ManagedTurbine());
 
         scheduledExecutorService.schedule(new Runnable() {
             @Override
