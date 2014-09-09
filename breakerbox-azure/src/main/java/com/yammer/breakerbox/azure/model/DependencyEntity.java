@@ -162,7 +162,7 @@ public class DependencyEntity extends TableType implements TableKey {
     }
 
     /**
-     * Getter for user field. <br/>
+     * Getter for user field.
      * NOTE: This method is exposed, but is also used for bean serialization. Don't remove this.
      */
     public String getUser() {
