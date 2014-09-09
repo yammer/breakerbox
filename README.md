@@ -17,7 +17,7 @@ in resilient design of foreign dependencies.
 Extract the archive and then run the following command
 
 ```bash
-java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service-0.1.0.jar server breakerbox.yml
+java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service-0.1.1.jar server breakerbox.yml
 ```
 
 Then point your browser at ``http://localhost:8080``. You should see a dashboard
