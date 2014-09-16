@@ -32,8 +32,10 @@ Here's a very simple bare configuration of Breakerbox. Each section will be desc
 ```yaml
 breakerbox:
   urls: file:config.properties,http://localhost:8080/archaius/breakerbox
-  initialDelay: 5s
+  initialDelay: 0s
   delay: 60s
+  
+breakerboxHostAndPort: localhost:8080 #default
 
 database:
   driverClass: org.h2.Driver
@@ -202,3 +204,8 @@ to run the tests. If you do not supply a valid Azure Table account, these tests 
 Docker
 ------
 Justin Plock created a [Docker for Breakerbox](https://registry.hub.docker.com/u/jplock/breakerbox/)
+
+Behind a Proxy
+--------------
+The dashboard leverages Javascript's EventSource which doesn't support CORs. There is a configurable parameter `breakerboxHostAndPort`
+which defaults to `localhost:8080`. You can change this to allow for your proxy to direct traffic appropriately.

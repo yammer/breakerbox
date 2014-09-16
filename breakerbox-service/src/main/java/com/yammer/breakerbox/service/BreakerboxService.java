@@ -23,6 +23,7 @@ import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKey;
 import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKeyFactory;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
+import com.yammer.breakerbox.service.views.DashboardViewFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
@@ -110,7 +111,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
         environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
-        environment.jersey().register(new DashboardResource());
+        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort())));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
         final ScheduledExecutorService scheduledExecutorService = environment

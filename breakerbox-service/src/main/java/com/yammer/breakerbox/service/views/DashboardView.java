@@ -1,15 +1,24 @@
 package com.yammer.breakerbox.service.views;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.net.HostAndPort;
+import com.google.common.net.UrlEscapers;
 
 public class DashboardView extends NavbarView {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardView.class);
     private final String clusterName;
+    private final HostAndPort breakerboxHostAndPort;
 
-    public DashboardView(String clusterName) {
+    public DashboardView(String clusterName, HostAndPort breakerboxHostAndPort) {
         super("/templates/dashboard/dashboard.mustache");
         this.clusterName = clusterName;
+        this.breakerboxHostAndPort = breakerboxHostAndPort;
+    }
+
+    public String escapedBreakerboxHostAndPort() {
+        return UrlEscapers.urlFormParameterEscaper().escape(breakerboxHostAndPort.toString());
+    }
+
+    public HostAndPort getBreakerboxHostAndPort() {
+        return breakerboxHostAndPort;
     }
 
     public String getClusterName() {
@@ -23,6 +32,7 @@ public class DashboardView extends NavbarView {
 
         DashboardView that = (DashboardView) o;
 
+        if (!breakerboxHostAndPort.equals(that.breakerboxHostAndPort)) return false;
         if (!clusterName.equals(that.clusterName)) return false;
 
         return true;
@@ -30,6 +40,8 @@ public class DashboardView extends NavbarView {
 
     @Override
     public int hashCode() {
-        return clusterName.hashCode();
+        int result = clusterName.hashCode();
+        result = 31 * result + breakerboxHostAndPort.hashCode();
+        return result;
     }
 }

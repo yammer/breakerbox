@@ -3,6 +3,7 @@ package com.yammer.breakerbox.service.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -40,6 +41,10 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid @JsonProperty("database")
     private Optional<JdbiConfiguration> jdbiConfiguration = Optional.absent();
 
+    /* Useful if you are Breakerbox is behind a proxy and not at localhost:8080 */
+    @NotNull @Valid
+    private HostAndPort breakerboxHostAndPort;
+
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
@@ -48,7 +53,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("breakerbox") BreakerboxConfiguration breakerboxConfiguration,
                                           @JsonProperty("ldap") LdapConfiguration ldapConfiguration,
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride,
-                                          @JsonProperty("database") JdbiConfiguration jdbiConfiguration) {
+                                          @JsonProperty("database") JdbiConfiguration jdbiConfiguration,
+                                          @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -57,6 +63,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.ldapConfiguration = Optional.fromNullable(ldapConfiguration);
         this.archaiusOverride = Optional.fromNullable(archaiusOverride).or(new ArchaiusOverrideConfiguration());
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
+        this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -105,6 +112,10 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = jdbiConfiguration;
     }
 
+    public HostAndPort getBreakerboxHostAndPort() {
+        return breakerboxHostAndPort;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,6 +126,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         if (!archaiusOverride.equals(that.archaiusOverride)) return false;
         if (!azure.equals(that.azure)) return false;
         if (!breakerboxConfiguration.equals(that.breakerboxConfiguration)) return false;
+        if (!breakerboxHostAndPort.equals(that.breakerboxHostAndPort)) return false;
         if (!breakerboxServicesConfiguration.equals(that.breakerboxServicesConfiguration)) return false;
         if (!breakerboxServicesPropertyKeys.equals(that.breakerboxServicesPropertyKeys)) return false;
         if (!jdbiConfiguration.equals(that.jdbiConfiguration)) return false;
@@ -134,6 +146,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         result = 31 * result + ldapConfiguration.hashCode();
         result = 31 * result + archaiusOverride.hashCode();
         result = 31 * result + jdbiConfiguration.hashCode();
+        result = 31 * result + breakerboxHostAndPort.hashCode();
         return result;
     }
 }
