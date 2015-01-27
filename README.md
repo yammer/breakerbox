@@ -51,6 +51,8 @@ tenacityClient:
   connectionTimeout: 500ms
   timeout: 1000ms
 
+defaultDashboard: production
+
 server:
   applicationConnectors:
     - type: http

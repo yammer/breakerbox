@@ -125,7 +125,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
         environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
-        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort())));
+        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort()), configuration.getDefaultDashboard()));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
         final ScheduledExecutorService scheduledExecutorService = environment

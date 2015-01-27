@@ -2,6 +2,7 @@
 -----
 * Tenacity 0.4.4
 * H2 1.4.185
+* Adding new configuration parameter to define the default dashboard.
 
 0.1.1
 --------------

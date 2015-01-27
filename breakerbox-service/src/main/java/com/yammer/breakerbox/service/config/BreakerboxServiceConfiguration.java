@@ -14,6 +14,7 @@ import io.dropwizard.client.JerseyClientConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
@@ -45,6 +46,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private HostAndPort breakerboxHostAndPort;
 
+    @NotNull
+    private String defaultDashboard;
+
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
@@ -54,7 +58,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("ldap") LdapConfiguration ldapConfiguration,
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride,
                                           @JsonProperty("database") JdbiConfiguration jdbiConfiguration,
-                                          @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort) {
+                                          @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort,
+                                          @JsonProperty("defaultDashboard") String defaultDashboard) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -64,6 +69,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.archaiusOverride = Optional.fromNullable(archaiusOverride).or(new ArchaiusOverrideConfiguration());
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
+        this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -116,37 +122,24 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return breakerboxHostAndPort;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BreakerboxServiceConfiguration that = (BreakerboxServiceConfiguration) o;
-
-        if (!archaiusOverride.equals(that.archaiusOverride)) return false;
-        if (!azure.equals(that.azure)) return false;
-        if (!breakerboxConfiguration.equals(that.breakerboxConfiguration)) return false;
-        if (!breakerboxHostAndPort.equals(that.breakerboxHostAndPort)) return false;
-        if (!breakerboxServicesConfiguration.equals(that.breakerboxServicesConfiguration)) return false;
-        if (!breakerboxServicesPropertyKeys.equals(that.breakerboxServicesPropertyKeys)) return false;
-        if (!jdbiConfiguration.equals(that.jdbiConfiguration)) return false;
-        if (!ldapConfiguration.equals(that.ldapConfiguration)) return false;
-        if (!tenacityClient.equals(that.tenacityClient)) return false;
-
-        return true;
+    public String getDefaultDashboard() {
+        return defaultDashboard;
     }
 
     @Override
     public int hashCode() {
-        int result = azure.hashCode();
-        result = 31 * result + tenacityClient.hashCode();
-        result = 31 * result + breakerboxServicesPropertyKeys.hashCode();
-        result = 31 * result + breakerboxServicesConfiguration.hashCode();
-        result = 31 * result + breakerboxConfiguration.hashCode();
-        result = 31 * result + ldapConfiguration.hashCode();
-        result = 31 * result + archaiusOverride.hashCode();
-        result = 31 * result + jdbiConfiguration.hashCode();
-        result = 31 * result + breakerboxHostAndPort.hashCode();
-        return result;
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, ldapConfiguration, archaiusOverride, jdbiConfiguration, breakerboxHostAndPort, defaultDashboard);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final BreakerboxServiceConfiguration other = (BreakerboxServiceConfiguration) obj;
+        return Objects.equals(this.azure, other.azure) && Objects.equals(this.tenacityClient, other.tenacityClient) && Objects.equals(this.breakerboxServicesPropertyKeys, other.breakerboxServicesPropertyKeys) && Objects.equals(this.breakerboxServicesConfiguration, other.breakerboxServicesConfiguration) && Objects.equals(this.breakerboxConfiguration, other.breakerboxConfiguration) && Objects.equals(this.ldapConfiguration, other.ldapConfiguration) && Objects.equals(this.archaiusOverride, other.archaiusOverride) && Objects.equals(this.jdbiConfiguration, other.jdbiConfiguration) && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort) && Objects.equals(this.defaultDashboard, other.defaultDashboard);
     }
 }
