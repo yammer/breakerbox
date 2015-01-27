@@ -38,11 +38,11 @@
     <properties>
         <dropwizard.version>0.7.1</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>0.4.2</tenacity.version>
+        <tenacity.version>0.4.4</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.1.2</dropwizard-auth-ldap.version>
         <postgresql.version>9.3-1102-jdbc41</postgresql.version>
-        <h2.version>1.4.181</h2.version>
+        <h2.version>1.4.185</h2.version>
     </properties>
 
     <dependencyManagement>

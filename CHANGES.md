@@ -1,3 +1,8 @@
+0.1.2
+-----
+* Tenacity 0.4.4
+* H2 1.4.185
+
 0.1.1
 --------------
 * Builds against Java8 now
