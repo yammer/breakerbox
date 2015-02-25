@@ -12,7 +12,6 @@ azure:
 
 tenacityClient:
   connectionTimeout: 50ms
-  timeout: 100ms
 
 ldap:
   uri: ldaps://fakeldap.com:636

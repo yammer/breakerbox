@@ -27,8 +27,7 @@ import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
-import com.yammer.tenacity.client.TenacityClient;
-import com.yammer.tenacity.client.TenacityClientFactory;
+import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
@@ -114,12 +113,17 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
         breakerboxStore.initialize();
 
-        final TenacityClient tenacityClient = new TenacityClientFactory(configuration.getTenacityClient()).build(environment);
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-                new TenacityPoller.Factory(tenacityClient));
+            new TenacityPoller.Factory(
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
+                    .using(configuration.getTenacityClient())
+                    .build()));
         final SyncComparator syncComparator = new SyncComparator(
-                new TenacityConfigurationFetcher.Factory(tenacityClient),
-                breakerboxStore);
+            new TenacityConfigurationFetcher.Factory(
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
+                    .using(configuration.getTenacityClient())
+                    .build()),
+            breakerboxStore);
 
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
