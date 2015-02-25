@@ -67,7 +67,7 @@ public class NullAuthProvider<T> implements InjectableProvider<Auth, Parameter> 
     }
 
     @Override
-    public Injectable getInjectable(ComponentContext ic, Auth auth, Parameter parameter) {
+    public Injectable<T> getInjectable(ComponentContext ic, Auth auth, Parameter parameter) {
         return new BasicAuthInjectable<>(authenticator, auth.required());
     }
 }
