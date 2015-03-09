@@ -1,3 +1,9 @@
+0.1.3
+-----
+* Tenacity 0.4.5
+* H2 1.4.186
+* Postgresql 9.4-1201-jdbc41
+
 0.1.2
 -----
 * Tenacity 0.4.4
