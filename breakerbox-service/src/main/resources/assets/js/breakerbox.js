@@ -70,7 +70,7 @@ Breakerbox.ConfigureForm.prototype.registerSubmit = function() {
 
         $.ajax({
             type: "POST",
-            timeout: 5000,
+            timeout: 30000,
             data: $(this).serialize(),
             url: '/configure/' + self.serviceId + '/' + self.dependencyId,
             success: function() {
