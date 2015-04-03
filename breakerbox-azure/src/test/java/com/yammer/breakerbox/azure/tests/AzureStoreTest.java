@@ -12,6 +12,7 @@ import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
+import com.yammer.tenacity.core.config.SemaphoreConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import org.joda.time.DateTime;
@@ -41,7 +42,11 @@ public class AzureStoreTest extends WithConfiguration {
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
         timestamp = 1345938944000l;
-        dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), 6789);
+        dependencyConfiguration = new TenacityConfiguration(
+                new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67),
+                new CircuitBreakerConfiguration(1, 2, 3, 4, 5),
+                new SemaphoreConfiguration(1, 2),
+                6789);
         user = "USER";
         assumeTrue(validAzureAccount());
         assertTrue(breakerboxStore.initialize());

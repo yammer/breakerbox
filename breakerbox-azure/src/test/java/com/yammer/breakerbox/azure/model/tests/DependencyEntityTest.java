@@ -10,6 +10,7 @@ import com.yammer.breakerbox.azure.tests.WithConfiguration;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
+import com.yammer.tenacity.core.config.SemaphoreConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import org.junit.After;
@@ -59,7 +60,7 @@ public class DependencyEntityTest extends WithConfiguration {
 
     @Test
     public void testSerializationAndDeserializationOfConfig() throws Exception {
-        final TenacityConfiguration dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), 6789);//numbers totally arbitrary
+        final TenacityConfiguration dependencyConfiguration = new TenacityConfiguration(new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67), new CircuitBreakerConfiguration(1, 2, 3, 4, 5), new SemaphoreConfiguration(3, 4), 6789);//numbers totally arbitrary
         final DependencyEntity entry = DependencyEntity.build(dependencyId, testTimeStamp, user, dependencyConfiguration, serviceId);
 
         final TenacityConfiguration recomposedConfiguration = entry.getConfiguration().get();
@@ -76,6 +77,7 @@ public class DependencyEntityTest extends WithConfiguration {
                 new TenacityConfiguration(
                         new ThreadPoolConfiguration(),
                         new CircuitBreakerConfiguration(1234, 5678, 910, 20000, 10),
+                        new SemaphoreConfiguration(),
                         3000),
                 serviceId);
 
@@ -84,6 +86,7 @@ public class DependencyEntityTest extends WithConfiguration {
         final TenacityConfiguration updatedConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(),
                 new CircuitBreakerConfiguration(987, 6543, 321, 1000, 20),
+                new SemaphoreConfiguration(),
                 4000);
         final DependencyEntity updatedEntity = DependencyEntity.build(dependencyId, testTimeStamp, user,
                 updatedConfiguration, serviceId);

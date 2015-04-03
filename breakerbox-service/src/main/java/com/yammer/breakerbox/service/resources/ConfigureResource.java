@@ -19,6 +19,7 @@ import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
+import com.yammer.tenacity.core.config.SemaphoreConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import io.dropwizard.auth.Auth;
@@ -149,7 +150,9 @@ public class ConfigureResource {
                               @FormParam("maxQueueSize") Integer maxQueueSize,
                               @FormParam("queueSizeRejectionThreshold") Integer queueSizeRejectionThreshold,
                               @FormParam("threadpoolStatisticalWindow") Integer threadpoolStatisticalWindow,
-                              @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets) {
+                              @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets,
+                              @FormParam("semaphoreMaxConcurrentRequests") Integer semaphoreMaxConcurrentRequests,
+                              @FormParam("semaphoreFallbackMaxConcurrentRequests") Integer semaphoreFallbackMaxConcurrentRequests) {
         final TenacityConfiguration tenacityConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(
                         threadPoolCoreSize,
@@ -164,6 +167,9 @@ public class ConfigureResource {
                         errorThresholdPercentage,
                         circuitBreakerstatisticalWindow,
                         circuitBreakerStatisticalWindowBuckets),
+                new SemaphoreConfiguration(
+                        semaphoreMaxConcurrentRequests,
+                        semaphoreFallbackMaxConcurrentRequests),
                 executionTimeout);
         final ServiceId serviceId = ServiceId.from(serviceName);
         final DependencyId dependencyId = DependencyId.from(dependencyName);

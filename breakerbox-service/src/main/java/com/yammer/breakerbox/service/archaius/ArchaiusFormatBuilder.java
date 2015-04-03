@@ -48,6 +48,8 @@ public class ArchaiusFormatBuilder {
         circuitBreakerSleepWindowInMilliseconds(key, configuration);
         circuitBreakermetricsRollingStatsNumBuckets(key, configuration);
         circuitBreakermetricsRollingStatsTimeInMilliseconds(key, configuration);
+        semaphoreMaxConcurrentRequests(key, configuration);
+        semaphoreFallbackMaxConcurrentRequests(key, configuration);
         return this;
     }
 
@@ -103,6 +105,14 @@ public class ArchaiusFormatBuilder {
 
     private void circuitBreakermetricsRollingStatsTimeInMilliseconds(TenacityPropertyKey key, TenacityConfiguration configuration) {
         appender(TenacityPropertyRegister.circuitBreakermetricsRollingStatsTimeInMilliseconds(key), configuration.getCircuitBreaker().getMetricsRollingStatisticalWindowInMilliseconds());
+    }
+
+    private void semaphoreMaxConcurrentRequests(TenacityPropertyKey key, TenacityConfiguration configuration) {
+        appender(TenacityPropertyRegister.semaphoreMaxConcurrentRequests(key), configuration.getSemaphore().getMaxConcurrentRequests());
+    }
+
+    private void semaphoreFallbackMaxConcurrentRequests(TenacityPropertyKey key, TenacityConfiguration configuration) {
+        appender(TenacityPropertyRegister.semaphoreFallbackMaxConcurrentRequests(key), configuration.getSemaphore().getFallbackMaxConcurrentRequests());
     }
 
     private <ValueType> void appender(String key, ValueType value) {
