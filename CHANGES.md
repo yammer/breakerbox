@@ -1,3 +1,8 @@
+0.1.4
+-----
+* Tenacity 0.5.3 - This brings ability to configure Semaphore configurations
+* Adjusting timeout on authentication requests to enhance the user experience (5s to 30s)
+
 0.1.3
 -----
 * Tenacity 0.4.5
