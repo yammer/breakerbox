@@ -1,8 +1,9 @@
 0.1.4
 -----
-* Tenacity 0.5.3 - This brings ability to configure Semaphore configurations
+* `TenacityObservableCommand` leverages the semaphore execution isolation strategy. Breakerbox now has support for configuring this through the web interface.
+* Tenacity 0.5.3 - This brings ability to configure Semaphore configurations (`SemaphoreConfiguration`).
 * Adjusting timeout on authentication requests to enhance the user experience (5s to 30s)
-* Updating breakerbox-dashboard to include support for Semaphore rejection and better error messages when problems occur
+* Updating `breakerbox-dashboard` to include support for semaphore rejection and better error messages when problems occur
 * Removing a bug where breakerbox would load two different versions, it now only loads one
 
 0.1.3
