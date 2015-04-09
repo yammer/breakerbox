@@ -14,7 +14,7 @@ public class BreakerboxDashboardBundle implements ConfiguredBundle<Configuration
     @Override
     public void initialize(Bootstrap<?> bootstrap) {
         bootstrap.addBundle(new AssetsBundle());
-        bootstrap.addBundle(new ViewBundle());
+        bootstrap.addBundle(new ViewBundle<>());
     }
 
     @Override

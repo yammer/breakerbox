@@ -8,7 +8,7 @@ import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
-import com.yammer.breakerbox.service.auth.NullAuthProvider;
+import com.yammer.breakerbox.service.auth.NullAuthFactory;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -39,8 +39,9 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKeyFactory;
 import com.yammer.tenacity.dbi.DBIExceptionLogger;
 import com.yammer.tenacity.dbi.SQLExceptionLogger;
 import io.dropwizard.Application;
+import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.auth.CachingAuthenticator;
-import io.dropwizard.auth.basic.BasicAuthProvider;
+import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
@@ -184,7 +185,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
     }
 
     private static void setupNullAuth(Environment environment) {
-        environment.jersey().register(new NullAuthProvider<>(new NullAuthenticator()));
+        environment.jersey().register(AuthFactory.binder(new NullAuthFactory<>(
+                new NullAuthenticator(), BasicCredentials.class)));
     }
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
@@ -201,6 +203,9 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.healthChecks().register("ldap-auth", new LdapHealthCheck<>(TenacityAuthenticator
                 .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
-        environment.jersey().register(new BasicAuthProvider<>(cachingAuthenticator, "breakerbox"));
+        environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
+                cachingAuthenticator,
+                "breakerbox",
+                BasicCredentials.class)));
     }
 }

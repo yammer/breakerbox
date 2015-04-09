@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstancesTest {
     @BeforeClass
