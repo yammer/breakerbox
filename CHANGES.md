@@ -2,6 +2,7 @@
 -----
 * Dropwizard 0.8.1
 * Tenacity 0.6.1
+* Timed out metrics on dashboard for semaphore commands
 
 0.1.4
 -----
