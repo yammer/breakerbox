@@ -1,3 +1,8 @@
+0.2.0
+-----
+* Dropwizard 0.8.1
+* Tenacity 0.6.1
+
 0.1.4
 -----
 * `TenacityObservableCommand` leverages the semaphore execution isolation strategy. Breakerbox now has support for configuring this through the web interface.

@@ -4,7 +4,7 @@ import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKey;
 import com.yammer.breakerbox.service.tenacity.BreakerboxDependencyKeyFactory;
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BreakerboxDependencyKeyFactoryTest {
     private final BreakerboxDependencyKeyFactory keyFactory = new BreakerboxDependencyKeyFactory();

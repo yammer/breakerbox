@@ -10,7 +10,7 @@ import org.skife.jdbi.v2.exceptions.DBIException;
 
 import java.util.UUID;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class DependencyDBTest extends H2Test {
     private DependencyDB dependencyDB;

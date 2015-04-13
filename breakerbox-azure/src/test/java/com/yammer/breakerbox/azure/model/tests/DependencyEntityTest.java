@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import java.util.UUID;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -64,7 +64,7 @@ public class DependencyEntityTest extends WithConfiguration {
         final DependencyEntity entry = DependencyEntity.build(dependencyId, testTimeStamp, user, dependencyConfiguration, serviceId);
 
         final TenacityConfiguration recomposedConfiguration = entry.getConfiguration().get();
-        assertThat(recomposedConfiguration).isEqualsToByComparingFields(dependencyConfiguration);
+        assertThat(recomposedConfiguration).isEqualToComparingFieldByField(dependencyConfiguration);
 
     }
 

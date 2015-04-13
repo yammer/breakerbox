@@ -9,7 +9,7 @@ import com.yammer.breakerbox.store.model.DependencyModel;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class SortRowFirstTest {
