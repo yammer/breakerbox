@@ -50,6 +50,7 @@ public class ArchaiusFormatBuilder {
         circuitBreakermetricsRollingStatsTimeInMilliseconds(key, configuration);
         semaphoreMaxConcurrentRequests(key, configuration);
         semaphoreFallbackMaxConcurrentRequests(key, configuration);
+        executionIsolationStrategy(key, configuration);
         return this;
     }
 
@@ -113,6 +114,10 @@ public class ArchaiusFormatBuilder {
 
     private void semaphoreFallbackMaxConcurrentRequests(TenacityPropertyKey key, TenacityConfiguration configuration) {
         appender(TenacityPropertyRegister.semaphoreFallbackMaxConcurrentRequests(key), configuration.getSemaphore().getFallbackMaxConcurrentRequests());
+    }
+
+    private void executionIsolationStrategy(TenacityPropertyKey key, TenacityConfiguration configuration) {
+        appender(TenacityPropertyRegister.executionIsolationStrategy(key), configuration.getExecutionIsolationStrategy());
     }
 
     private <ValueType> void appender(String key, ValueType value) {

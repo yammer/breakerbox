@@ -1,6 +1,7 @@
 package com.yammer.breakerbox.service.views;
 
 import com.google.common.collect.ImmutableList;
+import com.netflix.hystrix.HystrixCommandProperties;
 import com.yammer.breakerbox.service.core.SyncPropertyKeyState;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -32,6 +33,14 @@ public class ConfigureView extends NavbarView {
 
     public TenacityConfiguration getTenacityConfiguration() {
         return tenacityConfiguration;
+    }
+
+    public boolean isThreadExecutionIsolationStrategy() {
+        return getTenacityConfiguration().getExecutionIsolationStrategy().equals(HystrixCommandProperties.ExecutionIsolationStrategy.THREAD);
+    }
+
+    public boolean isSemaphoreExecutionIsolationStrategy() {
+        return getTenacityConfiguration().getExecutionIsolationStrategy().equals(HystrixCommandProperties.ExecutionIsolationStrategy.SEMAPHORE);
     }
 
     public Iterable<OptionItem> getConfigurationVersions() {

@@ -1,8 +1,9 @@
 0.2.0
 -----
 * Dropwizard 0.8.1
-* Tenacity 0.6.1
+* Tenacity 0.6.2
 * Timed out metrics on dashboard for semaphore commands
+* Ability to live configure `executionIsolationStrategy for any `TenacityPropertyKey`
 
 0.1.4
 -----

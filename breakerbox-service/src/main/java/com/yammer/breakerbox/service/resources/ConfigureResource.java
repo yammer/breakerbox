@@ -6,6 +6,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
+import com.netflix.hystrix.HystrixCommandProperties;
 import com.yammer.breakerbox.service.comparable.SortRowFirst;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -152,7 +153,8 @@ public class ConfigureResource {
                               @FormParam("threadpoolStatisticalWindow") Integer threadpoolStatisticalWindow,
                               @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets,
                               @FormParam("semaphoreMaxConcurrentRequests") Integer semaphoreMaxConcurrentRequests,
-                              @FormParam("semaphoreFallbackMaxConcurrentRequests") Integer semaphoreFallbackMaxConcurrentRequests) {
+                              @FormParam("semaphoreFallbackMaxConcurrentRequests") Integer semaphoreFallbackMaxConcurrentRequests,
+                              @FormParam("executionIsolationStrategy")HystrixCommandProperties.ExecutionIsolationStrategy executionIsolationStrategy) {
         final TenacityConfiguration tenacityConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(
                         threadPoolCoreSize,
@@ -170,7 +172,8 @@ public class ConfigureResource {
                 new SemaphoreConfiguration(
                         semaphoreMaxConcurrentRequests,
                         semaphoreFallbackMaxConcurrentRequests),
-                executionTimeout);
+                executionTimeout,
+                executionIsolationStrategy);
         final ServiceId serviceId = ServiceId.from(serviceName);
         final DependencyId dependencyId = DependencyId.from(dependencyName);
         if (breakerboxStore.store(new ServiceModel(serviceId, dependencyId)) &&

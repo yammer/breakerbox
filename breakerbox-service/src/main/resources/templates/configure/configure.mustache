@@ -108,6 +108,33 @@
             </div>
             <span class="help-block">Default 10.</span>
         </div>
+
+        <legend>Execution Isolation Strategy</legend>
+        <div class="form-group">
+            <label for="radioThreadStrategy" class="col-lg-3 control-label">Thread</label>
+            <div class="col-lg-1 radio">
+                <input type="radio" name="executionIsolationStrategy" id="radioThreadStrategy" value="THREAD"
+                    {{#isThreadExecutionIsolationStrategy}}
+                        checked
+                    {{/isThreadExecutionIsolationStrategy}}
+                        >
+            </div>
+            <span class="help-block">Default when using TenacityCommand.
+            <strong>Interrupts the thread after a timeout</strong></span>
+        </div>
+        <div class="form-group">
+            <label for="radioSemaphoreStrategy" class="col-lg-3 control-label">Semaphore</label>
+            <div class="col-lg-1 radio">
+                <input type="radio" name="executionIsolationStrategy" id="radioSemaphoreStrategy" value="SEMAPHORE"
+                    {{#isSemaphoreExecutionIsolationStrategy}}
+                        checked
+                    {{/isSemaphoreExecutionIsolationStrategy}}
+                        >
+            </div>
+            <span class="help-block">Default when using TenacityObservableCommand.
+            <strong>Unsubscribes after a timeout</strong></span>
+        </div>
+
         <legend>Threadpool</legend>
         <div class="form-group">
             <label for="inputThreadPoolCoreSize" class="col-lg-3 control-label">Core Size</label>
