@@ -27,6 +27,7 @@ import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
+import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -43,6 +44,7 @@ import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.auth.basic.BasicCredentials;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -116,14 +118,18 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
             new TenacityPoller.Factory(
-                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
-                    .using(configuration.getTenacityClient())
-                    .build()));
+                new TenacityClient(
+                    environment.metrics(),
+                    new JerseyClientBuilder(environment)
+                            .using(configuration.getTenacityClient())
+                            .build("tenacity-" + BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS))));
         final SyncComparator syncComparator = new SyncComparator(
             new TenacityConfigurationFetcher.Factory(
-                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
-                    .using(configuration.getTenacityClient())
-                    .build()),
+                new TenacityClient(
+                    environment.metrics(),
+                    new JerseyClientBuilder(environment)
+                            .using(configuration.getTenacityClient())
+                            .build("tenacity-" + BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION))),
             breakerboxStore);
 
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");

@@ -1,3 +1,7 @@
+0.2.1
+-----
+* Removing use of `TenacityJerseyClient`. We have identified a memory-leak with its implementation when using Jersey 2.x and dropwizard 0.8.x
+
 0.2.0
 -----
 * Dropwizard 0.8.1
