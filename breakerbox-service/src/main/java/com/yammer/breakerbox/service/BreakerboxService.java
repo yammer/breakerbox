@@ -118,18 +118,14 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
             new TenacityPoller.Factory(
-                new TenacityClient(
-                    environment.metrics(),
-                    new JerseyClientBuilder(environment)
-                            .using(configuration.getTenacityClient())
-                            .build("tenacity-" + BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS))));
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
+                        .using(configuration.getTenacityClient())
+                        .build()));
         final SyncComparator syncComparator = new SyncComparator(
             new TenacityConfigurationFetcher.Factory(
-                new TenacityClient(
-                    environment.metrics(),
-                    new JerseyClientBuilder(environment)
-                            .using(configuration.getTenacityClient())
-                            .build("tenacity-" + BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION))),
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
+                        .using(configuration.getTenacityClient())
+                        .build()),
             breakerboxStore);
 
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
