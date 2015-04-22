@@ -193,8 +193,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
         final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration);
-        final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
-                new LdapCanAuthenticate(ldapConfiguration));
         final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
                 new CachingAuthenticator<>(
                         environment.metrics(),
@@ -202,9 +200,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
                         ldapConfiguration.getCachePolicy()
                 );
-
-        environment.healthChecks().register("ldap-auth", new LdapHealthCheck<>(TenacityAuthenticator
-                .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
         environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
                 cachingAuthenticator,
                 "breakerbox",
