@@ -1,3 +1,8 @@
+0.2.3
+-----
+* Tenacity 0.6.4
+* H2 1.4.187
+
 0.2.2
 -----
 * Tenacity 0.6.3. Resolved the memory-leak in `TenacityJerseyClient` by leveraging a workaround.
