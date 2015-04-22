@@ -14,6 +14,10 @@ public class DelayedTenacityBundleBuilder extends TenacityBundleBuilder<Breakerb
             throw new IllegalArgumentException("Must supply a Configuration Factory");
         }
 
-        return new DelayedTenacityConfiguredBundle(configurationFactory, executionHook, exceptionMapperBuilder.build());
+        return new DelayedTenacityConfiguredBundle(
+                configurationFactory,
+                executionHook,
+                exceptionMapperBuilder.build(),
+                usingTenacityCircuitBreakerHealthCheck);
     }
 }

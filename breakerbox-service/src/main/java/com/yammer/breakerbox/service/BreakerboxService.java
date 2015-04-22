@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 
 public class BreakerboxService extends Application<BreakerboxServiceConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxService.class);
-    private DelayedTenacityConfiguredBundle tenacityConfiguredBundle;
 
     public static void main(String[] args) throws Exception {
         new BreakerboxService().run(args);
@@ -73,35 +72,34 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
             }
         });
 
-        tenacityConfiguredBundle = ((DelayedTenacityBundleBuilder)DelayedTenacityBundleBuilder
-            .newBuilder()
-            .configurationFactory(new TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration>() {
-                @Override
-                public Map<TenacityPropertyKey, TenacityConfiguration> getTenacityConfigurations(BreakerboxServiceConfiguration applicationConfiguration) {
-                    return ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
-                            BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, applicationConfiguration.getBreakerboxServicesPropertyKeys(),
-                            BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, applicationConfiguration.getBreakerboxServicesConfiguration(),
-                            BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, new TenacityConfiguration());
-                }
+        bootstrap.addBundle(DelayedTenacityBundleBuilder
+                .newBuilder()
+                .configurationFactory(new TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration>() {
+                    @Override
+                    public Map<TenacityPropertyKey, TenacityConfiguration> getTenacityConfigurations(BreakerboxServiceConfiguration applicationConfiguration) {
+                        return ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
+                                BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, applicationConfiguration.getBreakerboxServicesPropertyKeys(),
+                                BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, applicationConfiguration.getBreakerboxServicesConfiguration(),
+                                BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, new TenacityConfiguration());
+                    }
 
-                @Override
-                public TenacityPropertyKeyFactory getTenacityPropertyKeyFactory(BreakerboxServiceConfiguration applicationConfiguration) {
-                    return new BreakerboxDependencyKeyFactory();
-                }
+                    @Override
+                    public TenacityPropertyKeyFactory getTenacityPropertyKeyFactory(BreakerboxServiceConfiguration applicationConfiguration) {
+                        return new BreakerboxDependencyKeyFactory();
+                    }
 
-                @Override
-                public BreakerboxConfiguration getBreakerboxConfiguration(BreakerboxServiceConfiguration applicationConfiguration) {
-                    return applicationConfiguration.getBreakerboxConfiguration();
-                }
-            })
-            .mapAllHystrixRuntimeExceptionsTo(429)
-            .commandExecutionHook(new ExceptionLoggingCommandHook(
-                    ImmutableList.of(
-                            new DBIExceptionLogger(bootstrap.getMetricRegistry()),
-                            new SQLExceptionLogger(bootstrap.getMetricRegistry()),
-                            new DefaultExceptionLogger()))))
-            .build();
-        bootstrap.addBundle(tenacityConfiguredBundle);
+                    @Override
+                    public BreakerboxConfiguration getBreakerboxConfiguration(BreakerboxServiceConfiguration applicationConfiguration) {
+                        return applicationConfiguration.getBreakerboxConfiguration();
+                    }
+                })
+                .mapAllHystrixRuntimeExceptionsTo(429)
+                .commandExecutionHook(new ExceptionLoggingCommandHook(
+                        ImmutableList.of(
+                                new DBIExceptionLogger(bootstrap.getMetricRegistry()),
+                                new SQLExceptionLogger(bootstrap.getMetricRegistry()),
+                                new DefaultExceptionLogger())))
+                .build());
         bootstrap.addBundle(new BreakerboxDashboardBundle());
     }
 
@@ -150,15 +148,10 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 //TODO: The way properties get registered shouldn't need to depend on this strict of ordering.
                 //Need to also move off the static properties file for Turbine configuration and move to something more
                 //dynamic
-                if (tenacityConfiguredBundle != null) {
-                    tenacityConfiguredBundle.delayedRegisterTenacityProperties(
-                            tenacityConfiguredBundle.getTenacityBundleConfigurationFactory().getTenacityConfigurations(configuration),
-                            configuration);
+                try {
                     TurbineInit.init();
-                    tenacityConfiguredBundle = null;
-                } else {
+                } catch (Exception err) {
                     LOGGER.error("Unable to initialize Tenacity/Turbine.");
-                    throw new RuntimeException("Unable to initialize Tenacity/Turbine.");
                 }
             }
         }, 3, TimeUnit.SECONDS);

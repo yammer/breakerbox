@@ -14,14 +14,9 @@ import java.util.Map;
 public class DelayedTenacityConfiguredBundle extends TenacityConfiguredBundle<BreakerboxServiceConfiguration> {
     public DelayedTenacityConfiguredBundle(TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration> tenacityBundleConfigurationFactory,
                                            Optional<HystrixCommandExecutionHook> hystrixCommandExecutionHook,
-                                           Iterable<ExceptionMapper<? extends Throwable>> exceptionMappers) {
-        super(tenacityBundleConfigurationFactory, hystrixCommandExecutionHook, exceptionMappers);
-    }
-
-    @Override
-    protected void registerTenacityProperties(Map<TenacityPropertyKey, TenacityConfiguration> tenacityPropertyKeyConfigurations,
-                                              BreakerboxServiceConfiguration configuration) {
-        //noop
+                                           Iterable<ExceptionMapper<? extends Throwable>> exceptionMappers,
+                                           boolean usingTenacityCircuitBreakerHealthCheck) {
+        super(tenacityBundleConfigurationFactory, hystrixCommandExecutionHook, exceptionMappers, usingTenacityCircuitBreakerHealthCheck);
     }
 
     public void delayedRegisterTenacityProperties(
