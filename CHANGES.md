@@ -1,4 +1,8 @@
-0.2.3
+0.2.4
+-----
+* Fixed issue where Breakerbox incorrectly configured `Turbine`.
+
+~~0.2.3~~ Broke the initial configuration
 -----
 * Tenacity 0.6.4
 * H2 1.4.187
