@@ -23,11 +23,8 @@ import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.service.views.DashboardViewFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
-import com.yammer.dropwizard.authenticator.LdapCanAuthenticate;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
-import com.yammer.dropwizard.authenticator.healthchecks.LdapHealthCheck;
-import com.yammer.tenacity.client.TenacityClient;
 import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -44,7 +41,6 @@ import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.auth.basic.BasicCredentials;
-import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -193,8 +189,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
         final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration);
-        final ResourceAuthenticator canAuthenticate = new ResourceAuthenticator(
-                new LdapCanAuthenticate(ldapConfiguration));
         final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
                 new CachingAuthenticator<>(
                         environment.metrics(),
@@ -202,9 +196,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
                         ldapConfiguration.getCachePolicy()
                 );
-
-        environment.healthChecks().register("ldap-auth", new LdapHealthCheck<>(TenacityAuthenticator
-                .wrap(canAuthenticate, BreakerboxDependencyKey.BRKRBX_LDAP_AUTH)));
         environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
                 cachingAuthenticator,
                 "breakerbox",
