@@ -19,6 +19,11 @@ public class DelayedTenacityConfiguredBundle extends TenacityConfiguredBundle<Br
         super(tenacityBundleConfigurationFactory, hystrixCommandExecutionHook, exceptionMappers, usingTenacityCircuitBreakerHealthCheck);
     }
 
+    protected void registerTenacityProperties(Map<TenacityPropertyKey, TenacityConfiguration> tenacityPropertyKeyConfigurations,
+                                              BreakerboxServiceConfiguration configuration) {
+        //noop
+    }
+
     public void delayedRegisterTenacityProperties(
             Map<TenacityPropertyKey, TenacityConfiguration> tenacityPropertyKeyConfigurations,
             BreakerboxServiceConfiguration configuration) {
