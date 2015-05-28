@@ -1,4 +1,4 @@
-Breakerbox [![Build Status](https://travis-ci.org/yammer/breakerbox.svg)](https://travis-ci.org/yammer/breakerbox) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.yammer.breakerbox/breakerbox-service/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.yammer.breakerbox/breakerbox-service)
+Breakerbox [![Build Status](https://travis-ci.org/yammer/breakerbox.svg?style=flat-square)](https://travis-ci.org/yammer/breakerbox) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.yammer.breakerbox/breakerbox-service/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.yammer.breakerbox/breakerbox-service)
 ==========
 
 Breakerbox is a dashboard and dynamic configuration tool for [Tenacity](https://github.com/yammer/tenacity).
