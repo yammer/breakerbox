@@ -1,3 +1,8 @@
+0.2.5
+-----
+* Tenacity 0.6.6
+* Dropwizard-auth-ldap 0.2.0
+
 0.2.4
 -----
 * Fixed issue where Breakerbox incorrectly configured `Turbine`.
