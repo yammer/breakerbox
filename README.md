@@ -39,7 +39,7 @@ breakerboxHostAndPort: localhost:8080 #default
 
 database:
   driverClass: org.h2.Driver
-  url: jdbc:h2:mem:inMemory
+  url: jdbc:h2:mem:inMemory;DB_CLOSE_DELAY=-1
   user: breakerbox
   password: breakerboxpass
   maxSize: 10
