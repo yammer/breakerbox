@@ -1,4 +1,4 @@
-Next (0.2.5)
+0.2.5
 -----
 * Tenacity 0.6.7
 * Dropwizard-auth-ldap 0.2.0
