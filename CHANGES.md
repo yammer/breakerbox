@@ -1,3 +1,7 @@
+Next
+----
+* Tenacity 0.6.8
+
 0.2.5
 -----
 * Tenacity 0.6.7
