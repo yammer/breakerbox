@@ -1,6 +1,7 @@
-Next
+0.2.6
 ----
 * Tenacity 0.6.9
+* Switch from using `latency_execute` to `latency_total` for percentile metrics. The `latency_execute` is a closer measurement to successful execution times. Where `latency_total` is more accurate at the actual time the application is experiencing for successful and timed out commands. Since we assume breakerbox is used more in a debugging response and investigations rather than profiling/benchmarking, `latency_total` is more helpful in those quick response situations. In comparison when evaluating if your threadpool sizes and timeouts are set appropriately it is better to look at a historical trend of the `latency_execute` metric.
 
 0.2.5
 -----
