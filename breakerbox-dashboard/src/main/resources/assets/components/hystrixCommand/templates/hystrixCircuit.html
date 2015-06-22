@@ -58,19 +58,19 @@
 			<div class="cell data">Single</div>
 			<% } %>
 			<div class="cell header">90th</div>
-			<div class="cell data latency90"><span class="value"><%= getInstanceAverage(latencyExecute['90'], reportingHosts, false) %></span>ms</div>
+			<div class="cell data latency90"><span class="value"><%= getInstanceAverage(latencyTotal['90'], reportingHosts, false) %></span>ms</div>
 		</div>
 		<div class="tableRow">
 			<div class="cell header">Median</div>
-			<div class="cell data latencyMedian"><span class="value"><%= getInstanceAverage(latencyExecute['50'], reportingHosts, false) %></span>ms</div>
+			<div class="cell data latencyMedian"><span class="value"><%= getInstanceAverage(latencyTotal['50'], reportingHosts, false) %></span>ms</div>
 			<div class="cell header">99th</div>
-			<div class="cell data latency99"><span class="value"><%= getInstanceAverage(latencyExecute['99'], reportingHosts, false) %></span>ms</div>
+			<div class="cell data latency99"><span class="value"><%= getInstanceAverage(latencyTotal['99'], reportingHosts, false) %></span>ms</div>
 		</div>
 		<div class="tableRow">
 			<div class="cell header">Mean</div>
-			<div class="cell data latencyMean"><span class="value"><%= latencyExecute_mean %></span>ms</div>
+			<div class="cell data latencyMean"><span class="value"><%= latencyTotal_mean %></span>ms</div>
 			<div class="cell header">99.5th</div>
-			<div class="cell data latency995"><span class="value"><%= getInstanceAverage(latencyExecute['99.5'], reportingHosts, false) %></span>ms</div>
+			<div class="cell data latency995"><span class="value"><%= getInstanceAverage(latencyTotal['99.5'], reportingHosts, false) %></span>ms</div>
 		</div>
 	
 <!-- 	<a href="">History</a> <a href="">EPIC</a> <a href="">Actions</a> -->
