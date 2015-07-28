@@ -1,3 +1,8 @@
+0.2.7
+----
+* Tenacity 0.6.10
+* Adding Bad Request Counts to the dashboard
+
 0.2.6
 ----
 * Tenacity 0.6.9
