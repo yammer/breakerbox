@@ -36,11 +36,13 @@ public class ConfigureView extends NavbarView {
     }
 
     public boolean isThreadExecutionIsolationStrategy() {
-        return getTenacityConfiguration().getExecutionIsolationStrategy().equals(HystrixCommandProperties.ExecutionIsolationStrategy.THREAD);
+        return HystrixCommandProperties.ExecutionIsolationStrategy.THREAD.equals(
+                getTenacityConfiguration().getExecutionIsolationStrategy());
     }
 
     public boolean isSemaphoreExecutionIsolationStrategy() {
-        return getTenacityConfiguration().getExecutionIsolationStrategy().equals(HystrixCommandProperties.ExecutionIsolationStrategy.SEMAPHORE);
+        return HystrixCommandProperties.ExecutionIsolationStrategy.SEMAPHORE.equals(
+                getTenacityConfiguration().getExecutionIsolationStrategy());
     }
 
     public Iterable<OptionItem> getConfigurationVersions() {

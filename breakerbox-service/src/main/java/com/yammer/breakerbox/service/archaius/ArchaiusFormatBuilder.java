@@ -50,7 +50,9 @@ public class ArchaiusFormatBuilder {
         circuitBreakermetricsRollingStatsTimeInMilliseconds(key, configuration);
         semaphoreMaxConcurrentRequests(key, configuration);
         semaphoreFallbackMaxConcurrentRequests(key, configuration);
-        executionIsolationStrategy(key, configuration);
+        if (configuration.hasExecutionIsolationStrategy()) {
+            executionIsolationStrategy(key, configuration);
+        }
         return this;
     }
 

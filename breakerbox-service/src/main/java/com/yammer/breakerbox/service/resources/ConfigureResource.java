@@ -154,7 +154,7 @@ public class ConfigureResource {
                               @FormParam("threadpoolStatisticalWindowBuckets") Integer threadpoolStatisticalWindowBuckets,
                               @FormParam("semaphoreMaxConcurrentRequests") Integer semaphoreMaxConcurrentRequests,
                               @FormParam("semaphoreFallbackMaxConcurrentRequests") Integer semaphoreFallbackMaxConcurrentRequests,
-                              @FormParam("executionIsolationStrategy")HystrixCommandProperties.ExecutionIsolationStrategy executionIsolationStrategy) {
+                              @FormParam("executionIsolationStrategy") HystrixCommandProperties.ExecutionIsolationStrategy executionIsolationStrategy) {
         final TenacityConfiguration tenacityConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(
                         threadPoolCoreSize,
