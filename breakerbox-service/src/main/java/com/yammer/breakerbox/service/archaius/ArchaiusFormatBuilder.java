@@ -19,7 +19,7 @@ public class ArchaiusFormatBuilder {
     }
 
     public ArchaiusFormatBuilder turbineHostRetryMillis(long value) {
-        //This mispelling of retry is on purpose. Unfortunate feature relying on a bug.
+        //This misspelling of retry is on purpose. Unfortunate feature relying on a bug.
         appender("turbine.InstanceMonitor.hostRertyMillis", value);
         return this;
     }
