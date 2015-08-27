@@ -1,3 +1,9 @@
+0.2.8
+---
+* Tenacity 0.6.12
+* Only advertise `Archaius` values for `executionIsolationStrategy` if it was explicitly set by a user. This allows for the specific type of command `TenacityObservableCommand` or the original `TenacityCommand` to determine
+  what kind of isolation strategy to use. Only override this behavior if the user sets it on their own.
+
 0.2.7
 ----
 * Tenacity 0.6.10
