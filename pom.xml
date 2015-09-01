@@ -36,12 +36,12 @@
     </issueManagement>
 
     <properties>
-        <dropwizard.version>0.8.1</dropwizard.version>
+        <dropwizard.version>0.8.4</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
         <tenacity.version>0.6.12</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.2.0</dropwizard-auth-ldap.version>
-        <postgresql.version>9.4-1201-jdbc41</postgresql.version>
+        <postgresql.version>9.4-1202-jdbc42</postgresql.version>
         <h2.version>1.4.188</h2.version>
     </properties>
 
