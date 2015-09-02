@@ -1,3 +1,10 @@
+0.2.9
+---
+* Dropwizard 0.8.4
+* Postgresql 9.4-1202-jdbc42
+* Tenacity 0.6.13
+* Dropwizard-auth-ldap 0.2.1
+
 0.2.8
 ---
 * Tenacity 0.6.12
