@@ -48,7 +48,7 @@ public class InstancesTest {
     @Test
     public void instancesForCluster() {
         assertThat(Instances.instances(ServiceId.from("mock")))
-                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080/tenacity/mock.stream", "mock", true)));
+                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080", "mock", true)));
     }
 
     @Test

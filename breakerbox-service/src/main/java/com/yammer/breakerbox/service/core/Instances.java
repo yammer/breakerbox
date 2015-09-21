@@ -62,21 +62,7 @@ public class Instances {
         return new Function<Instance, URI>() {
             @Override
             public URI apply(Instance input) {
-                checkNotNull(input);
-                final URI original = URI.create("http://" + input.getHostname());
-                try {
-                    return new URI(
-                           original.getScheme(),
-                           original.getUserInfo(),
-                           original.getHost(),
-                           original.getPort(),
-                           "",
-                           original.getQuery(),
-                           original.getFragment());
-                } catch (URISyntaxException err) {
-                    LOGGER.warn("Unexpected exception", err);
-                }
-                return original;
+                return URI.create("http://" + input.getHostname().trim());
             }
         };
     }
