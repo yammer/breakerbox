@@ -1,3 +1,11 @@
+0.2.10
+---
+* Tenacity 0.6.14
+* H2 1.4.189
+* Postgresql 9.4-1203-jdbc42
+* Fixes a bug in `config.properties` it would not respect an instance:port:path when referencing an instance. It would only honor the instance:port and not the path.
+  Now if you specify 10.0.0.1:8080/some/root, it will look for tenacity resources at 10.0.0.1:8080/some/root/tenacity/...
+
 0.2.9
 ---
 * Dropwizard 0.8.4
