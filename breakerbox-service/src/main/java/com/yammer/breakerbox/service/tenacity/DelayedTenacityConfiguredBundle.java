@@ -15,8 +15,9 @@ public class DelayedTenacityConfiguredBundle extends TenacityConfiguredBundle<Br
     public DelayedTenacityConfiguredBundle(TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration> tenacityBundleConfigurationFactory,
                                            Optional<HystrixCommandExecutionHook> hystrixCommandExecutionHook,
                                            Iterable<ExceptionMapper<? extends Throwable>> exceptionMappers,
-                                           boolean usingTenacityCircuitBreakerHealthCheck) {
-        super(tenacityBundleConfigurationFactory, hystrixCommandExecutionHook, exceptionMappers, usingTenacityCircuitBreakerHealthCheck);
+                                           boolean usingTenacityCircuitBreakerHealthCheck,
+                                           boolean usingAdminPort) {
+        super(tenacityBundleConfigurationFactory, hystrixCommandExecutionHook, exceptionMappers, usingTenacityCircuitBreakerHealthCheck, usingAdminPort);
     }
 
     protected void registerTenacityProperties(Map<TenacityPropertyKey, TenacityConfiguration> tenacityPropertyKeyConfigurations,

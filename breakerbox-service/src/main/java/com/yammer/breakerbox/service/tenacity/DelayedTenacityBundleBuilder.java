@@ -18,6 +18,7 @@ public class DelayedTenacityBundleBuilder extends TenacityBundleBuilder<Breakerb
                 configurationFactory,
                 executionHook,
                 exceptionMapperBuilder.build(),
-                usingTenacityCircuitBreakerHealthCheck);
+                usingTenacityCircuitBreakerHealthCheck,
+                usingAdminPort);
     }
 }
