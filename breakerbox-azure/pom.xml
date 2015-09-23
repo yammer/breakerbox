@@ -3,7 +3,7 @@
     <parent>
         <artifactId>breakerbox-parent</artifactId>
         <groupId>com.yammer.breakerbox</groupId>
-        <version>0.2.10-SNAPSHOT</version>
+        <version>0.2.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
