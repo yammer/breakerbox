@@ -1,3 +1,9 @@
+0.2.11
+---
+* Tenacity 0.6.15
+* Merge dashboard fixes https://github.com/Netflix/Hystrix/pull/919
+* Merge dashboard fixes https://github.com/Netflix/Hystrix/pull/921
+
 0.2.10
 ---
 * Tenacity 0.6.14
