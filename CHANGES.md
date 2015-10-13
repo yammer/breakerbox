@@ -1,3 +1,8 @@
+0.2.12
+---
+* Tenacity 0.6.16
+* Fixing dashboard issue where when not all circuits were open it could cause the circuit to not render properly.
+
 0.2.11
 ---
 * Tenacity 0.6.15
