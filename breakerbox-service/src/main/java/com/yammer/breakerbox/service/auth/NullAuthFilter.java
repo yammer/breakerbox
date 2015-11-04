@@ -43,6 +43,7 @@ public class NullAuthFilter<P extends Principal> extends AuthFilter<BasicCredent
                         return SecurityContext.BASIC_AUTH;
                     }
                 });
+                return;
             }
         } catch (AuthenticationException e) {
             LOGGER.warn("Error authenticating credentials", e);

@@ -39,6 +39,7 @@ import com.yammer.tenacity.dbi.DBIExceptionLogger;
 import com.yammer.tenacity.dbi.SQLExceptionLogger;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.auth.basic.BasicCredentials;
@@ -189,6 +190,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                         .setAuthenticator(new NullAuthenticator())
                         .setRealm("null")
                         .buildAuthFilter()));
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
@@ -205,5 +207,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setAuthenticator(cachingAuthenticator)
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 }

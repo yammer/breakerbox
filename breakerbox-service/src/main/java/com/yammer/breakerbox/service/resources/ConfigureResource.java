@@ -19,12 +19,12 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
+import com.yammer.dropwizard.authenticator.User;
 import com.yammer.tenacity.core.config.CircuitBreakerConfiguration;
 import com.yammer.tenacity.core.config.SemaphoreConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.config.ThreadPoolConfiguration;
 import io.dropwizard.auth.Auth;
-import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.views.View;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -137,7 +137,7 @@ public class ConfigureResource {
 
     @POST @Timed @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("/{dependency}")
-    public Response configure(@Auth BasicCredentials creds,
+    public Response configure(@Auth User user,
                               @PathParam("service") String serviceName,
                               @PathParam("dependency") String dependencyName,
                               @FormParam("executionTimeout") Integer executionTimeout,
@@ -177,7 +177,7 @@ public class ConfigureResource {
         final ServiceId serviceId = ServiceId.from(serviceName);
         final DependencyId dependencyId = DependencyId.from(dependencyName);
         if (breakerboxStore.store(new ServiceModel(serviceId, dependencyId)) &&
-            breakerboxStore.store(new DependencyModel(dependencyId, DateTime.now(), tenacityConfiguration, creds.getUsername(), serviceId))) {
+            breakerboxStore.store(new DependencyModel(dependencyId, DateTime.now(), tenacityConfiguration, user.getName(), serviceId))) {
             return Response
                     .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
                     .build();
