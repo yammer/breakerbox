@@ -8,7 +8,7 @@ import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
-import com.yammer.breakerbox.service.auth.NullAuthFactory;
+import com.yammer.breakerbox.service.auth.NullAuthFilter;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -25,6 +25,7 @@ import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
+import com.yammer.dropwizard.authenticator.User;
 import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -37,9 +38,10 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKeyFactory;
 import com.yammer.tenacity.dbi.DBIExceptionLogger;
 import com.yammer.tenacity.dbi.SQLExceptionLogger;
 import io.dropwizard.Application;
-import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.AuthDynamicFeature;
+import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.CachingAuthenticator;
-import io.dropwizard.auth.basic.BasicAuthFactory;
+import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.auth.basic.BasicCredentials;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
@@ -183,22 +185,28 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
     }
 
     private static void setupNullAuth(Environment environment) {
-        environment.jersey().register(AuthFactory.binder(new NullAuthFactory<>(
-                new NullAuthenticator(), BasicCredentials.class)));
+        environment.jersey().register(new AuthDynamicFeature(
+                        new NullAuthFilter.Builder<User>()
+                        .setAuthenticator(new NullAuthenticator())
+                        .setRealm("null")
+                        .buildAuthFilter()));
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 
     private static void setupLdapAuth(LdapConfiguration ldapConfiguration, Environment environment) {
         final LdapAuthenticator ldapAuthenticator = new LdapAuthenticator(ldapConfiguration);
-        final CachingAuthenticator<BasicCredentials, BasicCredentials> cachingAuthenticator =
+        final CachingAuthenticator<BasicCredentials, User> cachingAuthenticator =
                 new CachingAuthenticator<>(
                         environment.metrics(),
                         TenacityAuthenticator.wrap(
                                 new ResourceAuthenticator(ldapAuthenticator), BreakerboxDependencyKey.BRKRBX_LDAP_AUTH),
                         ldapConfiguration.getCachePolicy()
                 );
-        environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(
-                cachingAuthenticator,
-                "breakerbox",
-                BasicCredentials.class)));
+        environment.jersey().register(new AuthDynamicFeature(
+                        new BasicCredentialAuthFilter.Builder<User>()
+                                .setAuthenticator(cachingAuthenticator)
+                                .setRealm("breakerbox")
+                                .buildAuthFilter()));
+        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 }

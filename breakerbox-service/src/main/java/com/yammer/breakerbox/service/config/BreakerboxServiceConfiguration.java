@@ -11,13 +11,14 @@ import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class BreakerboxServiceConfiguration extends Configuration {
-    @NotNull @Valid
+    @NotNull @UnwrapValidatedValue(false) @Valid
     private final Optional<AzureTableConfiguration> azure;
 
     @NotNull @Valid
@@ -33,13 +34,13 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private final BreakerboxConfiguration breakerboxConfiguration;
 
 
-    @NotNull @Valid @JsonProperty("ldap")
+    @NotNull @Valid @UnwrapValidatedValue(false) @JsonProperty("ldap")
     private Optional<LdapConfiguration> ldapConfiguration = Optional.absent();
 
     @NotNull @Valid
     private ArchaiusOverrideConfiguration archaiusOverride;
 
-    @NotNull @Valid @JsonProperty("database")
+    @NotNull @UnwrapValidatedValue(false) @Valid @JsonProperty("database")
     private Optional<JdbiConfiguration> jdbiConfiguration = Optional.absent();
 
     /* Useful if you are Breakerbox is behind a proxy and not at localhost:8080 */
