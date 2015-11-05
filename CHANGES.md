@@ -1,4 +1,4 @@
-0.3.1
+0.3.1 - Nov 5, 2015
 ---
 * Dropwizard 0.9.1
 * Tenacity 0.7.0
@@ -7,7 +7,7 @@
 * Postgresql 9.4-1205-jdbc42
 * H2 1.4.190
 
-0.3.0
+0.3.0 - Nov 5, 2015
 ---
 * Accidental re-release of 0.2.12
 
