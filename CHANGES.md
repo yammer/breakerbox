@@ -1,3 +1,16 @@
+0.3.1
+---
+* Dropwizard 0.9.1
+* Tenacity 0.7.0
+* dropwizard-auth-ldap 0.3.0
+* Upgraded maven-plugins
+* Postgresql 9.4-1205-jdbc42
+* H2 1.4.190
+
+0.3.0
+---
+* Accidental re-release of 0.2.12
+
 0.2.12
 ---
 * Tenacity 0.6.16
