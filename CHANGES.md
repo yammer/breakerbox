@@ -1,3 +1,8 @@
+0.3.2 - Nov 23, 2015
+---
+* Tenacity 0.7.2
+* Merge dashboard fixes https://github.com/Netflix/Hystrix/pull/959
+
 0.3.1 - Nov 5, 2015
 ---
 * Dropwizard 0.9.1
