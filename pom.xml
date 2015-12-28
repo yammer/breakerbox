@@ -41,7 +41,7 @@
         <tenacity.version>0.7.2</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
-        <postgresql.version>9.4-1205-jdbc42</postgresql.version>
+        <postgresql.version>9.4.1207.jre7</postgresql.version>
         <h2.version>1.4.190</h2.version>
     </properties>
 
