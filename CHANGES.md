@@ -1,3 +1,9 @@
+0.3.3 - Jan 21, 2016
+---
+* Dropwizard 0.9.2
+* Tenacity 0.7.3
+* Postgresql 9.4.1207.jre7
+
 0.3.2 - Nov 23, 2015
 ---
 * Tenacity 0.7.2
