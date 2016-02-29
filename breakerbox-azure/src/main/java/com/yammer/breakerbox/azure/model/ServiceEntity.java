@@ -62,7 +62,10 @@ public class ServiceEntity extends TableType implements TableKey {
         return TableId.SERVICE;
     }
 
-    /** For Azure */
+    /**
+     * @deprecated kept for backward compatibility
+     * For Azure 
+     */
 
     @Deprecated
     public ServiceEntity() {
