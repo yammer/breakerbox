@@ -150,22 +150,16 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public Iterable<ServiceModel> allServiceModels() {
-        try (Timer.Context timerContext = listServices.time()) {
-            return serviceDB.all();
-        }
+        return serviceDB.all();
     }
 
     @Override
     public Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId) {
-        try (Timer.Context timerContext = listService.time()) {
-            return serviceDB.all(serviceId);
-        }
+        return serviceDB.all(serviceId);
     }
 
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
-        try (Timer.Context timerContext = dependencyConfigs.time()) {
-            return dependencyDB.all(dependencyId, serviceId);
-        }
+        return dependencyDB.all(dependencyId, serviceId);
     }
 }
