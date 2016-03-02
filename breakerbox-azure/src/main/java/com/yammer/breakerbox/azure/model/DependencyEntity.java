@@ -133,6 +133,7 @@ public class DependencyEntity extends TableType implements TableKey {
     }
 
     /**
+     * @deprecated kept for backward compatibility
      * For Azure bean serialization via reflection
      */
 
@@ -141,21 +142,37 @@ public class DependencyEntity extends TableType implements TableKey {
         super(TableId.DEPENDENCY);
     }
 
+    /**
+     * @deprecated kept for backward compatibility
+     * @return
+     */
     @Deprecated
     public String getTenacityConfigurationAsString() {
         return tenacityConfigurationAsString;
     }
 
+    /**
+     * @deprecated kept for backward compatibility
+     * @param tenacityConfigurationAsString
+     */
     @Deprecated
     public void setTenacityConfigurationAsString(String tenacityConfigurationAsString) {
         this.tenacityConfigurationAsString = tenacityConfigurationAsString;
     }
 
+    /**
+     * @deprecated kept for backward compatibility
+     * @return
+     */
     @Deprecated
     public String getServiceName() {
         return serviceName;
     }
 
+    /**
+     * @deprecated kept for backward compatibility
+     * @param serviceName
+     */
     @Deprecated
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
@@ -169,6 +186,10 @@ public class DependencyEntity extends TableType implements TableKey {
         return user;
     }
 
+    /**
+     * @deprecated kept for backward compatibility
+     * @param user
+     */
     @Deprecated
     public void setUser(String user) {
         this.user = user;
