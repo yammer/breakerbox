@@ -2,6 +2,7 @@ package com.yammer.breakerbox.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
@@ -52,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -126,11 +128,16 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                         .build()),
             breakerboxStore);
 
+        Set<String> metaClusters = Sets.newHashSet();
+        for (String cluster : configuration.getMetaClusters()) {
+            metaClusters.add(cluster.toUpperCase());
+        }
+
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
-        environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator));
-        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort()), configuration.getDefaultDashboard()));
+        environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator, metaClusters));
+        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort()), configuration.getDefaultDashboard(), metaClusters));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
 
         final ScheduledExecutorService scheduledExecutorService = environment

@@ -34,6 +34,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Set;
 
 @Path("/configure/{service}")
 public class ConfigureResource {
@@ -41,13 +42,16 @@ public class ConfigureResource {
     private final BreakerboxStore breakerboxStore;
     private final TenacityPropertyKeysStore tenacityPropertyKeysStore;
     private final SyncComparator syncComparator;
+    private final Set<String> specifiedMetaClusters;
 
     public ConfigureResource(BreakerboxStore breakerboxStore,
                              TenacityPropertyKeysStore tenacityPropertyKeysStore,
-                             SyncComparator syncComparator) {
+                             SyncComparator syncComparator, 
+                             Set<String> specifiedMetaClusters) {
         this.breakerboxStore = breakerboxStore;
         this.tenacityPropertyKeysStore = tenacityPropertyKeysStore;
         this.syncComparator = syncComparator;
+        this.specifiedMetaClusters = specifiedMetaClusters;
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)
@@ -59,7 +63,7 @@ public class ConfigureResource {
         if (firstDependencyKey.isPresent()) {
             return create(serviceId, DependencyId.from(firstDependencyKey.get()), Optional.<Long>absent());
         } else {
-            return new NoPropertyKeysView(serviceId);
+            return new NoPropertyKeysView(serviceId, specifiedMetaClusters);
         }
     }
 
@@ -80,7 +84,8 @@ public class ConfigureResource {
                 serviceId,
                 syncComparator.allInSync(serviceId, propertyKeys),
                 getConfiguration(dependencyId, version, serviceId),
-                getDependencyVersionNameList(dependencyEntities));
+                getDependencyVersionNameList(dependencyEntities),
+                specifiedMetaClusters);
     }
 
     private TenacityConfiguration getConfiguration(DependencyId dependencyId, Optional<Long> version, ServiceId serviceId) {

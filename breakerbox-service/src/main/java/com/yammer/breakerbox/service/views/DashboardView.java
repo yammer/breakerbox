@@ -3,12 +3,14 @@ package com.yammer.breakerbox.service.views;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.UrlEscapers;
 
+import java.util.Set;
+
 public class DashboardView extends NavbarView {
     private final String clusterName;
     private final HostAndPort breakerboxHostAndPort;
 
-    public DashboardView(String clusterName, HostAndPort breakerboxHostAndPort) {
-        super("/templates/dashboard/dashboard.mustache");
+    public DashboardView(String clusterName, HostAndPort breakerboxHostAndPort, Set<String> specifiedMetaClusters) {
+        super("/templates/dashboard/dashboard.mustache", specifiedMetaClusters);
         this.clusterName = clusterName;
         this.breakerboxHostAndPort = breakerboxHostAndPort;
     }

@@ -2,6 +2,8 @@ package com.yammer.breakerbox.service.views;
 
 import com.google.common.net.HostAndPort;
 
+import java.util.Set;
+
 public class DashboardViewFactory {
     private final HostAndPort breakerboxHostAndPort;
 
@@ -9,7 +11,7 @@ public class DashboardViewFactory {
         this.breakerboxHostAndPort = breakerboxHostAndPort;
     }
 
-    public DashboardView create(String clusterName) {
-        return new DashboardView(clusterName, breakerboxHostAndPort);
+    public DashboardView create(String clusterName, Set<String> specifiedMetaClusters) {
+        return new DashboardView(clusterName, breakerboxHostAndPort, specifiedMetaClusters);
     }
 }
