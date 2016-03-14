@@ -1,6 +1,7 @@
 package com.yammer.breakerbox.service.core.tests;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.core.Instances;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URI;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +31,8 @@ public class InstancesTest {
 
     @Test
     public void instances() {
-        assertThat(Instances.noMetaClusters())
+        Set<String> specifiedMetaClusters = Sets.newHashSet("PRODUCTION");
+        assertThat(Instances.noMetaClusters(specifiedMetaClusters))
                 .isEqualTo(ImmutableSet.of("mock"));
     }
 

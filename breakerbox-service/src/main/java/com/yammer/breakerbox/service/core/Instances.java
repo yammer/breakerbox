@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,19 +30,12 @@ public class Instances {
         };
     }
 
-    private static Predicate<Instance> pruneMetaClusters() {
+    private static Predicate<Instance> pruneMetaClusters(final Set<String> specifiedMetaClusters) {
         return new Predicate<Instance>() {
             @Override
             public boolean apply(@Nullable Instance input) {
                 if (input != null) {
-                    switch (input.getCluster().toUpperCase()) {
-                        case "PRODUCTION":
-                        case "STAGE":
-                        case "STAGING":
-                            return false;
-                        default:
-                            return true;
-                    }
+                    return !specifiedMetaClusters.contains(input.getCluster().toUpperCase());
                 }
                 return false;
             }
@@ -84,9 +77,9 @@ public class Instances {
                 .toSortedSet(Ordering.natural());
     }
 
-    public static ImmutableSet<String> noMetaClusters() {
+    public static ImmutableSet<String> noMetaClusters(final Set<String> specifiedMetaClusters) {
         return rawInstances()
-                .filter(pruneMetaClusters())
+                .filter(pruneMetaClusters(specifiedMetaClusters))
                 .transform(toClusterName())
                 .toSortedSet(Ordering.natural());
     }

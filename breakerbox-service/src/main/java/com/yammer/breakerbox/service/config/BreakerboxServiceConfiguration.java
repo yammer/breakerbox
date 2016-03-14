@@ -15,6 +15,8 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class BreakerboxServiceConfiguration extends Configuration {
@@ -42,6 +44,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     @NotNull @UnwrapValidatedValue(false) @Valid @JsonProperty("database")
     private Optional<JdbiConfiguration> jdbiConfiguration = Optional.absent();
+
+    private List<String> metaClusters = Collections.emptyList();
 
     /* Useful if you are Breakerbox is behind a proxy and not at localhost:8080 */
     @NotNull @Valid
@@ -125,6 +129,10 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     public String getDefaultDashboard() {
         return defaultDashboard;
+    }
+
+    public List<String> getMetaClusters() {
+        return metaClusters;
     }
 
     @Override

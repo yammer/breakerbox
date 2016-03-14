@@ -6,6 +6,8 @@ import com.yammer.breakerbox.service.core.SyncPropertyKeyState;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 
+import java.util.Set;
+
 public class ConfigureView extends NavbarView {
     private final ServiceId serviceId;
     private final Iterable<SyncPropertyKeyState> syncPropertyKeyStates;
@@ -15,8 +17,9 @@ public class ConfigureView extends NavbarView {
     public ConfigureView(ServiceId serviceId,
                          Iterable<SyncPropertyKeyState> syncPropertyKeyStates,
                          TenacityConfiguration tenacityConfiguration,
-                         ImmutableList<OptionItem> dependencyEntities) {
-        super("/templates/configure/configure.mustache");
+                         ImmutableList<OptionItem> dependencyEntities,
+                         Set<String> specifiedMetaClusters) {
+        super("/templates/configure/configure.mustache", specifiedMetaClusters);
         this.serviceId = serviceId;
         this.syncPropertyKeyStates = syncPropertyKeyStates;
         this.tenacityConfiguration = tenacityConfiguration;

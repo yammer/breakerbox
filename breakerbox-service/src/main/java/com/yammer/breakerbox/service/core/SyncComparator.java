@@ -73,7 +73,9 @@ public class SyncComparator {
     }
 
     public ImmutableList<SyncServiceHostState> inSync(ServiceId serviceId, DependencyId dependencyId) {
+        // fetch from services
         final ImmutableList<InstanceConfiguration> configurations = fetch(serviceId, dependencyId);
+        
         final Optional<DependencyModel> entityOptional = breakerboxStore.retrieveLatest(dependencyId, serviceId);
         if (entityOptional.isPresent()) {
 
