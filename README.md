@@ -53,6 +53,11 @@ tenacityClient:
 
 defaultDashboard: production
 
+metaClusters: 
+  - production
+  - stage
+  - staging
+
 server:
   applicationConnectors:
     - type: http
@@ -145,6 +150,17 @@ turbine.ConfigPropertyBasedDiscovery.breakerbox.instances=localhost:8080
 
 *Note*: Easiest thing to do is make sure `config.properties` is in the same directory as the jar otherwise keep the `breakerbox#urls` and the `archaius.configurationSource.additionalUrls` system property pointing to the correct location.
 We plan to move this to a better configuration mechanism in the future.
+
+Meta Clusters
+-------------
+These are clusters that should be in the dashboard dropdown but aren't necessarily configurable. This is used for dashboards that are made up of multiple clusters that are informational, but don't make much context in the sense of configuring one of them.
+
+```yaml
+metaClusters: 
+  - production
+  - stage
+  - staging
+```
 
 Adding Breakerbox to your Dropwizard+Tenacity Service
 -----------------------

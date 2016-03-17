@@ -1,3 +1,11 @@
+0.3.4 - Mar 17, 2016
+---
+* Tenacity 0.8.0
+* Postgresql 9.4.1208.jre7
+* H2 1.4.191
+* [Deprecated elements should have both the annotation and the Javadoc tag](https://github.com/yammer/breakerbox/pull/12)
+* Allow for configuration of meta clusters [Issue 10](https://github.com/yammer/breakerbox/issues/10)
+
 0.3.3 - Jan 21, 2016
 ---
 * Dropwizard 0.9.2
