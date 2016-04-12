@@ -108,7 +108,7 @@ public class ConfigureResource {
 
         final ImmutableList.Builder<OptionItem> builder = ImmutableList.builder();
         if (sortedEntities.isEmpty()) {
-            builder.add(new OptionItem("Default", 0l));
+            builder.add(new OptionItem("Default", 0L));
         } else {
             for (DependencyModel entity : sortedEntities) {
                 builder.add(new OptionItem(entity.getDateTime().toString() + " by " + entity.getUser(), entity.getDateTime().getMillis()));
@@ -185,6 +185,7 @@ public class ConfigureResource {
             breakerboxStore.store(new DependencyModel(dependencyId, DateTime.now(), tenacityConfiguration, user.getName(), serviceId))) {
             return Response
                     .created(URI.create(String.format("/configuration/%s/%s", serviceName, dependencyName)))
+                    .entity(tenacityConfiguration)
                     .build();
         } else {
             return Response.serverError().build();
