@@ -134,7 +134,10 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
         environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator, metaClusters));
-        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort()), configuration.getDefaultDashboard(), metaClusters));
+        environment.jersey().register(new DashboardResource(configuration.getDefaultDashboard(),
+                configuration.getBreakerboxHostAndPort(),
+                new DashboardViewFactory(configuration.getBreakerboxHostAndPort()),
+                metaClusters));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
         environment.jersey().register(new ClustersResource(metaClusters, breakerboxStore, tenacityPropertyKeysStore));
 

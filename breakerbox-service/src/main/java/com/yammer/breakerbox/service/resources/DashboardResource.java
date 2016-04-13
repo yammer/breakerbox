@@ -3,6 +3,7 @@ package com.yammer.breakerbox.service.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.service.views.DashboardView;
 import com.yammer.breakerbox.service.views.DashboardViewFactory;
 
@@ -17,12 +18,14 @@ import java.util.Set;
 @Path("/")
 public class DashboardResource {
     private final String defaultDashboard;
+    private final HostAndPort breakerboxHostAndPort;
     private final DashboardViewFactory viewFactory;
     private final Set<String> specifiedMetaClusters;
-    
-    public DashboardResource(DashboardViewFactory viewFactory, String defaultDashboard, Set<String> specifiedMetaClusters) {
-        this.viewFactory = viewFactory;
+
+    public DashboardResource(String defaultDashboard, HostAndPort breakerboxHostAndPort, DashboardViewFactory viewFactory, Set<String> specifiedMetaClusters) {
         this.defaultDashboard = defaultDashboard;
+        this.breakerboxHostAndPort = breakerboxHostAndPort;
+        this.viewFactory = viewFactory;
         this.specifiedMetaClusters = specifiedMetaClusters;
     }
 
@@ -31,8 +34,10 @@ public class DashboardResource {
         return viewFactory.create(clusterName.or(defaultDashboard), specifiedMetaClusters);
     }
 
-    @Path("/dashboard/default") @GET @Timed @Produces(MediaType.APPLICATION_JSON)
+    @Path("/dashboard") @GET @Timed @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> defaultDashboard() {
-        return ImmutableMap.of("dashboard", defaultDashboard);
+        return ImmutableMap.of(
+                "name", defaultDashboard,
+                "turbine", breakerboxHostAndPort.toString());
     }
 }
