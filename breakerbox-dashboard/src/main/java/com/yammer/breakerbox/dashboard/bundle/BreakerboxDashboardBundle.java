@@ -2,7 +2,6 @@ package com.yammer.breakerbox.dashboard.bundle;
 
 import com.netflix.hystrix.dashboard.stream.MockStreamServlet;
 import com.netflix.hystrix.dashboard.stream.ProxyStreamServlet;
-import com.yammer.breakerbox.dashboard.resources.IndexResource;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.assets.AssetsBundle;
@@ -21,7 +20,5 @@ public class BreakerboxDashboardBundle implements ConfiguredBundle<Configuration
 
         environment.servlets().addServlet("mock.stream", new MockStreamServlet()).addMapping("/tenacity/mock.stream");
         environment.servlets().addServlet("proxy.stream", new ProxyStreamServlet()).addMapping("/tenacity/proxy.stream");
-
-        environment.jersey().register(new IndexResource());
     }
 }
