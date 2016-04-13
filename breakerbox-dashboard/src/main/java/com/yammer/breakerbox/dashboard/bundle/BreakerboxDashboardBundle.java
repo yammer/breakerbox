@@ -8,13 +8,11 @@ import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.views.ViewBundle;
 
 public class BreakerboxDashboardBundle implements ConfiguredBundle<Configuration> {
     @Override
     public void initialize(Bootstrap<?> bootstrap) {
         bootstrap.addBundle(new AssetsBundle());
-        bootstrap.addBundle(new ViewBundle<>());
     }
 
     @Override

@@ -18,7 +18,6 @@ import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
-import com.yammer.breakerbox.service.views.DashboardViewFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -133,11 +132,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
-        environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator, metaClusters));
-        environment.jersey().register(new DashboardResource(configuration.getDefaultDashboard(),
-                configuration.getBreakerboxHostAndPort(),
-                new DashboardViewFactory(configuration.getBreakerboxHostAndPort()),
-                metaClusters));
+        environment.jersey().register(new ConfigureResource(breakerboxStore));
+        environment.jersey().register(new DashboardResource(configuration.getDefaultDashboard(), configuration.getBreakerboxHostAndPort(), metaClusters));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
         environment.jersey().register(new ClustersResource(metaClusters, breakerboxStore, tenacityPropertyKeysStore));
 
