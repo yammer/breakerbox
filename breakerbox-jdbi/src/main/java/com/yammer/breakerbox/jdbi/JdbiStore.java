@@ -25,6 +25,7 @@ public class JdbiStore extends BreakerboxStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbiStore.class);
     protected final ServiceDB serviceDB;
     protected final DependencyDB dependencyDB;
+    private final MetricRegistry metricRegistry;
     protected JdbiConfiguration configuration;
 
     public JdbiStore(JdbiConfiguration storeConfiguration,
@@ -46,13 +47,15 @@ public class JdbiStore extends BreakerboxStore {
         serviceDB = database.onDemand(ServiceDB.class);
 
         this.configuration = storeConfiguration;
+
+        metricRegistry = environment.metrics();
     }
 
     @Override
-    public boolean initialize() throws Exception {
+    public boolean initialize() {
         try (CloseableLiquibase liquibase = new CloseableLiquibase(configuration
                 .getDataSourceFactory()
-                .build(new MetricRegistry(), "liquibase"))) {
+                .build(metricRegistry, "liquibase"))) {
             liquibase.update("");
             return true;
         } catch (Exception err) {
