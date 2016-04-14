@@ -1,3 +1,9 @@
+0.4.0 - Apr 14, 2016
+---
+* Tenacity 0.8.1
+* Rewritten UI in React.js
+* Added `/clusters`, `/clusters/:service/propertykeys`, `/clusters/:service/configurations/:propertykey`
+
 0.3.4 - Mar 17, 2016
 ---
 * Tenacity 0.8.0
