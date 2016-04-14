@@ -14,14 +14,10 @@ import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
 import com.yammer.breakerbox.service.managed.ManagedTurbine;
-import com.yammer.breakerbox.service.resources.ArchaiusResource;
-import com.yammer.breakerbox.service.resources.ConfigureResource;
-import com.yammer.breakerbox.service.resources.DashboardResource;
-import com.yammer.breakerbox.service.resources.InSyncResource;
+import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
-import com.yammer.breakerbox.service.views.DashboardViewFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -136,9 +132,10 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
         environment.jersey().register(new ArchaiusResource(configuration.getArchaiusOverride(), breakerboxStore));
-        environment.jersey().register(new ConfigureResource(breakerboxStore, tenacityPropertyKeysStore, syncComparator, metaClusters));
-        environment.jersey().register(new DashboardResource(new DashboardViewFactory(configuration.getBreakerboxHostAndPort()), configuration.getDefaultDashboard(), metaClusters));
+        environment.jersey().register(new ConfigureResource(breakerboxStore));
+        environment.jersey().register(new DashboardResource(configuration.getDefaultDashboard(), configuration.getBreakerboxHostAndPort(), metaClusters));
         environment.jersey().register(new InSyncResource(syncComparator, tenacityPropertyKeysStore));
+        environment.jersey().register(new ClustersResource(metaClusters, breakerboxStore, tenacityPropertyKeysStore));
 
         final ScheduledExecutorService scheduledExecutorService = environment
                 .lifecycle()
