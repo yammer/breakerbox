@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
+import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -35,6 +36,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private final BreakerboxConfiguration breakerboxConfiguration;
 
+    @NotNull @Valid
+    private final YamlInstanceConfiguration turbine;
 
     @NotNull @Valid @UnwrapValidatedValue(false) @JsonProperty("ldap")
     private Optional<LdapConfiguration> ldapConfiguration = Optional.absent();
@@ -64,7 +67,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("archaiusOverride") ArchaiusOverrideConfiguration archaiusOverride,
                                           @JsonProperty("database") JdbiConfiguration jdbiConfiguration,
                                           @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort,
-                                          @JsonProperty("defaultDashboard") String defaultDashboard) {
+                                          @JsonProperty("defaultDashboard") String defaultDashboard,
+                                          @JsonProperty("turbine") YamlInstanceConfiguration yamlInstanceConfiguration) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -75,6 +79,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
+        this.turbine = Optional.fromNullable(yamlInstanceConfiguration).or(new YamlInstanceConfiguration());
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -104,6 +109,10 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     public ArchaiusOverrideConfiguration getArchaiusOverride() {
         return archaiusOverride;
+    }
+
+    public YamlInstanceConfiguration getTurbine() {
+        return turbine;
     }
 
     public void setArchaiusOverride(ArchaiusOverrideConfiguration archaiusOverride) {
@@ -137,7 +146,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     @Override
     public int hashCode() {
-        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, ldapConfiguration, archaiusOverride, jdbiConfiguration, breakerboxHostAndPort, defaultDashboard);
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard);
     }
 
     @Override
@@ -149,6 +158,17 @@ public class BreakerboxServiceConfiguration extends Configuration {
             return false;
         }
         final BreakerboxServiceConfiguration other = (BreakerboxServiceConfiguration) obj;
-        return Objects.equals(this.azure, other.azure) && Objects.equals(this.tenacityClient, other.tenacityClient) && Objects.equals(this.breakerboxServicesPropertyKeys, other.breakerboxServicesPropertyKeys) && Objects.equals(this.breakerboxServicesConfiguration, other.breakerboxServicesConfiguration) && Objects.equals(this.breakerboxConfiguration, other.breakerboxConfiguration) && Objects.equals(this.ldapConfiguration, other.ldapConfiguration) && Objects.equals(this.archaiusOverride, other.archaiusOverride) && Objects.equals(this.jdbiConfiguration, other.jdbiConfiguration) && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort) && Objects.equals(this.defaultDashboard, other.defaultDashboard);
+        return Objects.equals(this.azure, other.azure)
+                && Objects.equals(this.tenacityClient, other.tenacityClient)
+                && Objects.equals(this.breakerboxServicesPropertyKeys, other.breakerboxServicesPropertyKeys)
+                && Objects.equals(this.breakerboxServicesConfiguration, other.breakerboxServicesConfiguration)
+                && Objects.equals(this.breakerboxConfiguration, other.breakerboxConfiguration)
+                && Objects.equals(this.turbine, other.turbine)
+                && Objects.equals(this.ldapConfiguration, other.ldapConfiguration)
+                && Objects.equals(this.archaiusOverride, other.archaiusOverride)
+                && Objects.equals(this.jdbiConfiguration, other.jdbiConfiguration)
+                && Objects.equals(this.metaClusters, other.metaClusters)
+                && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort)
+                && Objects.equals(this.defaultDashboard, other.defaultDashboard);
     }
 }

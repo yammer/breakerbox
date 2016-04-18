@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.netflix.turbine.init.TurbineInit;
+import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
@@ -18,6 +19,8 @@ import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
+import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
+import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -107,6 +110,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
+        setupYamlInstanceConfiguration(configuration.getTurbine());
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
@@ -212,5 +216,9 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    }
+
+    private static void setupYamlInstanceConfiguration(YamlInstanceConfiguration configuration) {
+        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getAllInstances()));
     }
 }

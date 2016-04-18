@@ -1,0 +1,6 @@
+clusters:
+  one:
+    instances:
+      - localhost:1234
+    clusters:
+      - one
