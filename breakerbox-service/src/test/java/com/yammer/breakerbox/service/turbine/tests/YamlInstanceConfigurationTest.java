@@ -30,7 +30,8 @@ public class YamlInstanceConfigurationTest {
                 "breakerbox", YamlInstanceConfiguration.Cluster.withInstances(HostAndPort.fromParts("localhost", 8080)),
                 "production", YamlInstanceConfiguration.Cluster.withClusters("breakerbox")));
         assertThat(configuration.getAllInstances()).isEqualTo(ImmutableSet.of(
-                new Instance("localhost:8080", "breakerbox", true)));
+                new Instance("localhost:8080", "breakerbox", true),
+                new Instance("localhost:8080", "production", true)));
     }
 
     @Test
@@ -46,8 +47,13 @@ public class YamlInstanceConfigurationTest {
                         ImmutableSet.of("one")),
                 "three", YamlInstanceConfiguration.Cluster.withClusters("one", "two")));
         assertThat(configuration.getAllInstances()).isEqualTo(
-                ImmutableSet.of(new Instance("localhost:1234", "one", true), new Instance("localhost:5678", "one", true),
-                        new Instance("localhost:4321", "two", true), new Instance("localhost:9876", "two", true)));
+                ImmutableSet.of(
+                        new Instance("localhost:1234", "one", true), new Instance("localhost:5678", "one", true),
+                        new Instance("localhost:4321", "one", true), new Instance("localhost:9876", "one", true),
+                        new Instance("localhost:4321", "two", true), new Instance("localhost:9876", "two", true),
+                        new Instance("localhost:1234", "two", true), new Instance("localhost:5678", "two", true),
+                        new Instance("localhost:4321", "three", true), new Instance("localhost:9876", "three", true),
+                        new Instance("localhost:1234", "three", true), new Instance("localhost:5678", "three", true)));
     }
 
     @Test
@@ -59,5 +65,12 @@ public class YamlInstanceConfigurationTest {
                         ImmutableSet.of(HostAndPort.fromParts("localhost", 1234)),
                         ImmutableSet.of("one"))));
         assertThat(configuration.getAllInstances()).isEqualTo(ImmutableSet.of(new Instance("localhost:1234", "one", true)));
+    }
+
+    @Test
+    public void urlSuffix() throws Exception {
+        final YamlInstanceConfiguration configuration = configFactory.build(
+                new File(Resources.getResource("turbineConfigurations/urlSuffix.yml").toURI()));
+        assertThat(configuration.getUrlSuffix()).isEqualTo("/foo/bar");
     }
 }

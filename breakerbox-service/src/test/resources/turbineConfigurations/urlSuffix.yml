@@ -1,0 +1,9 @@
+clusters:
+  breakerbox:
+    instances:
+      - localhost:8080
+  production:
+    clusters:
+      - breakerbox
+
+urlSuffix: /foo/bar

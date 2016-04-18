@@ -1,8 +1,11 @@
 package com.yammer.breakerbox.service;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.netflix.config.ConfigurationManager;
+import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
@@ -48,6 +51,7 @@ import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -220,5 +224,10 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     private static void setupYamlInstanceConfiguration(YamlInstanceConfiguration configuration) {
         PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getAllInstances()));
+        final AbstractConfiguration configurationManager = ConfigurationManager.getConfigInstance();
+        configurationManager.setProperty("turbine.instanceUrlSuffix", configuration.getUrlSuffix());
+        configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
+                Joiner.on(',').join(configuration.getClusters().keySet()));
+
     }
 }

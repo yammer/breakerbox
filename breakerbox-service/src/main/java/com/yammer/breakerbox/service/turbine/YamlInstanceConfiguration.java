@@ -7,6 +7,7 @@ import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +20,9 @@ public class YamlInstanceConfiguration {
     private ImmutableMap<String, Cluster> clusters = ImmutableMap.of(
             "breakerbox", Cluster.withInstances(HostAndPort.fromParts("localhost", 8080)),
             "production", Cluster.withClusters("breakerbox"));
+
+    @NotNull
+    private String urlSuffix = "/tenacity/metrics.stream";
 
     public ImmutableMap<String, Cluster> getClusters() {
         return clusters;
@@ -48,13 +52,21 @@ public class YamlInstanceConfiguration {
                 .stream()
                 .filter(name -> !visited.contains(name))
                 .forEach(notVisitedClusterName ->
-                    addCluster(acc, clusters.get(notVisitedClusterName), notVisitedClusterName,
-                        ImmutableSet.<String>builder().addAll(visited).add(clusterName).build()));
+                    addCluster(acc, clusters.get(notVisitedClusterName), clusterName,
+                        ImmutableSet.<String>builder().addAll(visited).add(notVisitedClusterName).build()));
+    }
+
+    public String getUrlSuffix() {
+        return urlSuffix;
+    }
+
+    public void setUrlSuffix(String urlSuffix) {
+        this.urlSuffix = urlSuffix;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clusters);
+        return Objects.hash(clusters, urlSuffix);
     }
 
     @Override
@@ -66,13 +78,15 @@ public class YamlInstanceConfiguration {
             return false;
         }
         final YamlInstanceConfiguration other = (YamlInstanceConfiguration) obj;
-        return Objects.equals(this.clusters, other.clusters);
+        return Objects.equals(this.clusters, other.clusters)
+                && Objects.equals(this.urlSuffix, other.urlSuffix);
     }
 
     @Override
     public String toString() {
         return "YamlInstanceConfiguration{" +
                 "clusters=" + clusters +
+                ", urlSuffix='" + urlSuffix + '\'' +
                 '}';
     }
 

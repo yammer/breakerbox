@@ -1,0 +1,11 @@
+clusters:
+  production:
+    instances:
+      - completie-001.sjc1.yammer.com:8080
+      - completie-002.sjc1.yammer.com:8080
+      - completie-003.sjc1.yammer.com:8080
+      - completie-004.sjc1.yammer.com:8080
+      - deploy-001.sjc1.yammer.com:9090
+  mock:
+    instances:
+      - localhost:8080
