@@ -17,7 +17,7 @@ in resilient design of foreign dependencies.
 Extract the archive and then run the following command
 
 ```bash
-java -Darchaius.configurationSource.additionalUrls=file:config.properties -jar breakerbox-service-0.1.1.jar server breakerbox.yml
+java -jar breakerbox-service-X.X.X.jar server breakerbox.yml
 ```
 
 Then point your browser at ``http://localhost:8080``. You should see a dashboard
@@ -57,6 +57,16 @@ metaClusters:
   - production
   - stage
   - staging
+
+turbine:
+  urlSuffix: /tenacity/metrics.stream
+  clusters:
+    breakerbox:
+      instances:
+        - localhost:8080
+    production:
+      clusters:
+        - breakerbox
 
 server:
   applicationConnectors:
@@ -133,23 +143,20 @@ If you need group membership filters you can see the additional documentation on
 
 Dashboard Configuration
 -----------------------------------------
-The `config.properties` file uses [Turbine's](https://github.com/Netflix/Turbine/wiki/Configuration) configuration syntax. This currently assumes a static setup. It isn't hard to add a dynamic host discovery
-system, but this is something that will be added on later.
-
-* `turbine.aggregator.clusterConfig`: specifies all the dashboards you'd like to create. (e.g. production, serviceA, serviceB)
-* `turbine.instanceUrlSuffix=/tenacity/metrics.stream`: use this default because this is where `tenacity` puts the metrics streaming endpoint.
-* `turbine.ConfigPropertyBasedDiscovery.production.instances`: this specifies the individual instances that make up the `production` cluster.
-* `turbine.ConfigPropertyBasedDiscovery.breakerbox.instances`: this specifies the individual instances that make up the `breakerbox` cluster.
-
-```
-turbine.aggregator.clusterConfig=production,breakerbox
-turbine.instanceUrlSuffix=/tenacity/metrics.stream
-turbine.ConfigPropertyBasedDiscovery.production.instances=localhost:8080,anotherservice.company.com:8080
-turbine.ConfigPropertyBasedDiscovery.breakerbox.instances=localhost:8080
+```yaml
+turbine:
+  urlSuffix: /tenacity/metrics.stream
+  clusters:
+    breakerbox:
+      instances:
+        - localhost:8080
+    production:
+      clusters:
+        - breakerbox
 ```
 
-*Note*: Easiest thing to do is make sure `config.properties` is in the same directory as the jar otherwise keep the `breakerbox#urls` and the `archaius.configurationSource.additionalUrls` system property pointing to the correct location.
-We plan to move this to a better configuration mechanism in the future.
+* `urlSuffix` defaults to `/tenacity/metrics.stream` you can alter this if you have this resource at a different location
+* `clusters` is the top level item for your clusters or dashboards you wish to have available. Underneath clusters you can specify dashboard names such as `breakerbox` or `production` in this example above. Underneath those you can specify either `instances` and `clusters`. `clusters` can reference other dashboards and will include their instances. This can reference cyclic dashboards and will add instances from both. `instances` lets you specify a single instance.  
 
 Meta Clusters
 -------------

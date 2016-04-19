@@ -1,0 +1,17 @@
+clusters:
+  one:
+    instances:
+      - localhost:1234
+      - localhost:5678
+    clusters:
+      - two
+  two:
+    instances:
+      - localhost:4321
+      - localhost:9876
+    clusters:
+      - one
+  three:
+    clusters:
+      - one
+      - two

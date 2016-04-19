@@ -6,8 +6,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-import com.netflix.turbine.discovery.ConfigPropertyBasedDiscovery;
 import com.netflix.turbine.discovery.Instance;
+import com.netflix.turbine.plugins.PluginsFactory;
 import com.yammer.breakerbox.store.ServiceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,9 +61,8 @@ public class Instances {
     }
 
     private static FluentIterable<Instance> rawInstances() {
-        final ConfigPropertyBasedDiscovery configPropertyBasedDiscovery = new ConfigPropertyBasedDiscovery();
         try {
-            return FluentIterable.from(configPropertyBasedDiscovery.getInstanceList());
+            return FluentIterable.from(PluginsFactory.getInstanceDiscovery().getInstanceList());
         } catch (Exception err) {
             LOGGER.warn("Could not fetch clusters dynamically", err);
         }

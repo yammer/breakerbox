@@ -1,9 +1,13 @@
 package com.yammer.breakerbox.service;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.netflix.config.ConfigurationManager;
+import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.netflix.turbine.init.TurbineInit;
+import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
@@ -18,6 +22,8 @@ import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
+import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
+import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -45,6 +51,7 @@ import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +114,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
+        setupYamlInstanceConfiguration(configuration.getTurbine());
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
@@ -212,5 +220,14 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    }
+
+    private static void setupYamlInstanceConfiguration(YamlInstanceConfiguration configuration) {
+        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getAllInstances()));
+        final AbstractConfiguration configurationManager = ConfigurationManager.getConfigInstance();
+        configurationManager.setProperty("turbine.instanceUrlSuffix", configuration.getUrlSuffix());
+        configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
+                Joiner.on(',').join(configuration.getClusters().keySet()));
+
     }
 }
