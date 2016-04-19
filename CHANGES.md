@@ -1,3 +1,9 @@
+0.4.2 - Apr 19, 2016
+---
+* Java 8 required
+* Dropped `config.properties` and introduced `YamlInstanceDiscovery` which now lets users configure which dashboards/clusters/instances configured via `yaml`. This adds the ability to construct
+  clusters made up of other clusters and instances for easy configuration.
+
 0.4.1 - Apr 14, 2016
 ---
 * Tenacity 0.8.2
