@@ -157,6 +157,7 @@ turbine:
 
 * `urlSuffix` defaults to `/tenacity/metrics.stream` you can alter this if you have this resource at a different location
 * `clusters` is the top level item for your clusters or dashboards you wish to have available. Underneath clusters you can specify dashboard names such as `breakerbox` or `production` in this example above. Underneath those you can specify either `instances` and `clusters`. `clusters` can reference other dashboards and will include their instances. This can reference cyclic dashboards and will add instances from both. `instances` lets you specify a single instance.  
+
 Meta Clusters
 -------------
 These are clusters that should be in the dashboard dropdown but aren't necessarily configurable. This is used for dashboards that are made up of multiple clusters that are informational, but don't make much context in the sense of configuring one of them.
