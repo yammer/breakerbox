@@ -15,6 +15,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "d3": "^3.5.17",
     "jquery": "^2.2.3",
     "lodash": "^4.10.0",
     "moment": "^2.12.0",

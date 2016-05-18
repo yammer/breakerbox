@@ -1,5 +1,6 @@
 var React = require('react');
 var $ = require('jquery');
+var CircuitSortBar = require('../components/CircuitSortBar');
 
 var Dashboard = React.createClass({
   contextTypes: {
@@ -56,12 +57,16 @@ var Dashboard = React.createClass({
       encodeURIComponent(this.state.dashboard.turbine) +
       '%2Fturbine.stream%3Fcluster%3D' +
       this.props.params.id;
-    return (<iframe id="tenacity-dashboard-iframe"
+    return (
+      <div>
+      <CircuitSortBar/>
+      <iframe id="tenacity-dashboard-iframe"
         seamless
         className="col-lg-12"
         style={style}
         src={src}>
-        </iframe>);
+        </iframe>
+    </div>);
   } 
 });
 
