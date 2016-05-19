@@ -1,44 +1,24 @@
 var React = require('react');
 var _ = require('lodash');
 var d3 = require('d3');
+var $ = require('jquery');
+var HystrixUtils = require('../lib/HystrixUtils');
 
 var HystrixCircuit = React.createClass({
-  reportingHosts: function() {
-    if (_.isUndefined(this.props.reportingHosts)) {
-      return    
-      <div>    
-        <div className="cell header">Host</div>
-        <div className="cell data">Single</div>
-      </div>;
-    } else {
-      return 
-      <div>
-        <div className="cell header">Hosts</div>
-        <div className="cell data">{this.props.reportingHosts}</div>
-      </div>;
-    }
-  },
-
-  getInstanceAverage: function(value, reportingHosts, decimal) {
-    if (decimal) {
-      return this.roundNumber(value / reportingHosts);
-    } else {
-      return Math.floor(value / reportingHosts);
-    }
-  },
-
-  roundNumber: function(num) {
-    var dec = 1;
-    var result = Math.round(num * Math.pow(10,dec)) / Math.pow(10, dec);
-    var resultAsString = result.toString();
-    if(resultAsString.indexOf('.') === -1) {
-      resultAsString = resultAsString + '.0';
-    }
-    return resultAsString;
-  },
-
   componentDidMount: function() {
+    /* escape with two backslashes */
+    //var sanitizedName = this.props.name.replace(/([ !"#$%&'()*+,.\/:;<=>?@[\]^`{|}~])/g,'\\\\$1') + '_' + this.props.index;
+    var vis = d3.select('#chart_CIRCUIT_' + this.props.escapedName).append("svg:svg").attr("width", "100%").attr("height", "100%");
+    /* add a circle -- we don't use the data point, we set it manually, so just passing in [1] */
+    var circle = vis.selectAll("circle").data([1]).enter().append("svg:circle");
+    /* setup the initial styling and sizing of the circle */
+    circle.style("fill", "green").attr("cx", "30%").attr("cy", "30%").attr("r", 5);
+
+    /* add the line graph - it will be populated by javascript, no default to show here */
+    /* escape with two backslashes */
+    d3.select('#graph_CIRCUIT_' + this.props.escapedName).append("svg:svg").attr("width", "100%").attr("height", "100%"); 
     d3.selectAll('#graph_CIRCUIT_' + this.props.escapedName + ' svg').append("svg:path");
+    this.updateD3();
   },
 
   circuitStatus: function() {
@@ -58,39 +38,50 @@ var HystrixCircuit = React.createClass({
     }
   },
 
-  addCommas: function(nStr){
-    nStr += '';
-    if (nStr.length <= 3) {
-      return nStr; //shortcut if we don't need commas
-    }
-    x = nStr.split('.');
-    x1 = x[0];
-    x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
-  },
-
   rejectedRequestCount: function() {
     if (this.props.propertyValue_executionIsolationStrategy === 'THREAD') {
-      return 
+      return (
         <a href="javascript://" title="Threadpool Rejected Request Count" className="line rejected">
-          {this.addCommas(this.props.rollingCountThreadPoolRejected)}
-        </a>;
+          {HystrixUtils.addCommas(this.props.rollingCountThreadPoolRejected)}
+        </a>);
     }
     else if (this.props.propertyValue_executionIsolationStrategy === 'SEMAPHORE') {
-      return
+      return (
         <a href="javascript://" title="Semaphore Rejected Request Count" className="line rejected">
-          {this.addCommas(this.props.rollingCountSemaphoreRejected)}
-        </a>;
+          {HystrixUtils.addCommas(this.props.rollingCountSemaphoreRejected)}
+        </a>);
+    }
+  },
+
+  componentDidUpdate: function() {
+    this.updateD3();
+  },
+
+  updateD3: function() {
+    var ratePerSecond = this.props.ratePerSecond;
+    var ratePerSecondPerHost = this.props.ratePerSecondPerHost;
+    var ratePerSecondPerHostDisplay = ratePerSecondPerHost;
+    var errorThenVolume = isNaN( ratePerSecond )? -1: (this.props.errorPercentage * 100000000) +  ratePerSecond;
+    // set the rates on the div element so it's available for sorting
+    $('#CIRCUIT_' + this.props.escapedName).attr('rate_value', ratePerSecond);
+    $('#CIRCUIT_' + this.props.escapedName).attr('error_then_volume', errorThenVolume);
+
+    // update errorPercentage color on page
+    $('#CIRCUIT_' + this.props.escapedName + ' a.errorPercentage').css('color', this.props.hystrixMonitor.circuitErrorPercentageColorRange(this.props.errorPercentage));
+
+    this.props.hystrixMonitor.updateCircle('circuit', '#CIRCUIT_' + this.props.escapedName + ' circle', ratePerSecondPerHostDisplay, this.props.errorPercentage);
+
+    if (this.props.graphValues) {
+      // we have a set of values to initialize with
+      this.props.hystrixMonitor.updateSparkline('circuit', '#CIRCUIT_' + this.props.escapedName + ' path', this.props.graphValues);
+    } else {
+      this.props.hystrixMonitor.updateSparkline('circuit', '#CIRCUIT_' + this.props.escapedName + ' path', ratePerSecond);
     }
   },
 
   render: function() {
     return (
-      <div>
+      <div className="monitor_data">
         <div className="counters"> 
           <div className="cell line">
             <a href="javascript://" title="Error Percentage [Timed-out + Threadpool Rejected + Failure / Total]" className="errorPercentage">
@@ -100,22 +91,22 @@ var HystrixCircuit = React.createClass({
           
           <div className="cell borderRight">
             <a href="javascript://" title="Timed-out Request Count" className="line timeout">
-              {this.addCommas(this.props.rollingCountTimeout)}
+              {HystrixUtils.addCommas(this.props.rollingCountTimeout)}
             </a>
             {this.rejectedRequestCount()}
             <a href="javascript://" title="Failure Request Count" className="line failure">
-              {this.addCommas(this.props.rollingCountFailure)}
+              {HystrixUtils.addCommas(this.props.rollingCountFailure)}
             </a> 
           </div>
           <div className="cell borderRight">
             <a href="javascript://" title="Successful Request Count" className="line success">
-              {this.addCommas(this.props.rollingCountSuccess)}
+              {HystrixUtils.addCommas(this.props.rollingCountSuccess)}
             </a>
             <a href="javascript://" title="Short-circuited Request Count" className="line shortCircuited">
-              {this.addCommas(this.props.rollingCountShortCircuited)}
+              {HystrixUtils.addCommas(this.props.rollingCountShortCircuited)}
             </a>
             <a href="javascript://" title="Bad Request Count" className="line badRequest">
-              {this.addCommas(this.props.rollingCountBadRequests)}
+              {HystrixUtils.addCommas(this.props.rollingCountBadRequests)}
             </a>
             <br></br>
           </div>
@@ -124,13 +115,13 @@ var HystrixCircuit = React.createClass({
         <div className="rate">
           <a href="javascript://" title="Total Request Rate per Second per Reporting Host" className="rate">
             <span className="smaller">Host: </span>
-            <span className="ratePerSecondPerHost">{this.addCommas(this.roundNumber(this.props.ratePerSecondPerHost))}</span>/s
+            <span className="ratePerSecondPerHost">{HystrixUtils.addCommas(HystrixUtils.roundNumber(this.props.ratePerSecondPerHost))}</span>/s
           </a>
         </div>
         <div className="rate">  
           <a href="javascript://" title="Total Request Rate per Second for Cluster" className="rate">
             <span className="smaller">Cluster: </span>
-            <span className="ratePerSecond">{this.addCommas(this.roundNumber(this.props.ratePerSecond))}</span>/s
+            <span className="ratePerSecond">{HystrixUtils.addCommas(HystrixUtils.roundNumber(this.props.ratePerSecond))}</span>/s
           </a>
         </div>
 
@@ -141,21 +132,22 @@ var HystrixCircuit = React.createClass({
         <div className="spacer"></div>
 
         <div className="tableRow">
-          {this.reportingHosts}
+          <div className="cell header">Hosts</div>
+          <div className="cell data">{this.props.reportingHosts || 'Single'}</div>
           <div className="cell header">90th</div>
-          <div className="cell data latency90"><span className="value">{this.getInstanceAverage(this.props.latencyTotal['90'], this.props.reportingHosts, false)}</span>ms</div>
+          <div className="cell data latency90"><span className="value">{HystrixUtils.getInstanceAverage(this.props.latencyTotal['90'], this.props.reportingHosts, false)}</span>ms</div>
         </div>
         <div className="tableRow">
           <div className="cell header">Median</div>
-          <div className="cell data latencyMedian"><span className="value">{this.getInstanceAverage(this.props.latencyTotal['50'], this.props.reportingHosts, false)}</span>ms</div>
+          <div className="cell data latencyMedian"><span className="value">{HystrixUtils.getInstanceAverage(this.props.latencyTotal['50'], this.props.reportingHosts, false)}</span>ms</div>
           <div className="cell header">99th</div>
-          <div className="cell data latency99"><span className="value">{this.getInstanceAverage(this.props.latencyTotal['99'], this.props.reportingHosts, false)}</span>ms</div>
+          <div className="cell data latency99"><span className="value">{HystrixUtils.getInstanceAverage(this.props.latencyTotal['99'], this.props.reportingHosts, false)}</span>ms</div>
         </div>
         <div className="tableRow">
           <div className="cell header">Mean</div>
           <div className="cell data latencyMean"><span className="value">{this.props.latencyTotal_mean}</span>ms</div>
           <div className="cell header">99.5th</div>
-          <div className="cell data latency995"><span className="value">{this.getInstanceAverage(this.props.latencyTotal['99.5'], this.props.reportingHosts, false)}</span>ms</div>
+          <div className="cell data latency995"><span className="value">{HystrixUtils.getInstanceAverage(this.props.latencyTotal['99.5'], this.props.reportingHosts, false)}</span>ms</div>
         </div>
       </div>);
   }
