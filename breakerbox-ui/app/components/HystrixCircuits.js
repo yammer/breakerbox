@@ -64,7 +64,7 @@ var HystrixCircuits = React.createClass({
       // args for display
       if (this.props.hystrixMonitor.args.includeDetailIcon != undefined && this.props.hystrixMonitor.includeDetailIcon) {
         data.includeDetailIcon = true;
-      }else {
+      } else {
         data.includeDetailIcon = false;
       }
 

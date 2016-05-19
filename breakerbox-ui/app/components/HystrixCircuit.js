@@ -7,7 +7,6 @@ var HystrixUtils = require('../lib/HystrixUtils');
 var HystrixCircuit = React.createClass({
   componentDidMount: function() {
     /* escape with two backslashes */
-    //var sanitizedName = this.props.name.replace(/([ !"#$%&'()*+,.\/:;<=>?@[\]^`{|}~])/g,'\\\\$1') + '_' + this.props.index;
     var vis = d3.select('#chart_CIRCUIT_' + this.props.escapedName).append("svg:svg").attr("width", "100%").attr("height", "100%");
     /* add a circle -- we don't use the data point, we set it manually, so just passing in [1] */
     var circle = vis.selectAll("circle").data([1]).enter().append("svg:circle");
@@ -19,6 +18,7 @@ var HystrixCircuit = React.createClass({
     d3.select('#graph_CIRCUIT_' + this.props.escapedName).append("svg:svg").attr("width", "100%").attr("height", "100%"); 
     d3.selectAll('#graph_CIRCUIT_' + this.props.escapedName + ' svg').append("svg:path");
     this.updateD3();
+    this.props.hystrixMonitor.sortSameAsLast();
   },
 
   circuitStatus: function() {
