@@ -6,17 +6,15 @@ import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.yammer.breakerbox.service.core.Instances;
-import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
 import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.ServiceId;
-import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,14 +22,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstancesTest {
     @BeforeClass
     public static void setupTest() throws Exception {
-        final ConfigurationFactory<YamlInstanceConfiguration> configFactory = new ConfigurationFactory<>(
-                YamlInstanceConfiguration.class,
+        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(
+                Paths.get(Resources.getResource("turbineConfigurations/instances.yml").toURI()),
                 Validators.newValidator(),
-                Jackson.newObjectMapper(),
-                "dw");
-        final YamlInstanceConfiguration configuration = configFactory.build(
-                new File(Resources.getResource("turbineConfigurations/instances.yml").toURI()));
-        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getAllInstances()));
+                Jackson.newObjectMapper()));
     }
 
     @Test
