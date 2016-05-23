@@ -1,3 +1,7 @@
+0.4.3 - May 23, 2016
+---
+* `turbine` configuration now references a `yaml` containing the instances configuration which will be reloaded whenever there is a change.
+
 0.4.2 - Apr 19, 2016
 ---
 * Java 8 required

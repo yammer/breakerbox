@@ -24,6 +24,8 @@ tenacityClient:
 
 defaultDashboard: production
 
+turbine: breakerbox-instances.yml
+
 server:
   applicationConnectors:
     - type: http
