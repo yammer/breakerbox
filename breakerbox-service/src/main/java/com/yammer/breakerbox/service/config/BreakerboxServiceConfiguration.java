@@ -6,7 +6,6 @@ import com.google.common.base.Optional;
 import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
-import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
@@ -16,6 +15,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private final BreakerboxConfiguration breakerboxConfiguration;
 
     @NotNull @Valid
-    private final YamlInstanceConfiguration turbine;
+    private final Path turbine;
 
     @NotNull @Valid @UnwrapValidatedValue(false) @JsonProperty("ldap")
     private Optional<LdapConfiguration> ldapConfiguration = Optional.absent();
@@ -68,7 +68,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("database") JdbiConfiguration jdbiConfiguration,
                                           @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort,
                                           @JsonProperty("defaultDashboard") String defaultDashboard,
-                                          @JsonProperty("turbine") YamlInstanceConfiguration yamlInstanceConfiguration) {
+                                          @JsonProperty("turbine") Path turbine) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -79,7 +79,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
-        this.turbine = Optional.fromNullable(yamlInstanceConfiguration).or(new YamlInstanceConfiguration());
+        this.turbine = turbine;
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -111,7 +111,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return archaiusOverride;
     }
 
-    public YamlInstanceConfiguration getTurbine() {
+    public Path getTurbine() {
         return turbine;
     }
 

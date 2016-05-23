@@ -144,17 +144,21 @@ If you need group membership filters you can see the additional documentation on
 Dashboard Configuration
 -----------------------------------------
 ```yaml
-turbine:
-  urlSuffix: /tenacity/metrics.stream
-  clusters:
-    breakerbox:
-      instances:
-        - localhost:8080
-    production:
-      clusters:
-        - breakerbox
+turbine: /path/to/instances.yml
 ```
 
+```yaml
+urlSuffix: /tenacity/metrics.stream
+clusters:
+breakerbox:
+  instances:
+    - localhost:8080
+production:
+  clusters:
+    - breakerbox
+```
+
+* `turbine` is a path to where a `yaml` configuration file containing the instances configuration is located (this is editable at runtime allowing for dynamic rediscovery).
 * `urlSuffix` defaults to `/tenacity/metrics.stream` you can alter this if you have this resource at a different location
 * `clusters` is the top level item for your clusters or dashboards you wish to have available. Underneath clusters you can specify dashboard names such as `breakerbox` or `production` in this example above. Underneath those you can specify either `instances` and `clusters`. `clusters` can reference other dashboards and will include their instances. This can reference cyclic dashboards and will add instances from both. `instances` lets you specify a single instance.  
 
