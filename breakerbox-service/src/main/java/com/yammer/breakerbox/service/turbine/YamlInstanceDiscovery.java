@@ -31,21 +31,23 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
                 objectMapper,
                 "dw");
         this.configurationManager = ConfigurationManager.getConfigInstance();
+        parseYamlInstanceConfiguration();
     }
 
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
-        final YamlInstanceConfiguration configuration = parseYamlInstanceConfiguration()
-                .orElse(new YamlInstanceConfiguration());
-        configurationManager.setProperty("turbine.instanceUrlSuffix", configuration.getUrlSuffix());
-        configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
-                Joiner.on(',').join(configuration.getClusters().keySet()));
-        return configuration.getAllInstances();
+        return parseYamlInstanceConfiguration()
+                .orElse(new YamlInstanceConfiguration())
+                .getAllInstances();
     }
 
     private Optional<YamlInstanceConfiguration> parseYamlInstanceConfiguration() {
         try {
-            return Optional.of(configurationFactory.build(path.toFile()));
+            final YamlInstanceConfiguration yamlInstanceConfiguration = configurationFactory.build(path.toFile());
+            configurationManager.setProperty("turbine.instanceUrlSuffix", yamlInstanceConfiguration.getUrlSuffix());
+            configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
+                    Joiner.on(',').join(yamlInstanceConfiguration.getClusters().keySet()));
+            return Optional.of(yamlInstanceConfiguration);
         } catch (Exception err) {
             LOGGER.error("Unable to parse {}", path.toAbsolutePath(), err);
         }
