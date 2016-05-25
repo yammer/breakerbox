@@ -3,6 +3,8 @@ var $ = require('jquery');
 var preProcessDataRegex = /([ !"#$%&'()*+,.\/:;<=>?@[\]^`{|}~])/g;
 
 var HystrixUtils = {
+  preProcessDataRegex: preProcessDataRegex,
+  
   preProcessData: function(data) {
     // set defaults for values that may be missing from older streams
     this.setIfMissing(data, "rollingCountBadRequests", 0);

@@ -7,14 +7,8 @@ var HystrixUtils = require('../lib/HystrixUtils');
 var HystrixCircuits = React.createClass({
   getInitialState: function() {
     this.props.hystrixMonitor.sortByErrorThenVolume();
-    this.props.dependencyThreadPoolMonitor.sortByVolume();
-
-    var proxyStream = '/tenacity/proxy.stream?origin=localhost:8080/turbine.stream?cluster=production&delay=1000'
-    var source = new EventSource(proxyStream);
-
-    source.addEventListener('message', this.hystrixCircuitEventSourceMessageListener.bind(this), false);
-    source.addEventListener('message', this.props.dependencyThreadPoolMonitor.eventSourceMessageListener, false);
-    source.addEventListener('error', function(e) {
+    this.props.source.addEventListener('message', this.eventSourceMessageListener.bind(this), false);
+    this.props.source.addEventListener('error', function(e) {
         $("#" + this.props.hystrixMonitor.containerId + " .loading").html("Unable to connect to Command Metric Stream.");
         $("#" + this.props.hystrixMonitor.containerId + " .loading").addClass("failed");
         if (e.eventPhase === EventSource.CLOSED) {
@@ -26,12 +20,11 @@ var HystrixCircuits = React.createClass({
       }, false);
 
     return {
-      source: source,
       hystrixMonitors: {}
     };
   },
 
-   hystrixCircuitEventSourceMessageListener: function(e) {
+   eventSourceMessageListener: function(e) {
     var data = JSON.parse(e.data);
     if (data) {
       data.index = this.props.hystrixMonitor.index;
@@ -58,7 +51,6 @@ var HystrixCircuits = React.createClass({
       return;
     }
     
-    var addNew = false;
     // check if we need to create the container
     if (!_.has(this.state.hystrixMonitors, data.escapedName)) {
       // args for display
@@ -67,8 +59,6 @@ var HystrixCircuits = React.createClass({
       } else {
         data.includeDetailIcon = false;
       }
-
-      addNew = true;
     }
 
     var newHystrixMonitor = {};

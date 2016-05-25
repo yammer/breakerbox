@@ -1,4 +1,5 @@
 var $ = require('jquery');
+var d3 = require('d3');
 require('./tinysort');
 
 var HystrixCommandMonitor = function(index, containerId, args) {
@@ -26,7 +27,7 @@ var HystrixCommandMonitor = function(index, containerId, args) {
      * 
      * In other words, sorting only for adds/deletes is not sufficient as all but alphabetical sort are dynamically changing.
      */
-    setInterval(function() {
+    this.intervalId = setInterval(function() {
       // sort since we have added a new one
       this.sortSameAsLast();
     }.bind(this), 10000);
@@ -257,11 +258,6 @@ HystrixCommandMonitor.prototype.sortSameAsLast = function() {
   } else if(this.sortedBy == 'latMedian_desc') {
     this.sortByMetricInDirection('desc', '.latencyMedian .value');
   }  
-};
-
-// a temporary home for the logger until we become more sophisticated
-function log(message) {
-  console.log(message);
 };
 
 module.exports = HystrixCommandMonitor;

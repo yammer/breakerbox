@@ -1,15 +1,19 @@
 var React = require('react');
 var $ = require("jquery");
 var HystrixCommandMonitor = require('../lib/HystrixCommandMonitor');
+var HystrixThreadPoolMonitor = require('../lib/HystrixThreadPoolMonitor');
 var HystrixCircuits = require('./HystrixCircuits');
+var HystrixThreadPools = require('./HystrixThreadPools');
 
 var CircuitSortBar = React.createClass({
   getInitialState: function() {
+    var proxyStream = '/tenacity/proxy.stream?origin=localhost:8080/turbine.stream?cluster=production&delay=1000'
     var dependenciesId = 'dependencies_0';
     var dependencyThreadPoolsId = 'dependencyThreadPools_0';
     var state = {
+      source: new EventSource(proxyStream),
       hystrixMonitor: new HystrixCommandMonitor(0, dependenciesId, {includeDetailIcon:false}),
-      dependencyThreadPoolMonitor: new HystrixThreadPoolMonitor(0, dependencyThreadPoolsId)
+      hystrixThreadPoolMonitor: new HystrixThreadPoolMonitor(0, dependencyThreadPoolsId)
     };
 
     return state;
@@ -39,19 +43,19 @@ var CircuitSortBar = React.createClass({
               </div> 
             </div> 
           </div> 
-          <HystrixCircuits id={this.state.hystrixMonitor.containerId} hystrixMonitor={this.state.hystrixMonitor} dependencyThreadPoolMonitor={this.state.dependencyThreadPoolMonitor} />
+          <HystrixCircuits id={this.state.hystrixMonitor.containerId} hystrixMonitor={this.state.hystrixMonitor} source={this.state.source} />
           <div className="spacer"></div> 
 
           <div className="row"> 
             <div className="menubar"> 
               <div className="title">Thread Pools</div> 
               <div className="menu_actions"> 
-                Sort: <a href="javascript://" onclick={this.state.dependencyThreadPoolMonitor.sortAlphabetically}>Alphabetical</a> |  
-                <a href="javascript://" onclick={this.state.dependencyThreadPoolMonitor.sortByVolume}>Volume</a> |  
+                Sort: <a href="javascript://" onclick={this.state.hystrixThreadPoolMonitor.sortAlphabetically}>Alphabetical</a> |  
+                <a href="javascript://" onclick={this.state.hystrixThreadPoolMonitor.sortByVolume}>Volume</a> |  
               </div> 
             </div> 
           </div> 
-          <div id={this.state.dependencyThreadPoolMonitor.containerId} className="row dependencyThreadPools"><span className="loading">Loading ...</span></div> 
+          <HystrixThreadPools id={this.state.hystrixThreadPoolMonitor.containerId} hystrixThreadPoolMonitor={this.state.hystrixThreadPoolMonitor} source={this.state.source} />
           <div className="spacer"></div> 
           <div className="spacer"></div> 
           </div> 
