@@ -34,7 +34,7 @@ var HystrixThreadPools = React.createClass({
       
       if (data && data.type == 'HystrixThreadPool') {
         if (data.deleteData == 'true') {
-          HystrixUtils.deleteThreadPool(data.escapedName);
+          HystrixThreadPoolUtils.deleteThreadPool(data.escapedName);
         } else {
           this.displayThreadPool(data);
         }
@@ -46,7 +46,7 @@ var HystrixThreadPools = React.createClass({
     try {
       HystrixThreadPoolUtils.preProcessData(data);
     } catch (err) {
-      log("Failed preProcessData: " + err.message);
+      console.log("Failed preProcessData: " + err.message);
       return;
     }
 
@@ -54,7 +54,7 @@ var HystrixThreadPools = React.createClass({
     newHystrixMonitor[data.escapedName] = <HystrixThreadPoolContainer {...data} hystrixThreadPoolMonitor={this.props.hystrixThreadPoolMonitor}/>;
 
     this.setState({
-      hystrixThreadPoolMonitors: _.extend(this.state.hystrixMonitors, newHystrixMonitor)
+      hystrixThreadPoolMonitors: _.extend(this.state.hystrixThreadPoolMonitors, newHystrixMonitor)
     });
   },
 
