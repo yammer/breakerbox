@@ -19,12 +19,16 @@ import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
-import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
+import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.User;
+import com.yammer.lodbrok.discovery.core.client.LodbrokClientFactory;
+import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
+import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
+import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStorePoller;
 import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -109,8 +113,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
-        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getTurbine(),
-                environment.getValidator(), environment.getObjectMapper()));
+        setupLodbrokInstanceDiscovery(configuration.getLodbrok(), environment);
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
@@ -216,5 +219,22 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    }
+
+    private static void setupLodbrokInstanceDiscovery(LodbrokDiscoveryConfiguration configuration,
+                                                      Environment environment) {
+        final LodbrokClientFactory lodbrokClientFactory = new LodbrokClientFactory(configuration, environment);
+        final LodbrokInstanceStore lodbrokInstanceStore = LodbrokInstanceStore.empty();
+        final LodbrokInstanceStorePoller lodbrokInstanceStorePoller = new LodbrokInstanceStorePoller(
+                environment
+                        .lifecycle()
+                        .scheduledExecutorService("lodbrok-instance-store-poller-%d", true)
+                        .threads(1)
+                        .build(),
+                configuration.getPollInterval(),
+                lodbrokInstanceStore,
+                lodbrokClientFactory.build("lodbrok-client"));
+        lodbrokInstanceStorePoller.schedule();
+        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getLodbrokUri()));
     }
 }

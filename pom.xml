@@ -43,6 +43,7 @@
         <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.4.1208.jre7</postgresql.version>
         <h2.version>1.4.191</h2.version>
+        <lodbrok.version>0.0.1-SNAPSHOT</lodbrok.version>
     </properties>
 
     <dependencyManagement>
@@ -121,6 +122,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>com.yammer.lodbrok.discovery</groupId>
+                <artifactId>lodbrok-discovery-core</artifactId>
+                <version>${lodbrok.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -155,6 +161,18 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <repositories>
+        <repository>
+            <id>maven.int.yammer.com-releases</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>maven.int.yammer.com-snapshots</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
 
     <profiles>
         <profile>

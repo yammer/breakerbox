@@ -52,8 +52,17 @@
             <artifactId>tenacity-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.netflix.turbine</groupId>
             <artifactId>turbine-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.lodbrok.discovery</groupId>
+            <artifactId>lodbrok-discovery-core</artifactId>
         </dependency>
     </dependencies>
 
