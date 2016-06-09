@@ -1,11 +1,9 @@
 package com.yammer.breakerbox.service.turbine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
-import com.netflix.turbine.plugins.PluginsFactory;
 import io.dropwizard.configuration.ConfigurationFactory;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
@@ -45,10 +43,8 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
     private Optional<YamlInstanceConfiguration> parseYamlInstanceConfiguration() {
         try {
             final YamlInstanceConfiguration yamlInstanceConfiguration = configurationFactory.build(path.toFile());
-            configurationManager.setProperty("turbine.instanceUrlSuffix", yamlInstanceConfiguration.getUrlSuffix());
-            configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
-                    Joiner.on(',').join(yamlInstanceConfiguration.getClusters().keySet()));
-            PluginsFactory.getClusterMonitorFactory().initClusterMonitors();
+            TurbineInstanceDiscovery.registerClusters(yamlInstanceConfiguration.getClusters().keySet(),
+                    yamlInstanceConfiguration.getUrlSuffix());
             return Optional.of(yamlInstanceConfiguration);
         } catch (Exception err) {
             LOGGER.error("Unable to parse {}", path.toAbsolutePath(), err);
