@@ -20,7 +20,8 @@ import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
-import com.yammer.breakerbox.service.turbine.client.DelegatingTenacityClient;
+import com.yammer.breakerbox.service.turbine.client.DelegatingLodbrokTenacityClient;
+import com.yammer.breakerbox.service.turbine.client.LodbrokTenacityClientBuilder;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -30,7 +31,6 @@ import com.yammer.lodbrok.discovery.core.client.LodbrokClientFactory;
 import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStorePoller;
-import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
@@ -121,13 +121,13 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         breakerboxStore.initialize();
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-            new TenacityPoller.Factory(new DelegatingTenacityClient(
-                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
+            new TenacityPoller.Factory(new DelegatingLodbrokTenacityClient(
+                new LodbrokTenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
                         .using(configuration.getTenacityClient())
                         .build())));
         final SyncComparator syncComparator = new SyncComparator(
-            new TenacityConfigurationFetcher.Factory(new DelegatingTenacityClient(
-                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
+            new TenacityConfigurationFetcher.Factory(new DelegatingLodbrokTenacityClient(
+                new LodbrokTenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
                         .using(configuration.getTenacityClient())
                         .build())),
             breakerboxStore);

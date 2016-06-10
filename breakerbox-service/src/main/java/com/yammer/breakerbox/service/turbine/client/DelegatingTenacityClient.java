@@ -8,8 +8,6 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.core.CircuitBreaker;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 
-import java.net.URI;
-
 public class DelegatingTenacityClient implements TurbineTenacityClient {
     private final TenacityClient client;
 
@@ -19,35 +17,26 @@ public class DelegatingTenacityClient implements TurbineTenacityClient {
 
     @Override
     public Optional<ImmutableList<String>> getTenacityPropertyKeys(Instance instance) {
-        return client.getTenacityPropertyKeys(toUri(instance));
+        return client.getTenacityPropertyKeys(TurbineTenacityClient.toUri(instance));
     }
 
     @Override
     public Optional<TenacityConfiguration> getTenacityConfiguration(Instance instance, TenacityPropertyKey key) {
-        return client.getTenacityConfiguration(toUri(instance), key);
+        return client.getTenacityConfiguration(TurbineTenacityClient.toUri(instance), key);
     }
 
     @Override
     public Optional<ImmutableList<CircuitBreaker>> getCircuitBreakers(Instance instance) {
-        return client.getCircuitBreakers(toUri(instance));
+        return client.getCircuitBreakers(TurbineTenacityClient.toUri(instance));
     }
 
     @Override
     public Optional<CircuitBreaker> getCircuitBreaker(Instance instance, TenacityPropertyKey key) {
-        return client.getCircuitBreaker(toUri(instance), key);
+        return client.getCircuitBreaker(TurbineTenacityClient.toUri(instance), key);
     }
 
     @Override
     public Optional<CircuitBreaker> modifyCircuitBreaker(Instance instance, TenacityPropertyKey key, CircuitBreaker.State state) {
-        return client.modifyCircuitBreaker(toUri(instance), key, state);
-    }
-
-    private static URI toUri(Instance instance) {
-        final String rawHostname = instance.getHostname().trim();
-        if (rawHostname.startsWith("http")) {
-            return URI.create(rawHostname);
-        } else {
-            return URI.create("http://" + rawHostname);
-        }
+        return client.modifyCircuitBreaker(TurbineTenacityClient.toUri(instance), key, state);
     }
 }

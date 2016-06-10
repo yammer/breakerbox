@@ -16,7 +16,8 @@ import java.util.stream.Stream;
 public class LodbrokInstanceDiscovery implements InstanceDiscovery {
     private final LodbrokInstanceStore lodbrokInstanceStore;
     private final URI lodbrokGlobalUri;
-    public static final String LODBROK_ROUTE = "lodbrok-route";
+    public static final String LODBROK_ROUTE_IP = "lodbrok-route-ip";
+    public static final String LODBROK_ROUTE_ID = "lodbrok-route-id";
     public static final String DEFAULT_TENACITY_METRICS_STREAM = "/tenacity/metrics.stream";
     private static Function<LodbrokInstance, Stream<Task>> TO_TASKS_STREAM =
             (lodbrokInstance) -> lodbrokInstance
@@ -42,14 +43,15 @@ public class LodbrokInstanceDiscovery implements InstanceDiscovery {
                                 .fromUri(lodbrokGlobalUri)
                                 .port(Integer.parseInt(task.getPortsList().get(0))).build().toString(),
                                 task.getName(), true);
-                        setLodbrokRouteAttribute(instance, task);
+                        setLodbrokRouteAttributes(instance, task);
                         return instance;
                     })
                     .collect(Collectors.toList());
     }
 
-    public static void setLodbrokRouteAttribute(Instance instance, Task task) {
-        instance.getAttributes().putIfAbsent(LODBROK_ROUTE, String.format("%s-%s", task.getIp().getHostAddress(), task.getId()));
+    public static void setLodbrokRouteAttributes(Instance instance, Task task) {
+        instance.getAttributes().put(LODBROK_ROUTE_IP, task.getIp().getHostAddress());
+        instance.getAttributes().put(LODBROK_ROUTE_ID, task.getId());
     }
 
     private void registerDynamicClusterNames(Collection<LodbrokInstance> instances) {
