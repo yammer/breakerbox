@@ -8,6 +8,7 @@ import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
+import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteConfiguration;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import io.dropwizard.Configuration;
@@ -61,6 +62,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @Valid
     private LodbrokDiscoveryConfiguration lodbrok = new LodbrokDiscoveryConfiguration();
 
+    @NotNull @Valid
+    private ChuteGraphiteConfiguration chute = new ChuteGraphiteConfiguration();
+
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
@@ -73,7 +77,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort,
                                           @JsonProperty("defaultDashboard") String defaultDashboard,
                                           @JsonProperty("turbine") Path turbine,
-                                          @JsonProperty("lodbrok") LodbrokDiscoveryConfiguration lodbrok) {
+                                          @JsonProperty("lodbrok") LodbrokDiscoveryConfiguration lodbrok,
+                                          @JsonProperty("chute") ChuteGraphiteConfiguration chute) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -86,6 +91,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
         this.turbine = turbine;
         this.lodbrok = lodbrok;
+        this.chute = chute;
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -158,9 +164,17 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.lodbrok = lodbrok;
     }
 
+    public ChuteGraphiteConfiguration getChute() {
+        return chute;
+    }
+
+    public void setChute(ChuteGraphiteConfiguration chute) {
+        this.chute = chute;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, lodbrok);
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, lodbrok, chute);
     }
 
     @Override
@@ -184,6 +198,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                 && Objects.equals(this.metaClusters, other.metaClusters)
                 && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort)
                 && Objects.equals(this.defaultDashboard, other.defaultDashboard)
-                && Objects.equals(this.lodbrok, other.lodbrok);
+                && Objects.equals(this.lodbrok, other.lodbrok)
+                && Objects.equals(this.chute, other.chute);
     }
 }

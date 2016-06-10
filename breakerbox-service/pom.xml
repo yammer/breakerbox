@@ -64,6 +64,10 @@
             <groupId>com.yammer.lodbrok.discovery</groupId>
             <artifactId>lodbrok-discovery-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yammer.metrics.reporters</groupId>
+            <artifactId>chute-graphite-reporter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

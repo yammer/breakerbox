@@ -30,6 +30,10 @@ import com.yammer.lodbrok.discovery.core.client.LodbrokClientFactory;
 import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStorePoller;
+import com.yammer.metrics.reporters.chute.graphite.ChuteGraphite;
+import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteConfiguration;
+import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteFactory;
+import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteReporter;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
@@ -114,6 +118,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
+        registerChuteReporter(configuration.getChute(), environment);
         setupLodbrokInstanceDiscovery(configuration.getLodbrok(), environment);
         setupAuth(configuration, environment);
 
@@ -231,5 +236,13 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 configuration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
         PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getLodbrokUri()));
+    }
+
+    private static void registerChuteReporter(ChuteGraphiteConfiguration configuration, Environment environment) {
+        final ChuteGraphite chuteGraphite = new ChuteGraphiteFactory(configuration).build(environment);
+        final ChuteGraphiteReporter chuteGraphiteReporter = ChuteGraphiteReporter
+                .forRegistry(environment.metrics())
+                .build(chuteGraphite);
+        chuteGraphiteReporter.start(1, TimeUnit.MINUTES);
     }
 }

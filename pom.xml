@@ -44,6 +44,7 @@
         <postgresql.version>9.4.1208.jre7</postgresql.version>
         <lodbrok.version>0.0.1</lodbrok.version>
         <h2.version>1.4.192</h2.version>
+        <chute.reporters.version>0.1.2</chute.reporters.version>
     </properties>
 
     <dependencyManagement>
@@ -126,6 +127,11 @@
                 <groupId>com.yammer.lodbrok.discovery</groupId>
                 <artifactId>lodbrok-discovery-core</artifactId>
                 <version>${lodbrok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yammer.metrics.reporters</groupId>
+                <artifactId>chute-graphite-reporter</artifactId>
+                <version>${chute.reporters.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
