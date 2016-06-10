@@ -9,7 +9,7 @@
     <name>Breakerbox Project</name>
     <description>Frontend for Tenacity + Archaius</description>
 
-    <url>https://github.com/yammer/breakerbox</url>
+    <url>https://github.int.yammer.com/yammer/breakerbox</url>
 
     <prerequisites>
         <maven>3.0.0</maven>
@@ -24,15 +24,15 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/yammer/breakerbox.git</connection>
-        <developerConnection>scm:git:git@github.com:yammer/breakerbox.git</developerConnection>
-        <url>https://github.com/yammer/breakerbox/</url>
+        <connection>scm:git:git://github.int.yammer.com/yammer/breakerbox.git</connection>
+        <developerConnection>scm:git:git@github.int.yammer.com:yammer/breakerbox.git</developerConnection>
+        <url>https://github.int.yammer.com/yammer/breakerbox/</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/yammer/breakerbox/issues</url>
+        <url>https://github.int.yammer.com/yammer/breakerbox/issues</url>
     </issueManagement>
 
     <properties>
@@ -147,19 +147,6 @@
         </developer>
     </developers>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -167,6 +154,17 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>maven.int.yammer.com-releases</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.int.yammer.com-snapshots</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <repositories>
         <repository>
@@ -179,39 +177,7 @@
         </repository>
     </repositories>
 
-
     <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <keyname>28D77313</keyname>
-                            <useAgent>true</useAgent>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>allow-snapshots</id>
             <activation><activeByDefault>true</activeByDefault></activation>
