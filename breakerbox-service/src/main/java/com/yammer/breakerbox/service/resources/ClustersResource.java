@@ -38,7 +38,7 @@ public class ClustersResource {
     @Path("{serviceId}/propertykeys")
     public Collection<String> propertyKeys(@PathParam("serviceId") String id) {
         final ServiceId serviceId = ServiceId.from(id);
-        return tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId));
+        return tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.instances(serviceId));
     }
 
     @GET @Timed @Produces(MediaType.APPLICATION_JSON)

@@ -20,6 +20,7 @@ import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
+import com.yammer.breakerbox.service.turbine.client.DelegatingTenacityClient;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -120,15 +121,15 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         breakerboxStore.initialize();
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-            new TenacityPoller.Factory(
+            new TenacityPoller.Factory(new DelegatingTenacityClient(
                 new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
                         .using(configuration.getTenacityClient())
-                        .build()));
+                        .build())));
         final SyncComparator syncComparator = new SyncComparator(
-            new TenacityConfigurationFetcher.Factory(
+            new TenacityConfigurationFetcher.Factory(new DelegatingTenacityClient(
                 new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
                         .using(configuration.getTenacityClient())
-                        .build()),
+                        .build())),
             breakerboxStore);
 
         Set<String> metaClusters = Sets.newHashSet();
@@ -157,9 +158,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.lifecycle().manage(new ManagedTurbine());
 
-        scheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
+        scheduledExecutorService.schedule(() -> {
                 //TODO: The way properties get registered shouldn't need to depend on this strict of ordering.
                 //Need to also move off the static properties file for Turbine configuration and move to something more
                 //dynamic
@@ -173,8 +172,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                     LOGGER.error("Unable to initialize Tenacity/Turbine.");
                     throw new RuntimeException("Unable to initialize Tenacity/Turbine.");
                 }
-            }
-        }, 3, TimeUnit.SECONDS);
+            }, 3, TimeUnit.SECONDS);
     }
 
     private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
