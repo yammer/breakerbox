@@ -1,12 +1,9 @@
 package com.yammer.breakerbox.service.turbine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.netflix.config.ConfigurationManager;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
 import io.dropwizard.configuration.ConfigurationFactory;
-import org.apache.commons.configuration.AbstractConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +16,6 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
     private static final Logger LOGGER = LoggerFactory.getLogger(YamlInstanceDiscovery.class);
     private final Path path;
     private final ConfigurationFactory<YamlInstanceConfiguration> configurationFactory;
-    private final AbstractConfiguration configurationManager;
 
     public YamlInstanceDiscovery(Path path,
                                  Validator validator,
@@ -30,7 +26,6 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
                 validator,
                 objectMapper,
                 "dw");
-        this.configurationManager = ConfigurationManager.getConfigInstance();
         parseYamlInstanceConfiguration();
     }
 
@@ -44,9 +39,8 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
     private Optional<YamlInstanceConfiguration> parseYamlInstanceConfiguration() {
         try {
             final YamlInstanceConfiguration yamlInstanceConfiguration = configurationFactory.build(path.toFile());
-            configurationManager.setProperty("turbine.instanceUrlSuffix", yamlInstanceConfiguration.getUrlSuffix());
-            configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
-                    Joiner.on(',').join(yamlInstanceConfiguration.getClusters().keySet()));
+            TurbineInstanceDiscovery.registerClusters(yamlInstanceConfiguration.getClusters().keySet(),
+                    yamlInstanceConfiguration.getUrlSuffix());
             return Optional.of(yamlInstanceConfiguration);
         } catch (Exception err) {
             LOGGER.error("Unable to parse {}", path.toAbsolutePath(), err);

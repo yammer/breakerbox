@@ -1,10 +1,8 @@
 package com.yammer.breakerbox.service.core.tests;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
+import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -21,8 +19,9 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URI;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -45,72 +44,56 @@ public class SyncComparatorTest {
         mockFetcher = mock(TenacityConfigurationFetcher.class);
     }
 
-    private ImmutableList<SyncServiceHostState> unsynchronized() {
-        return FluentIterable
-                .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncServiceHostState>() {
-                    @Override
-                    public SyncServiceHostState apply(URI input) {
-                        return SyncServiceHostState.createUnsynchronized(input);
-                    }
-                })
-                .toList();
+    private List<SyncServiceHostState> unsynchronized() {
+        return Instances
+                .instances(serviceId)
+                .stream()
+                .map((instance) -> SyncServiceHostState.createUnsynchronized(Instances.toUri(instance)))
+                .collect(Collectors.toList());
     }
 
-    private ImmutableList<SyncServiceHostState> allSynchronized() {
-        return FluentIterable
-                .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncServiceHostState>() {
-                    @Override
-                    public SyncServiceHostState apply(URI input) {
-                        return SyncServiceHostState.createSynchronized(input);
-                    }
-                })
-                .toList();
+    private List<SyncServiceHostState> allSynchronized() {
+        return Instances
+                .instances(serviceId)
+                .stream()
+                .map((instance) -> SyncServiceHostState.createSynchronized(Instances.toUri(instance)))
+                .collect(Collectors.toList());
     }
 
-    private ImmutableList<SyncServiceHostState> unknown() {
-        return FluentIterable
-                .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncServiceHostState>() {
-                    @Override
-                    public SyncServiceHostState apply(URI input) {
-                        return SyncServiceHostState.createUnknown(input);
-                    }
-                })
-                .toList();
+    private List<SyncServiceHostState> unknown() {
+        return Instances
+                .instances(serviceId)
+                .stream()
+                .map((instance) -> SyncServiceHostState.createUnknown(Instances.toUri(instance)))
+                .collect(Collectors.toList());
     }
 
-    private ImmutableList<SyncServiceHostState> allSynchronizedExceptUnknown(final URI uri) {
-        return FluentIterable
-                .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncServiceHostState>() {
-                    @Override
-                    public SyncServiceHostState apply(URI input) {
-                        if (input.equals(uri)) {
-                            return SyncServiceHostState.createUnknown(input);
-                        } else {
-                            return SyncServiceHostState.createSynchronized(input);
-                        }
+    private List<SyncServiceHostState> allSynchronizedExceptUnknown(Instance exceptionInstance) {
+        return Instances
+                .instances(serviceId)
+                .stream()
+                .map((instance) -> {
+                    if (instance.equals(exceptionInstance)) {
+                        return SyncServiceHostState.createUnknown(Instances.toUri(instance));
+                    } else {
+                        return SyncServiceHostState.createSynchronized(Instances.toUri(instance));
                     }
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    private ImmutableList<SyncServiceHostState> allSynchronizedExcept(final URI uri) {
-        return FluentIterable
-                .from(Instances.propertyKeyUris(serviceId))
-                .transform(new Function<URI, SyncServiceHostState>() {
-                    @Override
-                    public SyncServiceHostState apply(URI input) {
-                        if (input.equals(uri)) {
-                            return SyncServiceHostState.createUnsynchronized(input);
-                        } else {
-                            return SyncServiceHostState.createSynchronized(input);
-                        }
+    private List<SyncServiceHostState> allSynchronizedExcept(Instance exceptionInstance) {
+        return Instances
+                .instances(serviceId)
+                .stream()
+                .map((instance) -> {
+                    if (instance.equals(exceptionInstance)) {
+                        return SyncServiceHostState.createUnsynchronized(Instances.toUri(instance));
+                    } else {
+                        return SyncServiceHostState.createSynchronized(Instances.toUri(instance));
                     }
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Test
@@ -118,7 +101,7 @@ public class SyncComparatorTest {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.<DependencyModel>absent());
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
@@ -130,7 +113,7 @@ public class SyncComparatorTest {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.<DependencyModel>absent());
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
@@ -147,7 +130,7 @@ public class SyncComparatorTest {
                 .thenReturn(Optional.of(new ServiceModel(serviceId, dependencyId)));
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), differentConfiguration, "fooUser", serviceId)));
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
@@ -162,7 +145,7 @@ public class SyncComparatorTest {
                 .thenReturn(Optional.of(new ServiceModel(serviceId, dependencyId)));
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), DependencyEntity.defaultConfiguration(), "fooUser", serviceId)));
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
@@ -175,20 +158,20 @@ public class SyncComparatorTest {
         final TenacityConfigurationFetcher differentFetcher = mock(TenacityConfigurationFetcher.class);
         final TenacityConfiguration differentConfiguration = new TenacityConfiguration();
         differentConfiguration.setExecutionIsolationThreadTimeoutInMillis(9);
-        final URI differentURI = URI.create("http://deploy-001.sjc1.yammer.com:9090");
+        final Instance differentInstance = new Instance("http://deploy-001.sjc1.yammer.com:9090", "ignored", true);
 
         when(mockTenacityStory.retrieve(serviceId, dependencyId))
                 .thenReturn(Optional.of(new ServiceModel(serviceId, dependencyId)));
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), DependencyEntity.defaultConfiguration(), "fooUser", serviceId)));
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
-        when(mockFactory.create(eq(differentURI), any(TenacityPropertyKey.class)))
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(eq(differentInstance), any(TenacityPropertyKey.class)))
                 .thenReturn(differentFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
         when(differentFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(differentConfiguration)));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
-                .isEqualTo(allSynchronizedExcept(differentURI));
+                .isEqualTo(allSynchronizedExcept(differentInstance));
     }
 
     @Test
@@ -197,20 +180,20 @@ public class SyncComparatorTest {
         final TenacityConfigurationFetcher differentFetcher = mock(TenacityConfigurationFetcher.class);
         final TenacityConfiguration differentConfiguration = new TenacityConfiguration();
         differentConfiguration.setExecutionIsolationThreadTimeoutInMillis(9);
-        final URI differentURI = URI.create("http://deploy-001.sjc1.yammer.com:9090");
+        final Instance differentInstance = new Instance("http://deploy-001.sjc1.yammer.com:9090", "ignored", true);
 
         when(mockTenacityStory.retrieve(serviceId, dependencyId))
                 .thenReturn(Optional.of(new ServiceModel(serviceId, dependencyId)));
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), DependencyEntity.defaultConfiguration(), "fooUser", serviceId)));
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
-        when(mockFactory.create(eq(differentURI), any(TenacityPropertyKey.class)))
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(eq(differentInstance), any(TenacityPropertyKey.class)))
                 .thenReturn(differentFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
         when(differentFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
-                .isEqualTo(allSynchronizedExceptUnknown(differentURI));
+                .isEqualTo(allSynchronizedExceptUnknown(differentInstance));
     }
 
     @Test
@@ -221,25 +204,10 @@ public class SyncComparatorTest {
                 .thenReturn(Optional.of(new ServiceModel(serviceId, dependencyId)));
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), DependencyEntity.defaultConfiguration(), "fooUser", serviceId)));
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
+        when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
                 .isEqualTo(unknown());
-    }
-
-    @Test
-    public void testKeyRunningOnDefaultConfig() throws Exception {
-        final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
-
-        when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
-                .thenReturn(Optional.<DependencyModel>absent());
-        when(mockFactory.create(any(URI.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
-        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
-
-        assertThat(syncComparator.inSync(serviceId,dependencyId))
-                .isEqualTo(unsynchronized());
-
-
     }
 }
