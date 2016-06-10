@@ -2,7 +2,6 @@ package com.yammer.breakerbox.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
@@ -59,6 +58,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class BreakerboxService extends Application<BreakerboxServiceConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxService.class);
@@ -132,10 +132,11 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                         .build())),
             breakerboxStore);
 
-        Set<String> metaClusters = Sets.newHashSet();
-        for (String cluster : configuration.getMetaClusters()) {
-            metaClusters.add(cluster.toUpperCase());
-        }
+        final Set<String> metaClusters = configuration
+                .getMetaClusters()
+                .stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
 
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
