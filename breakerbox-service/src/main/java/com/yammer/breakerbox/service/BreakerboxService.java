@@ -224,15 +224,11 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                                       Environment environment) {
         final LodbrokClientFactory lodbrokClientFactory = new LodbrokClientFactory(configuration, environment);
         final LodbrokInstanceStore lodbrokInstanceStore = LodbrokInstanceStore.empty();
-        final LodbrokInstanceStorePoller lodbrokInstanceStorePoller = new LodbrokInstanceStorePoller(
-                environment
-                        .lifecycle()
-                        .scheduledExecutorService("lodbrok-instance-store-poller-%d", true)
-                        .threads(1)
-                        .build(),
-                configuration.getPollInterval(),
+        final LodbrokInstanceStorePoller lodbrokInstanceStorePoller = LodbrokInstanceStorePoller.build(
+                environment,
                 lodbrokInstanceStore,
-                lodbrokClientFactory.build("lodbrok-client"));
+                lodbrokClientFactory.build("lodbrok-client"),
+                configuration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
         PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getLodbrokUri()));
     }
