@@ -98,22 +98,22 @@ public class LodbrokInstanceDiscoveryTest {
 
     private Instance instanceOne() {
         final Instance instance = new Instance("https://some.where.io:12345", "service1", true);
-        instance.getAttributes().putIfAbsent(LodbrokInstanceDiscovery.LODBROK_ROUTE,
-                String.format("%s-%s", "1.2.3.4", task1.getId()));
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "1.2.3.4");
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task1.getId());
         return instance;
     }
 
     private Instance instanceTwo() {
         final Instance instance = new Instance("https://some.where.io:56789", "service2", true);
-        instance.getAttributes().putIfAbsent(LodbrokInstanceDiscovery.LODBROK_ROUTE,
-                String.format("%s-%s", "5.6.7.8", task2.getId()));
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "5.6.7.8");
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task2.getId());
         return instance;
     }
 
     private Instance instanceThree() {
         final Instance instance = new Instance("https://some.where.io:12345", "service3", true);
-        instance.getAttributes().putIfAbsent(LodbrokInstanceDiscovery.LODBROK_ROUTE,
-                String.format("%s-%s", "1.2.3.4", task3.getId()));
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "1.2.3.4");
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task3.getId());
         return instance;
     }
 }
