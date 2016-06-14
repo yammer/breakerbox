@@ -1,0 +1,80 @@
+breakerbox:
+  urls: {{ if .Env.BREAKERBOX_URL }}{{ .Env.BREAKERBOX_URL }}{{ end }}
+  initialDelay: 0s
+  delay: 60s
+
+archaiusOverride:
+  hystrixMetricsStreamServletMaxConnections: {{ .Env.TURBINE_HYSTRIX_METRICS_STREAM_SERVLET_MAX_CONNECTIONS }}
+  turbineHostRetry: {{ .Env.TURBINE_HOST_RETRY }}
+  turbineLatencyThreshold: {{ .Env.TURBINE_LATENCY_THRESHOLD }}
+  turbineSkipLineDelay: {{ .Env.TURBINE_SKIP_LINE_DELAY }}
+
+defaultDashboard: {{ .Env.DEFAULT_DASHBOARD }}
+
+azure:
+  accountName: {{ $.Secrets.AZURE_ACCOUNT }}
+  accountKey: {{ $.Secrets.AZURE_KEY }}
+  timeout: 2s 
+  retryInterval: 500ms
+  retryAttempts: 1 
+
+tenacityClient:
+  connectionTimeout: 500ms
+
+ldap:
+  uri: {{ .Env.LDAP_URI }}
+  cachePolicy: {{ .Env.LDAP_CACHE_POLICY }} 
+  userFilter: ou=people,dc=yammer,dc=com
+  groupFilter: ou=groups,dc=yammer,dc=com
+  userNameAttribute: cn
+  groupNameAttribute: cn
+  groupMembershipAttribute: memberUid
+  restrictToGroups:
+    - eng
+  connectTimeout: 500ms
+  readTimeout: 5s
+
+chuteGraphiteReporter:
+  uri: {{ .Env.CHIPPER_URL }}
+  hostname: breakerbox
+  connectionTimeout: 500ms
+  timeout: 10s
+  tags:
+    ip: {{ .Env.HOST }}
+    port: {{ .Env.PORTS }}
+    region: {{ .Env.REGION }}
+
+metaClusters:
+  - PRODUCTION
+  - STAGE
+  - STAGING
+
+logging:
+  level: INFO
+  appenders:
+    - type: logstash-file
+      threshold: INFO
+      currentLogFilename: logs/breakerbox-json.log
+      archive: false
+      timeZone: UTC
+      customFields:
+        region: {{ .Env.REGION }}
+        docker_host: {{ .Env.HOST }}
+        docker_port: {{ .Env.PORTS }}
+        git_sha: {{ .Env.GIT_SHA }}
+        source: breakerbox
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081
+  gzip:
+    enabled: false
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: logs/requests.log
+        archive: false
