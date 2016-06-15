@@ -43,7 +43,7 @@ tenacityClient:
 
 ldap:
   uri: {{ .Env.LDAP_URI }}
-  cachePolicy: maximumSize=10000,expireAfterWrite=15m
+  cachePolicy: {{ .Env.LDAP_CACHE_POLICY }}
   userFilter: ou=people,dc=yammer,dc=com
   groupFilter: ou=groups,dc=yammer,dc=com
   userNameAttribute: cn

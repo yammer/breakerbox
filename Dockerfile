@@ -1,4 +1,4 @@
-FROM registry.int.yammer.com/java-base:jdk-8u77-b03
+FROM registry.int.yammer.com/java-base:jdk-8u91-b14
 
 ENV SERVICE_NAME breakerbox
 
