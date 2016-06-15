@@ -18,6 +18,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -89,8 +90,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
-        this.turbine = turbine;
-        this.lodbrok = lodbrok;
+        this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox.yml"));
+        this.lodbrok = Optional.fromNullable(lodbrok).or(new LodbrokDiscoveryConfiguration());
         this.chute = chute;
     }
 

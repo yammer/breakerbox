@@ -1,5 +1,5 @@
 breakerbox:
-  urls: {{ if .Env.BREAKERBOX_URL }}{{ .Env.BREAKERBOX_URL }}{{ end }}
+  urls: {{ .Env.BREAKERBOX_URL }}
   initialDelay: 0s
   delay: 60s
 
@@ -11,6 +11,7 @@ archaiusOverride:
 
 defaultDashboard: {{ .Env.DEFAULT_DASHBOARD }}
 
+{{ if $.Secrets.AZURE_ACCOUNT }}
 azure:
   accountName: {{ $.Secrets.AZURE_ACCOUNT }}
   accountKey: {{ $.Secrets.AZURE_KEY }}
@@ -18,12 +19,25 @@ azure:
   retryInterval: 500ms
   retryAttempts: 1 
 
+{{ else }}
+
+database:
+  driverClass: org.h2.Driver
+  url: jdbc:h2:mem:inMemory;DB_CLOSE_DELAY=-1
+  user: breakerbox
+  password: breakerboxpass
+  maxSize: 10
+  minSize: 2
+  checkConnectionWhileIdle: true
+  validationInterval: 30s
+{{ end }}
+
 tenacityClient:
   connectionTimeout: 500ms
 
 ldap:
   uri: {{ .Env.LDAP_URI }}
-  cachePolicy: {{ .Env.LDAP_CACHE_POLICY }} 
+  cachePolicy: maximumSize=10000,expireAfterWrite=15m
   userFilter: ou=people,dc=yammer,dc=com
   groupFilter: ou=groups,dc=yammer,dc=com
   userNameAttribute: cn
@@ -34,7 +48,7 @@ ldap:
   connectTimeout: 500ms
   readTimeout: 5s
 
-chuteGraphiteReporter:
+chute:
   uri: {{ .Env.CHIPPER_URL }}
   hostname: breakerbox
   connectionTimeout: 500ms

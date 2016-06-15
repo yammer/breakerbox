@@ -6,7 +6,9 @@ ENV SERVICE_NAME breakerbox
 ENV MARATHON_APP_RESOURCE_MEM 256
 
 WORKDIR /home/app-user
+RUN mkdir logs
 
+COPY ./docker/vault-token .vault-token
 COPY ./docker/jvm.conf ./
 COPY ./docker/start.sh ./
 COPY ./docker/${SERVICE_NAME}.yml.template ./

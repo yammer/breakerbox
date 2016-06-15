@@ -68,6 +68,10 @@
             <groupId>com.yammer.metrics.reporters</groupId>
             <artifactId>chute-graphite-reporter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yammer</groupId>
+            <artifactId>dropwizard-logstash-appender-dw9</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
