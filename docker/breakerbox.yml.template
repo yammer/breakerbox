@@ -3,6 +3,12 @@ breakerbox:
   initialDelay: 0s
   delay: 60s
 
+lodbrok:
+  uri: {{ .Env.LODBROK_URI }}
+  jersey: 
+    timeout: 5s
+  pollInterval: 30s
+
 archaiusOverride:
   hystrixMetricsStreamServletMaxConnections: {{ .Env.TURBINE_HYSTRIX_METRICS_STREAM_SERVLET_MAX_CONNECTIONS }}
   turbineHostRetry: {{ .Env.TURBINE_HOST_RETRY }}

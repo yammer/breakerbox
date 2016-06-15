@@ -235,7 +235,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 lodbrokClientFactory.build("lodbrok-client"),
                 configuration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
-        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getLodbrokUri()));
+        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getUri()));
     }
 
     private static void registerChuteReporter(ChuteGraphiteConfiguration configuration, Environment environment) {
