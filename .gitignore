@@ -6,3 +6,7 @@ target*
 dependency-reduced-pom.xml
 *.keystore
 breakerbox-ui/node_modules
+*.jar
+*.swp
+docker/vault
+docker/logs

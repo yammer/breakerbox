@@ -45,6 +45,7 @@
         <lodbrok.version>0.0.1</lodbrok.version>
         <h2.version>1.4.192</h2.version>
         <chute.reporters.version>0.1.2</chute.reporters.version>
+        <logstash.appender.version>0.0.5</logstash.appender.version>
     </properties>
 
     <dependencyManagement>
@@ -132,6 +133,17 @@
                 <groupId>com.yammer.metrics.reporters</groupId>
                 <artifactId>chute-graphite-reporter</artifactId>
                 <version>${chute.reporters.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yammer</groupId>
+                <artifactId>dropwizard-logstash-appender-dw9</artifactId>
+                <version>${logstash.appender.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
