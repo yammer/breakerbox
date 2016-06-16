@@ -21,6 +21,7 @@ import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
 import com.yammer.breakerbox.service.turbine.client.DelegatingLodbrokTenacityClient;
 import com.yammer.breakerbox.service.turbine.client.LodbrokTenacityClientBuilder;
+import com.yammer.breakerbox.service.turbine.monitor.BreakerboxAggregatorFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
@@ -235,6 +236,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 lodbrokClientFactory.build("lodbrok-client"),
                 configuration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
+        PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
         PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getUri()));
     }
 
