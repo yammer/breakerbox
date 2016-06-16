@@ -26,7 +26,7 @@ public class Instances {
         return ImmutableList.of();
     }
 
-    public static Set<String> clusters() {
+    public static Collection<String> clusters() {
         return instances()
                 .stream()
                 .map(Instance::getCluster)
@@ -34,7 +34,7 @@ public class Instances {
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    public static Set<String> noMetaClusters(Set<String> specifiedMetaClusters) {
+    public static Collection<String> noMetaClusters(Set<String> specifiedMetaClusters) {
         return instances()
                 .stream()
                 .filter((instance) -> !specifiedMetaClusters.contains(instance.getCluster().toUpperCase()))
@@ -43,12 +43,12 @@ public class Instances {
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    public static Set<Instance> instances(ServiceId serviceId) {
+    public static Collection<Instance> instances(ServiceId serviceId) {
         return instances()
                 .stream()
                 .filter((instance) -> instance.getCluster().equals(serviceId.getId()))
                 .sorted()
-                .collect(Collectors.toCollection(TreeSet::new));
+                .collect(Collectors.toList());
     }
 
     public static URI toUri(Instance instance) {
