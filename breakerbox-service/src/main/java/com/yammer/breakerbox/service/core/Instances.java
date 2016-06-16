@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class Instances {
@@ -30,7 +31,7 @@ public class Instances {
                 .stream()
                 .map(Instance::getCluster)
                 .sorted()
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static Set<String> noMetaClusters(Set<String> specifiedMetaClusters) {
@@ -39,7 +40,7 @@ public class Instances {
                 .filter((instance) -> !specifiedMetaClusters.contains(instance.getCluster().toUpperCase()))
                 .map(Instance::getCluster)
                 .sorted()
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static Set<Instance> instances(ServiceId serviceId) {
@@ -47,7 +48,7 @@ public class Instances {
                 .stream()
                 .filter((instance) -> instance.getCluster().equals(serviceId.getId()))
                 .sorted()
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static URI toUri(Instance instance) {

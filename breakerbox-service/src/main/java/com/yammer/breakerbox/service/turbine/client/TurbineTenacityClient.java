@@ -2,6 +2,8 @@ package com.yammer.breakerbox.service.turbine.client;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.netflix.config.DynamicPropertyFactory;
+import com.netflix.config.DynamicStringProperty;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.core.CircuitBreaker;
@@ -27,7 +29,12 @@ public interface TurbineTenacityClient {
         if (rawHostname.startsWith("http")) {
             return URI.create(rawHostname);
         } else {
-            return URI.create("http://" + rawHostname);
+            final String protocolKey = "turbine.protocol." + instance.getCluster();
+            final DynamicStringProperty protocolConfig = DynamicPropertyFactory
+                    .getInstance()
+                    .getStringProperty(protocolKey, "https");
+
+            return URI.create(protocolConfig.get() + "://" + rawHostname);
         }
     }
 }
