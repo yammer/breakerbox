@@ -11,6 +11,8 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.core.CircuitBreaker;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.Map;
 
 public class DelegatingLodbrokTenacityClient implements TurbineTenacityClient {
@@ -22,27 +24,34 @@ public class DelegatingLodbrokTenacityClient implements TurbineTenacityClient {
 
     @Override
     public Optional<ImmutableList<String>> getTenacityPropertyKeys(Instance instance) {
-        return client.getTenacityPropertyKeys(TurbineTenacityClient.toUri(instance), toTask(instance));
+        return client.getTenacityPropertyKeys(toUri(instance), toTask(instance));
     }
 
     @Override
     public Optional<TenacityConfiguration> getTenacityConfiguration(Instance instance, TenacityPropertyKey key) {
-        return client.getTenacityConfiguration(TurbineTenacityClient.toUri(instance), toTask(instance), key);
+        return client.getTenacityConfiguration(toUri(instance), toTask(instance), key);
     }
 
     @Override
     public Optional<ImmutableList<CircuitBreaker>> getCircuitBreakers(Instance instance) {
-        return client.getCircuitBreakers(TurbineTenacityClient.toUri(instance), toTask(instance));
+        return client.getCircuitBreakers(toUri(instance), toTask(instance));
     }
 
     @Override
     public Optional<CircuitBreaker> getCircuitBreaker(Instance instance, TenacityPropertyKey key) {
-        return client.getCircuitBreaker(TurbineTenacityClient.toUri(instance), toTask(instance), key);
+        return client.getCircuitBreaker(toUri(instance), toTask(instance), key);
     }
 
     @Override
     public Optional<CircuitBreaker> modifyCircuitBreaker(Instance instance, TenacityPropertyKey key, CircuitBreaker.State state) {
-        return client.modifyCircuitBreaker(TurbineTenacityClient.toUri(instance), toTask(instance), key, state);
+        return client.modifyCircuitBreaker(toUri(instance), toTask(instance), key, state);
+    }
+
+    private URI toUri(Instance instance) {
+        return UriBuilder
+                .fromUri(instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_GLOBAL))
+                .port(Integer.parseInt(instance.getHostname().split(":")[1]))
+                .build();
     }
 
     public static Task toTask(Instance instance) {

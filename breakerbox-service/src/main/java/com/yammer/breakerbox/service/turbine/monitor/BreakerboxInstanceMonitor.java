@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
@@ -277,8 +278,12 @@ public class BreakerboxInstanceMonitor extends TurbineDataMonitor<DataFromSingle
      * @throws Exception
      */
     private void init(Instance instance) throws Exception {
-
-        HttpGet httpget = new HttpGet(url);
+        final String lodbrokUri = UriBuilder
+                .fromUri(instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_GLOBAL))
+                .port(-1)
+                .build()
+                + ":" + url.split(":")[2];
+        HttpGet httpget = new HttpGet(lodbrokUri);
         httpget.setHeader("X-Lodbrok-Route", String.format("%s-%s",
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP),
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID)));
