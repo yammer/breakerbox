@@ -26,6 +26,7 @@ import com.netflix.turbine.monitor.MonitorConsole;
 import com.netflix.turbine.monitor.TurbineDataMonitor;
 import com.netflix.turbine.monitor.instance.InstanceUrlClosure;
 import com.yammer.breakerbox.lodbrok.LodbrokInstanceDiscovery;
+import com.yammer.lodbrok.discovery.core.tenacity.LodbrokTenacityClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -275,7 +276,7 @@ public class BreakerboxInstanceMonitor extends TurbineDataMonitor<DataFromSingle
                 .build()
                 + ":" + url.split(":")[2];
         HttpGet httpget = new HttpGet(lodbrokUri);
-        httpget.setHeader("X-Lodbrok-Route", String.format("%s-%s",
+        httpget.setHeader(LodbrokTenacityClient.X_LODBROK_ROUTE, String.format("%s-%s",
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP),
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID)));
         HttpResponse response = gatewayHttpClient.getHttpClient().execute(httpget);
