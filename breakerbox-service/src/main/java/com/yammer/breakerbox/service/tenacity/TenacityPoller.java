@@ -3,7 +3,7 @@ package com.yammer.breakerbox.service.tenacity;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.breakerbox.service.turbine.client.TurbineTenacityClient;
+import com.yammer.breakerbox.turbine.client.TurbineTenacityClient;
 import com.yammer.tenacity.core.TenacityCommand;
 
 public class TenacityPoller extends TenacityCommand<Optional<ImmutableList<String>>> {

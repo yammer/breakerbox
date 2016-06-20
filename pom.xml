@@ -21,6 +21,8 @@
         <module>breakerbox-azure</module>
         <module>breakerbox-store</module>
         <module>breakerbox-jdbi</module>
+        <module>breakerbox-lodbrok</module>
+        <module>breakerbox-turbine</module>
     </modules>
 
     <scm>
@@ -65,6 +67,16 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.yammer.breakerbox</groupId>
+                <artifactId>breakerbox-turbine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yammer.breakerbox</groupId>
+                <artifactId>breakerbox-lodbrok</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.yammer.breakerbox</groupId>
                 <artifactId>breakerbox-store</artifactId>

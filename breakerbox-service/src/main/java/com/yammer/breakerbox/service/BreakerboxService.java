@@ -3,34 +3,29 @@ package com.yammer.breakerbox.service;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.turbine.init.TurbineInit;
-import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
+import com.yammer.breakerbox.lodbrok.LodbrokDiscoveryBundle;
+import com.yammer.breakerbox.lodbrok.tenacity.DelegatingLodbrokTenacityClient;
+import com.yammer.breakerbox.lodbrok.tenacity.LodbrokTenacityClientBuilder;
 import com.yammer.breakerbox.service.auth.NullAuthFilter;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
-import com.yammer.breakerbox.service.managed.ManagedTurbine;
 import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
-import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
-import com.yammer.breakerbox.service.turbine.client.DelegatingLodbrokTenacityClient;
-import com.yammer.breakerbox.service.turbine.client.LodbrokTenacityClientBuilder;
-import com.yammer.breakerbox.service.turbine.monitor.BreakerboxAggregatorFactory;
 import com.yammer.breakerbox.store.BreakerboxStore;
+import com.yammer.breakerbox.turbine.managed.ManagedTurbine;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.User;
-import com.yammer.lodbrok.discovery.core.client.LodbrokClientFactory;
 import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
-import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
-import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStorePoller;
 import com.yammer.metrics.reporters.chute.graphite.ChuteGraphite;
 import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteConfiguration;
 import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteFactory;
@@ -84,6 +79,12 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                 return configuration.getJdbiConfiguration().or(new JdbiConfiguration()).getDataSourceFactory();
             }
         });
+        bootstrap.addBundle(new LodbrokDiscoveryBundle<BreakerboxServiceConfiguration>() {
+            @Override
+            protected LodbrokDiscoveryConfiguration getLodbrokDiscoveryConfiguration(BreakerboxServiceConfiguration configuration) {
+                return configuration.getLodbrok();
+            }
+        });
 
         tenacityConfiguredBundle = ((DelayedTenacityBundleBuilder)DelayedTenacityBundleBuilder
             .newBuilder()
@@ -120,7 +121,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
         registerChuteReporter(configuration.getChute(), environment);
-        setupLodbrokInstanceDiscovery(configuration.getLodbrok(), environment);
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
@@ -224,20 +224,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
-    }
-
-    private static void setupLodbrokInstanceDiscovery(LodbrokDiscoveryConfiguration configuration,
-                                                      Environment environment) {
-        final LodbrokClientFactory lodbrokClientFactory = new LodbrokClientFactory(configuration, environment);
-        final LodbrokInstanceStore lodbrokInstanceStore = LodbrokInstanceStore.empty();
-        final LodbrokInstanceStorePoller lodbrokInstanceStorePoller = LodbrokInstanceStorePoller.build(
-                environment,
-                lodbrokInstanceStore,
-                lodbrokClientFactory.build("lodbrok-client"),
-                configuration.getPollInterval());
-        lodbrokInstanceStorePoller.schedule();
-        PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
-        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, configuration.getUri()));
     }
 
     private static void registerChuteReporter(ChuteGraphiteConfiguration configuration, Environment environment) {

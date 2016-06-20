@@ -1,8 +1,10 @@
 package com.yammer.breakerbox.service.core.tests;
 
 import com.google.common.base.Optional;
+import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;
 import com.netflix.turbine.discovery.Instance;
+import com.netflix.turbine.plugins.PluginsFactory;
 import com.yammer.breakerbox.azure.model.DependencyEntity;
 import com.yammer.breakerbox.service.core.Instances;
 import com.yammer.breakerbox.service.core.SyncComparator;
@@ -13,12 +15,18 @@ import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
+import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
+import com.yammer.tenacity.testing.TenacityTestRule;
+import io.dropwizard.jackson.Jackson;
+import io.dropwizard.jersey.validation.Validators;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,6 +38,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SyncComparatorTest {
+    @Rule
+    public final TenacityTestRule tenacityTestRule = new TenacityTestRule();
     TenacityConfigurationFetcher.Factory mockFactory;
     BreakerboxStore mockTenacityStory;
     TenacityConfigurationFetcher mockFetcher;
@@ -38,7 +48,11 @@ public class SyncComparatorTest {
     private long testTimestamp = System.currentTimeMillis() - 1000;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(
+                Paths.get(Resources.getResource("turbineConfigurations/instances.yml").toURI()),
+                Validators.newValidator(),
+                Jackson.newObjectMapper()));
         mockFactory = mock(TenacityConfigurationFetcher.Factory.class);
         mockTenacityStory = mock(BreakerboxStore.class);
         mockFetcher = mock(TenacityConfigurationFetcher.class);

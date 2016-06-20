@@ -57,12 +57,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.netflix.turbine</groupId>
-            <artifactId>turbine-core</artifactId>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-turbine</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.yammer.lodbrok.discovery</groupId>
-            <artifactId>lodbrok-discovery-core</artifactId>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-lodbrok</artifactId>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics.reporters</groupId>
