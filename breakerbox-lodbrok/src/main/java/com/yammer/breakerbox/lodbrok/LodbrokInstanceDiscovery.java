@@ -1,67 +1,70 @@
 package com.yammer.breakerbox.lodbrok;
 
+import com.google.common.collect.ImmutableList;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.yammer.breakerbox.turbine.TurbineInstanceDiscovery;
-import com.yammer.lodbrok.discovery.core.LodbrokInstance;
 import com.yammer.lodbrok.discovery.core.Task;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
 
-import java.net.URI;
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LodbrokInstanceDiscovery implements InstanceDiscovery {
-    private final LodbrokInstanceStore lodbrokInstanceStore;
-    private final URI lodbrokGlobalUri;
+    private final Collection<LodbrokInstanceStore> lodbrokInstanceStores;
     public static final String LODBROK_GLOBAL = "lodbrok-global";
     public static final String LODBROK_ROUTE_IP = "lodbrok-route-ip";
     public static final String LODBROK_ROUTE_ID = "lodbrok-route-id";
+    public static final String LODBROK_REGION = "lodbrok-region";
     public static final String DEFAULT_TENACITY_METRICS_STREAM = "/tenacity/metrics.stream";
-    private static Function<LodbrokInstance, Stream<Task>> TO_TASKS_STREAM =
-            (lodbrokInstance) -> lodbrokInstance
-                        .getTasks()
-                        .values()
-                        .stream();
 
-    public LodbrokInstanceDiscovery(LodbrokInstanceStore lodbrokInstanceStore,
-                                    URI lodbrokGlobalUri) {
-        this.lodbrokInstanceStore = lodbrokInstanceStore;
-        this.lodbrokGlobalUri = lodbrokGlobalUri;
+    public LodbrokInstanceDiscovery(Collection<LodbrokInstanceStore> lodbrokInstanceStores) {
+        this.lodbrokInstanceStores = lodbrokInstanceStores;
+    }
+
+    public LodbrokInstanceDiscovery(LodbrokInstanceStore lodbrokInstanceStore) {
+        this(ImmutableList.of(lodbrokInstanceStore));
     }
 
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
-        final Collection<LodbrokInstance> instances = lodbrokInstanceStore.instances().values();
-        registerDynamicClusterNames(instances);
-        return instances
+        final Collection<Instance> instances = lodbrokInstanceStores
+            .stream()
+            .flatMap((lodbrokInstanceStore) ->
+                 lodbrokInstanceStore
+                    .instances()
+                    .values()
                     .stream()
-                    .flatMap(TO_TASKS_STREAM)
+                    .flatMap((lodbrokInstance) -> lodbrokInstance
+                        .getTasks()
+                        .values()
+                        .stream())
                     .map((task) -> {
                         final Instance instance = new Instance(
-                                String.format("%s:%s", task.getId(),
-                                        Integer.parseInt(task.getPortsList().get(0))),
+                                String.format("%s:%s", task.getId(), Integer.parseInt(task.getPortsList().get(0))),
                                 task.getName(), true);
-                        setLodbrokRouteAttributes(instance, task);
+                        setLodbrokRouteAttributes(lodbrokInstanceStore, instance, task);
                         return instance;
-                    })
-                    .collect(Collectors.toList());
+                    }))
+            .collect(Collectors.toList());
+        registerDynamicClusterNames(instances);
+        return instances;
     }
 
-    public void setLodbrokRouteAttributes(Instance instance, Task task) {
+    public static void setLodbrokRouteAttributes(LodbrokInstanceStore lodbrokInstanceStore, Instance instance, Task task) {
         instance.getAttributes().put(LODBROK_ROUTE_IP, task.getIp().getHostAddress());
         instance.getAttributes().put(LODBROK_ROUTE_ID, task.getId());
-        instance.getAttributes().put(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID, task.getId());
-        instance.getAttributes().put(LODBROK_GLOBAL, lodbrokGlobalUri.toString());
+        instance.getAttributes().put(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID,
+                String.format("%s: %s", lodbrokInstanceStore.getName(), task.getId()));
+        instance.getAttributes().put(LODBROK_GLOBAL, lodbrokInstanceStore.getLodbrokUri().toString());
+        instance.getAttributes().put(LODBROK_REGION, lodbrokInstanceStore.getName());
     }
 
-    private void registerDynamicClusterNames(Collection<LodbrokInstance> instances) {
-        final Collection<String> clusterNames = instances.stream()
-                .flatMap(TO_TASKS_STREAM)
-                .map(Task::getName)
-                .collect(Collectors.toList());
+    private void registerDynamicClusterNames(Collection<Instance> instances) {
+        final Collection<String> clusterNames = instances
+                .stream()
+                .map(Instance::getCluster)
+                .collect(Collectors.toSet());
         TurbineInstanceDiscovery.registerClusters(clusterNames, DEFAULT_TENACITY_METRICS_STREAM);
     }
 }

@@ -44,7 +44,7 @@
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.4.1208.jre7</postgresql.version>
-        <lodbrok.version>0.0.2-SNAPSHOT</lodbrok.version>
+        <lodbrok.version>0.0.3-SNAPSHOT</lodbrok.version>
         <h2.version>1.4.192</h2.version>
         <chute.reporters.version>0.1.2</chute.reporters.version>
         <logstash.appender.version>0.0.5</logstash.appender.version>

@@ -8,7 +8,6 @@ import com.yammer.breakerbox.turbine.TurbineInstanceDiscovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +51,7 @@ public class Instances {
                 .collect(Collectors.toList());
     }
 
-    public static URI toInstanceId(Instance instance) {
-        return URI.create(instance.getAttributes().get(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID));
+    public static String toInstanceId(Instance instance) {
+        return instance.getAttributes().get(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID);
     }
 }

@@ -67,8 +67,8 @@ public class LodbrokInstanceDiscoveryTest {
 
     @Before
     public void setup() throws Exception {
-        lodbrokInstanceStore = LodbrokInstanceStore.empty();
-        discovery = new LodbrokInstanceDiscovery(lodbrokInstanceStore, lodbrokGlobalUri);
+        lodbrokInstanceStore = new LodbrokInstanceStore("test", lodbrokGlobalUri);
+        discovery = new LodbrokInstanceDiscovery(lodbrokInstanceStore);
         PluginsFactory.setInstanceDiscovery(discovery);
         assertThat(discovery.getInstanceList()).isEmpty();
     }

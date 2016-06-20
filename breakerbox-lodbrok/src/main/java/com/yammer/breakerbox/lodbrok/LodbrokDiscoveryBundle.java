@@ -11,20 +11,27 @@ import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 public abstract class LodbrokDiscoveryBundle<T extends Configuration> implements ConfiguredBundle<T> {
     @Override
     public void run(T configuration, Environment environment) throws Exception {
         final LodbrokDiscoveryConfiguration lodbrokDiscoveryConfiguration = getLodbrokDiscoveryConfiguration(configuration);
         final LodbrokClientFactory lodbrokClientFactory = new LodbrokClientFactory(lodbrokDiscoveryConfiguration, environment);
-        final LodbrokInstanceStore lodbrokInstanceStore = LodbrokInstanceStore.empty();
+        final Collection<LodbrokInstanceStore> lodbrokInstanceStores = lodbrokDiscoveryConfiguration
+                .getRegions()
+                .stream()
+                .map((region) -> new LodbrokInstanceStore(region.getName(), region.getUri()))
+                .collect(Collectors.toList());
         final LodbrokInstanceStorePoller lodbrokInstanceStorePoller = LodbrokInstanceStorePoller.build(
                 environment,
-                lodbrokInstanceStore,
+                lodbrokInstanceStores,
                 lodbrokClientFactory.build("lodbrok-client"),
                 lodbrokDiscoveryConfiguration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
         PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
-        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStore, lodbrokDiscoveryConfiguration.getUri()));
+        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStores));
     }
 
     protected abstract LodbrokDiscoveryConfiguration getLodbrokDiscoveryConfiguration(T configuration);
