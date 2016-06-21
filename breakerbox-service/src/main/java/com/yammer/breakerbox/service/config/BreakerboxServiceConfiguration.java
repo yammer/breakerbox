@@ -90,7 +90,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
-        this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox.yml"));
+        this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox-instances.yml"));
         this.lodbrok = Optional.fromNullable(lodbrok).or(new LodbrokDiscoveryConfiguration());
         this.chute = chute;
     }
