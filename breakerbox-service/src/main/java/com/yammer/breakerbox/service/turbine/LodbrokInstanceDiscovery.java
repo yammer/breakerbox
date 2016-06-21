@@ -6,7 +6,6 @@ import com.yammer.lodbrok.discovery.core.LodbrokInstance;
 import com.yammer.lodbrok.discovery.core.Task;
 import com.yammer.lodbrok.discovery.core.store.LodbrokInstanceStore;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collection;
 import java.util.function.Function;
@@ -39,9 +38,9 @@ public class LodbrokInstanceDiscovery implements InstanceDiscovery {
                     .stream()
                     .flatMap(TO_TASKS_STREAM)
                     .map((task) -> {
-                        final Instance instance = new Instance(UriBuilder
-                                .fromUri(lodbrokGlobalUri)
-                                .port(Integer.parseInt(task.getPortsList().get(0))).build().toString(),
+                        final Instance instance = new Instance(
+                                String.format("%s:%s", lodbrokGlobalUri.getHost(),
+                                        Integer.parseInt(task.getPortsList().get(0))),
                                 task.getName(), true);
                         setLodbrokRouteAttributes(instance, task);
                         return instance;

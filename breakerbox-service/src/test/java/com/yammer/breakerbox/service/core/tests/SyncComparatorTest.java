@@ -48,7 +48,7 @@ public class SyncComparatorTest {
         return Instances
                 .instances(serviceId)
                 .stream()
-                .map((instance) -> SyncServiceHostState.createUnsynchronized(Instances.toUri(instance)))
+                .map((instance) -> SyncServiceHostState.createUnsynchronized(Instances.toInstanceId(instance)))
                 .collect(Collectors.toList());
     }
 
@@ -56,7 +56,7 @@ public class SyncComparatorTest {
         return Instances
                 .instances(serviceId)
                 .stream()
-                .map((instance) -> SyncServiceHostState.createSynchronized(Instances.toUri(instance)))
+                .map((instance) -> SyncServiceHostState.createSynchronized(Instances.toInstanceId(instance)))
                 .collect(Collectors.toList());
     }
 
@@ -64,7 +64,7 @@ public class SyncComparatorTest {
         return Instances
                 .instances(serviceId)
                 .stream()
-                .map((instance) -> SyncServiceHostState.createUnknown(Instances.toUri(instance)))
+                .map((instance) -> SyncServiceHostState.createUnknown(Instances.toInstanceId(instance)))
                 .collect(Collectors.toList());
     }
 
@@ -74,9 +74,9 @@ public class SyncComparatorTest {
                 .stream()
                 .map((instance) -> {
                     if (instance.equals(exceptionInstance)) {
-                        return SyncServiceHostState.createUnknown(Instances.toUri(instance));
+                        return SyncServiceHostState.createUnknown(Instances.toInstanceId(instance));
                     } else {
-                        return SyncServiceHostState.createSynchronized(Instances.toUri(instance));
+                        return SyncServiceHostState.createSynchronized(Instances.toInstanceId(instance));
                     }
                 })
                 .collect(Collectors.toList());
@@ -88,9 +88,9 @@ public class SyncComparatorTest {
                 .stream()
                 .map((instance) -> {
                     if (instance.equals(exceptionInstance)) {
-                        return SyncServiceHostState.createUnsynchronized(Instances.toUri(instance));
+                        return SyncServiceHostState.createUnsynchronized(Instances.toInstanceId(instance));
                     } else {
-                        return SyncServiceHostState.createSynchronized(Instances.toUri(instance));
+                        return SyncServiceHostState.createSynchronized(Instances.toInstanceId(instance));
                     }
                 })
                 .collect(Collectors.toList());

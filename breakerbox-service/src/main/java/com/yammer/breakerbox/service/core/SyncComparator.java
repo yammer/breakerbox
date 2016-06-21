@@ -34,15 +34,15 @@ public class SyncComparator {
             try {
                 if (instanceConfiguration.getTenacityConfiguration().isPresent()) {
                     if (instanceConfiguration.getTenacityConfiguration().get().equals(tenacityConfiguration)) {
-                        return SyncServiceHostState.createSynchronized(Instances.toUri(instanceConfiguration.getInstance()));
+                        return SyncServiceHostState.createSynchronized(Instances.toInstanceId(instanceConfiguration.getInstance()));
                     } else {
-                        return SyncServiceHostState.createUnsynchronized(Instances.toUri(instanceConfiguration.getInstance()));
+                        return SyncServiceHostState.createUnsynchronized(Instances.toInstanceId(instanceConfiguration.getInstance()));
                     }
                 }
             } catch (InterruptedException | ExecutionException err) {
                 LOGGER.warn("Failed to comparing configurations", err);
             }
-            return SyncServiceHostState.createUnknown(Instances.toUri(instanceConfiguration.getInstance()));
+            return SyncServiceHostState.createUnknown(Instances.toInstanceId(instanceConfiguration.getInstance()));
         };
     }
 
@@ -67,7 +67,7 @@ public class SyncComparator {
         }
         return configurations
                 .stream()
-                .map((instance) -> SyncServiceHostState.createUnsynchronized(Instances.toUri(instance.getInstance())))
+                .map((instance) -> SyncServiceHostState.createUnsynchronized(Instances.toInstanceId(instance.getInstance())))
                 .collect(Collectors.toList());
     }
 
