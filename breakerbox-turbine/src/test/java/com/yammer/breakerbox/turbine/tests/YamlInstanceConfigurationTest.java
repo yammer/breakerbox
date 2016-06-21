@@ -1,11 +1,11 @@
-package com.yammer.breakerbox.service.turbine.tests;
+package com.yammer.breakerbox.turbine.tests;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.breakerbox.service.turbine.YamlInstanceConfiguration;
+import com.yammer.breakerbox.turbine.YamlInstanceConfiguration;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;

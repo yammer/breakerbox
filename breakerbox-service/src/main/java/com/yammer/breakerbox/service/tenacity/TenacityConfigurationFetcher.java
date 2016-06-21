@@ -5,7 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.breakerbox.service.turbine.client.TurbineTenacityClient;
+import com.yammer.breakerbox.turbine.client.TurbineTenacityClient;
 import com.yammer.tenacity.core.TenacityCommand;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;

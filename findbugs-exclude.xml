@@ -9,18 +9,18 @@
         <Class name="com.yammer.breakerbox.azure.model.Entities$2"/>
         <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
     </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.service.core.Instances$1"/>
-        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
-    </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.service.core.Instances$4"/>
-        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
-    </Match>
 
     <!-- Netflix -->
     <Match>
         <Class name="com.netflix.hystrix.dashboard.stream.ProxyStreamServlet"/>
+        <Bug pattern="WMI_WRONG_MAP_ITERATOR"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.breakerbox.lodbrok.turbine.BreakerboxClusterMonitor$UnitTest"/>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    </Match>
+    <Match>
+        <Class name="com.yammer.breakerbox.lodbrok.turbine.BreakerboxInstanceMonitor"/>
         <Bug pattern="WMI_WRONG_MAP_ITERATOR"/>
     </Match>
 </FindBugsFilter>

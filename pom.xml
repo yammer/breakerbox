@@ -21,6 +21,8 @@
         <module>breakerbox-azure</module>
         <module>breakerbox-store</module>
         <module>breakerbox-jdbi</module>
+        <module>breakerbox-lodbrok</module>
+        <module>breakerbox-turbine</module>
     </modules>
 
     <scm>
@@ -42,7 +44,7 @@
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.4.1208.jre7</postgresql.version>
-        <lodbrok.version>0.0.2-SNAPSHOT</lodbrok.version>
+        <lodbrok.version>0.0.3</lodbrok.version>
         <h2.version>1.4.192</h2.version>
         <chute.reporters.version>0.1.2</chute.reporters.version>
         <logstash.appender.version>0.0.5</logstash.appender.version>
@@ -65,6 +67,16 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.yammer.breakerbox</groupId>
+                <artifactId>breakerbox-turbine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yammer.breakerbox</groupId>
+                <artifactId>breakerbox-lodbrok</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.yammer.breakerbox</groupId>
                 <artifactId>breakerbox-store</artifactId>

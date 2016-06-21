@@ -3,12 +3,11 @@ package com.yammer.breakerbox.service.core;
 import com.google.common.collect.ImmutableList;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.plugins.PluginsFactory;
-import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.turbine.TurbineInstanceDiscovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,7 +51,7 @@ public class Instances {
                 .collect(Collectors.toList());
     }
 
-    public static URI toInstanceId(Instance instance) {
-        return URI.create(instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID));
+    public static String toInstanceId(Instance instance) {
+        return instance.getAttributes().get(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID);
     }
 }

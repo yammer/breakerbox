@@ -6,8 +6,8 @@ import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.yammer.breakerbox.service.core.Instances;
-import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
 import org.junit.BeforeClass;
@@ -61,7 +61,7 @@ public class InstancesTest {
     @Test
     public void instancesForCluster() {
         assertThat(Instances.instances(ServiceId.from("mock")))
-                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080", "mock", true)));
+                .containsExactly(new Instance("localhost:8080", "mock", true));
     }
 
     @Test

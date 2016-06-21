@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.turbine.client;
+package com.yammer.breakerbox.turbine.client;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;

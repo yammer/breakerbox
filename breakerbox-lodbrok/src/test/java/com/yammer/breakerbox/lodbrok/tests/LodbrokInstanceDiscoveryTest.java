@@ -1,11 +1,11 @@
-package com.yammer.breakerbox.service.turbine.tests;
+package com.yammer.breakerbox.lodbrok.tests;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.plugins.PluginsFactory;
-import com.yammer.breakerbox.service.turbine.LodbrokInstanceDiscovery;
+import com.yammer.breakerbox.lodbrok.LodbrokInstanceDiscovery;
 import com.yammer.lodbrok.discovery.core.HealthCheck;
 import com.yammer.lodbrok.discovery.core.LodbrokInstance;
 import com.yammer.lodbrok.discovery.core.PortMapping;
@@ -19,7 +19,8 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.UUID;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class LodbrokInstanceDiscoveryTest {
     @Rule
@@ -66,8 +67,8 @@ public class LodbrokInstanceDiscoveryTest {
 
     @Before
     public void setup() throws Exception {
-        lodbrokInstanceStore = LodbrokInstanceStore.empty();
-        discovery = new LodbrokInstanceDiscovery(lodbrokInstanceStore, lodbrokGlobalUri);
+        lodbrokInstanceStore = new LodbrokInstanceStore("test", lodbrokGlobalUri);
+        discovery = new LodbrokInstanceDiscovery(lodbrokInstanceStore);
         PluginsFactory.setInstanceDiscovery(discovery);
         assertThat(discovery.getInstanceList()).isEmpty();
     }
@@ -97,23 +98,26 @@ public class LodbrokInstanceDiscoveryTest {
     }
 
     private Instance instanceOne() {
-        final Instance instance = new Instance("https://some.where.io:12345", "service1", true);
+        final Instance instance = new Instance(task1.getId() + ":12345", "service1", true);
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "1.2.3.4");
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task1.getId());
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_GLOBAL, lodbrokGlobalUri.toString());
         return instance;
     }
 
     private Instance instanceTwo() {
-        final Instance instance = new Instance("https://some.where.io:56789", "service2", true);
+        final Instance instance = new Instance(task2.getId() + ":56789", "service2", true);
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "5.6.7.8");
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task2.getId());
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_GLOBAL, lodbrokGlobalUri.toString());
         return instance;
     }
 
     private Instance instanceThree() {
-        final Instance instance = new Instance("https://some.where.io:12345", "service3", true);
+        final Instance instance = new Instance(task3.getId() + ":12345", "service3", true);
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP, "1.2.3.4");
         instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID, task3.getId());
+        instance.getAttributes().put(LodbrokInstanceDiscovery.LODBROK_GLOBAL, lodbrokGlobalUri.toString());
         return instance;
     }
 }

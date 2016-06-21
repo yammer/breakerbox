@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.turbine;
+package com.yammer.breakerbox.turbine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.turbine.discovery.Instance;
