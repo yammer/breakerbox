@@ -4,10 +4,16 @@ breakerbox:
   delay: 60s
 
 lodbrok:
-  uri: {{ .Env.LODBROK_URI }}
-  jersey: 
-    timeout: 5s
-  pollInterval: 30s
+  regions:
+    -
+      uri: {{ .Env.LODBROK_EAST_URI }}
+      name: {{ .Env.LODBROK_EAST_NAME }}
+    -
+      uri: {{ .Env.LODBROK_CENTRAL_URI }}
+      name: {{ .Env.LODBROK_CENTRAL_NAME }}
+  pollInterval: 60s
+
+turbine: {{ .Env.TURBINE_INSTANCES_PATH }}
 
 archaiusOverride:
   hystrixMetricsStreamServletMaxConnections: {{ .Env.TURBINE_HYSTRIX_METRICS_STREAM_SERVLET_MAX_CONNECTIONS }}
