@@ -29,5 +29,10 @@
             <artifactId>dropwizard-testing</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -34,6 +34,7 @@ public class ConcatenatingInstanceDiscovery implements InstanceDiscovery {
                     }
                     return Stream.empty();
                 })
+                .sorted()
                 .collect(Collectors.toList());
     }
 }

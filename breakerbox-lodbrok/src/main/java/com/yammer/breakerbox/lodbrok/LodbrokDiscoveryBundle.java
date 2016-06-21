@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 public abstract class LodbrokDiscoveryBundle<T extends Configuration> implements ConfiguredBundle<T> {
     @Override
     public void run(T configuration, Environment environment) throws Exception {
+        PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
+        PluginsFactory.setInstanceDiscovery(createInstanceDiscovery(configuration, environment));
+    }
+
+    public LodbrokInstanceDiscovery createInstanceDiscovery(T configuration, Environment environment) {
         final LodbrokDiscoveryConfiguration lodbrokDiscoveryConfiguration = getLodbrokDiscoveryConfiguration(configuration);
         final LodbrokClientFactory lodbrokClientFactory = new LodbrokClientFactory(lodbrokDiscoveryConfiguration, environment);
         final Collection<LodbrokInstanceStore> lodbrokInstanceStores = lodbrokDiscoveryConfiguration
@@ -30,8 +35,7 @@ public abstract class LodbrokDiscoveryBundle<T extends Configuration> implements
                 lodbrokClientFactory.build("lodbrok-client"),
                 lodbrokDiscoveryConfiguration.getPollInterval());
         lodbrokInstanceStorePoller.schedule();
-        PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
-        PluginsFactory.setInstanceDiscovery(new LodbrokInstanceDiscovery(lodbrokInstanceStores));
+        return new LodbrokInstanceDiscovery(lodbrokInstanceStores);
     }
 
     protected abstract LodbrokDiscoveryConfiguration getLodbrokDiscoveryConfiguration(T configuration);

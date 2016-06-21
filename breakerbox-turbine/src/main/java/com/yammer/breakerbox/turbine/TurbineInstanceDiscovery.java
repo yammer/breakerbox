@@ -20,8 +20,6 @@ public class TurbineInstanceDiscovery {
         configurationManager.setProperty(InstanceDiscovery.TURBINE_AGGREGATOR_CLUSTER_CONFIG,
                 Joiner.on(',').join(clusterNames));
         configurationManager.setProperty("turbine.instanceUrlSuffix", instanceUrlSuffix);
-        clusterNames.stream()
-                .forEach((clusterName) -> configurationManager.setProperty("turbine.protocol." + clusterName, "https"));
         final ClusterMonitorFactory<?> clusterMonitorFactory = PluginsFactory.getClusterMonitorFactory();
         if (clusterMonitorFactory != null) {
             clusterMonitorFactory.initClusterMonitors();

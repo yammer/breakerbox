@@ -265,17 +265,24 @@ public class BreakerboxInstanceMonitor extends TurbineDataMonitor<DataFromSingle
         }
     }
 
+    private String instanceUri(Instance instance) {
+        if (instance.getAttributes().containsKey(LodbrokInstanceDiscovery.LODBROK_GLOBAL)) {
+            return UriBuilder
+                    .fromUri(instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_GLOBAL))
+                    .port(-1)
+                    .build()
+                    + ":" + url.split(":")[2];
+        } else {
+            return url;
+        }
+    }
+
     /**
      * Init resources required
      * @throws Exception
      */
     private void init(Instance instance) throws Exception {
-        final String lodbrokUri = UriBuilder
-                .fromUri(instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_GLOBAL))
-                .port(-1)
-                .build()
-                + ":" + url.split(":")[2];
-        HttpGet httpget = new HttpGet(lodbrokUri);
+        HttpGet httpget = new HttpGet(instanceUri(instance));
         httpget.setHeader(LodbrokTenacityClient.X_LODBROK_ROUTE, String.format("%s-%s",
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_IP),
                 instance.getAttributes().get(LodbrokInstanceDiscovery.LODBROK_ROUTE_ID)));

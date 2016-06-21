@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.net.InetAddresses;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.lodbrok.LodbrokInstanceDiscovery;
+import com.yammer.breakerbox.turbine.client.DelegatingTenacityClient;
 import com.yammer.breakerbox.turbine.client.TurbineTenacityClient;
 import com.yammer.lodbrok.discovery.core.Task;
 import com.yammer.lodbrok.discovery.core.tenacity.LodbrokTenacityClient;
@@ -18,34 +19,50 @@ import java.util.Map;
 
 public class DelegatingLodbrokTenacityClient implements TurbineTenacityClient {
     private final LodbrokTenacityClient client;
+    private final DelegatingTenacityClient defaultClient;
 
-    public DelegatingLodbrokTenacityClient(LodbrokTenacityClient client) {
+    public DelegatingLodbrokTenacityClient(LodbrokTenacityClient client, DelegatingTenacityClient defaultClient) {
         this.client = client;
+        this.defaultClient = defaultClient;
     }
 
     @Override
     public Optional<ImmutableList<String>> getTenacityPropertyKeys(Instance instance) {
-        return client.getTenacityPropertyKeys(toUri(instance), toTask(instance));
+        return isLodbrok(instance) ?
+                client.getTenacityPropertyKeys(toUri(instance), toTask(instance)) :
+                defaultClient.getTenacityPropertyKeys(instance);
     }
 
     @Override
     public Optional<TenacityConfiguration> getTenacityConfiguration(Instance instance, TenacityPropertyKey key) {
-        return client.getTenacityConfiguration(toUri(instance), toTask(instance), key);
+        return isLodbrok(instance) ?
+                client.getTenacityConfiguration(toUri(instance), toTask(instance), key) :
+                defaultClient.getTenacityConfiguration(instance, key);
     }
 
     @Override
     public Optional<ImmutableList<CircuitBreaker>> getCircuitBreakers(Instance instance) {
-        return client.getCircuitBreakers(toUri(instance), toTask(instance));
+        return isLodbrok(instance) ?
+                client.getCircuitBreakers(toUri(instance), toTask(instance)) :
+                defaultClient.getCircuitBreakers(instance);
     }
 
     @Override
     public Optional<CircuitBreaker> getCircuitBreaker(Instance instance, TenacityPropertyKey key) {
-        return client.getCircuitBreaker(toUri(instance), toTask(instance), key);
+        return isLodbrok(instance) ?
+                client.getCircuitBreaker(toUri(instance), toTask(instance), key) :
+                defaultClient.getCircuitBreaker(instance, key);
     }
 
     @Override
     public Optional<CircuitBreaker> modifyCircuitBreaker(Instance instance, TenacityPropertyKey key, CircuitBreaker.State state) {
-        return client.modifyCircuitBreaker(toUri(instance), toTask(instance), key, state);
+        return isLodbrok(instance) ?
+                client.modifyCircuitBreaker(toUri(instance), toTask(instance), key, state) :
+                defaultClient.getCircuitBreaker(instance, key);
+    }
+
+    private static boolean isLodbrok(Instance instance) {
+        return instance.getAttributes().containsKey(LodbrokInstanceDiscovery.LODBROK_GLOBAL);
     }
 
     private URI toUri(Instance instance) {

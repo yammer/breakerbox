@@ -28,7 +28,7 @@ public class LodbrokTenacityClientBuilder {
     public LodbrokTenacityClient build() {
         final Client client = new JerseyClientBuilder(environment)
                 .using(jerseyConfiguration)
-                .build("tenacity-" + tenacityPropertyKey);
+                .build("lodbrok-tenacity-" + tenacityPropertyKey);
         return new LodbrokTenacityClient(environment.metrics(), TenacityJerseyClientBuilder
                 .builder(tenacityPropertyKey)
                 .build(client));
