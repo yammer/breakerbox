@@ -1,5 +1,5 @@
 breakerbox:
-  urls: {{ .Env.BREAKERBOX_URL }}
+  urls: {{ .Env.BREAKERBOX_URL }}{{ .Env.BREAKERBOX_PATH }}
   initialDelay: 0s
   delay: 60s
 
