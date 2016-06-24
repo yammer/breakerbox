@@ -60,10 +60,6 @@
             <groupId>com.yammer.breakerbox</groupId>
             <artifactId>breakerbox-turbine</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

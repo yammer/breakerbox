@@ -2,6 +2,7 @@ package com.yammer.breakerbox.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
@@ -52,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -221,6 +223,24 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                                Environment environment) {
         final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
                 configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
-        PluginsFactory.setInstanceDiscovery(new ConcatenatingInstanceDiscovery(yamlInstanceDiscovery));
+        final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration);
+        if (customInstanceDiscovery.isPresent()) {
+            PluginsFactory.setInstanceDiscovery(new ConcatenatingInstanceDiscovery(
+                    customInstanceDiscovery.get(), yamlInstanceDiscovery));
+        } else {
+            PluginsFactory.setInstanceDiscovery(yamlInstanceDiscovery);
+        }
+    }
+
+    private static Optional<InstanceDiscovery> createInstanceDiscovery(BreakerboxServiceConfiguration configuration) {
+        if (configuration.getInstanceDiscoveryClass().isPresent()) {
+            try {
+                final Class<?> instanceDiscoveryClass = Class.forName(configuration.getInstanceDiscoveryClass().get());
+                return Optional.of((InstanceDiscovery) instanceDiscoveryClass.newInstance());
+            } catch (Exception err) {
+                LOGGER.warn("No default constructor for {}", configuration.getInstanceDiscoveryClass(), err);
+            }
+        }
+        return Optional.empty();
     }
 }

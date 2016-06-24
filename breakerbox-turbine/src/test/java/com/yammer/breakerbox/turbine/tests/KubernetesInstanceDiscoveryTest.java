@@ -1,8 +1,8 @@
-package com.yammer.breakerbox.service.turbine.tests;
+package com.yammer.breakerbox.turbine.tests;
 
 import com.google.common.collect.Lists;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.breakerbox.service.turbine.KubernetesInstanceDiscovery;
+import com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.dsl.ClientMixedOperation;
