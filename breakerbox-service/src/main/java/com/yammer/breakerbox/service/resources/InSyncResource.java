@@ -38,6 +38,6 @@ public class InSyncResource {
     public Iterable<SyncPropertyKeyState> allInSync(@PathParam("service") String serviceName) {
         final ServiceId serviceId = ServiceId.from(serviceName);
         return syncComparator.allInSync(serviceId,
-                tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.propertyKeyUris(serviceId)));
+                tenacityPropertyKeysStore.tenacityPropertyKeysFor(Instances.instances(serviceId)));
     }
 }

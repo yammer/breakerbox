@@ -1,19 +1,18 @@
 package com.yammer.breakerbox.service.store;
 
-import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.util.concurrent.Callable;
+import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * TenacityPropertyKeysStore is a component used to track known keys for presentation in the Breakerbox
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TenacityPropertyKeysStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityPropertyKeysStore.class);
-    private final Cache<URI, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder
+    private final Cache<Instance, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder
             .newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .build();
@@ -32,14 +31,10 @@ public class TenacityPropertyKeysStore {
         this.tenacityPollerFactory = tenacityPollerFactory;
     }
 
-    public ImmutableList<String> getTenacityPropertyKeys(final URI uri) {
+    public ImmutableList<String> getTenacityPropertyKeys(Instance instance) {
         try {
-            return tenacityPropertyKeyCache.get(uri, new Callable<ImmutableList<String>>() {
-                @Override
-                public ImmutableList<String> call() throws Exception {
-                    return tenacityPollerFactory.create(uri).execute().orNull();
-                }
-            });
+            return tenacityPropertyKeyCache.get(instance, () ->
+                    tenacityPollerFactory.create(instance).execute().orNull());
         } catch (CacheLoader.InvalidCacheLoadException err) {
             //null was returned
         } catch (Exception err) {
@@ -48,15 +43,12 @@ public class TenacityPropertyKeysStore {
         return ImmutableList.of();
     }
 
-    public ImmutableSet<String> tenacityPropertyKeysFor(Iterable<URI> uris) {
-        return FluentIterable
-                .from(uris)
-                .transformAndConcat(new Function<URI, ImmutableList<String>>() {
-                    @Override
-                    public ImmutableList<String> apply(URI input) {
-                        return getTenacityPropertyKeys(input);
-                    }
-                })
-                .toSet();
+    public Set<String> tenacityPropertyKeysFor(Collection<Instance> instances) {
+        return instances
+                .stream()
+                .map(this::getTenacityPropertyKeys)
+                .flatMap(Collection::stream)
+                .sorted()
+                .collect(Collectors.toSet());
     }
 }

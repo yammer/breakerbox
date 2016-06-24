@@ -53,6 +53,8 @@ tenacityClient:
 
 defaultDashboard: production
 
+instanceDiscoveryClass: com.yammer.breakerbox.turbine.YamlInstanceDiscovery #default
+
 metaClusters: 
   - production
   - stage
@@ -161,6 +163,11 @@ production:
 * `turbine` is a path to where a `yaml` configuration file containing the instances configuration is located (this is editable at runtime allowing for dynamic rediscovery).
 * `urlSuffix` defaults to `/tenacity/metrics.stream` you can alter this if you have this resource at a different location
 * `clusters` is the top level item for your clusters or dashboards you wish to have available. Underneath clusters you can specify dashboard names such as `breakerbox` or `production` in this example above. Underneath those you can specify either `instances` and `clusters`. `clusters` can reference other dashboards and will include their instances. This can reference cyclic dashboards and will add instances from both. `instances` lets you specify a single instance.  
+
+Instance Discovery Class
+------------------------
+Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implemention. You can also leverage the 
+`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` class.
 
 Meta Clusters
 -------------

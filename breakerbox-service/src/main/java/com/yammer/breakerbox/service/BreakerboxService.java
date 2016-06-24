@@ -2,7 +2,7 @@ package com.yammer.breakerbox.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.netflix.turbine.init.TurbineInit;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.netflix.turbine.streaming.servlet.TurbineStreamServlet;
@@ -14,13 +14,15 @@ import com.yammer.breakerbox.service.auth.NullAuthFilter;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.breakerbox.service.core.SyncComparator;
-import com.yammer.breakerbox.service.managed.ManagedTurbine;
 import com.yammer.breakerbox.service.resources.*;
 import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
-import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.BreakerboxStore;
+import com.yammer.breakerbox.turbine.ConcatenatingInstanceDiscovery;
+import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
+import com.yammer.breakerbox.turbine.client.DelegatingTenacityClient;
+import com.yammer.breakerbox.turbine.managed.ManagedTurbine;
 import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
@@ -51,9 +53,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class BreakerboxService extends Application<BreakerboxServiceConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BreakerboxService.class);
@@ -109,29 +113,29 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
-        PluginsFactory.setInstanceDiscovery(new YamlInstanceDiscovery(configuration.getTurbine(),
-                environment.getValidator(), environment.getObjectMapper()));
+        setupInstanceDiscovery(configuration, environment);
         setupAuth(configuration, environment);
 
         final BreakerboxStore breakerboxStore = createBreakerboxStore(configuration, environment);
         breakerboxStore.initialize();
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-            new TenacityPoller.Factory(
+            new TenacityPoller.Factory(new DelegatingTenacityClient(
                 new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
                         .using(configuration.getTenacityClient())
-                        .build()));
+                        .build())));
         final SyncComparator syncComparator = new SyncComparator(
-            new TenacityConfigurationFetcher.Factory(
+            new TenacityConfigurationFetcher.Factory(new DelegatingTenacityClient(
                 new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
                         .using(configuration.getTenacityClient())
-                        .build()),
+                        .build())),
             breakerboxStore);
 
-        Set<String> metaClusters = Sets.newHashSet();
-        for (String cluster : configuration.getMetaClusters()) {
-            metaClusters.add(cluster.toUpperCase());
-        }
+        final Set<String> metaClusters = configuration
+                .getMetaClusters()
+                .stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.toSet());
 
         environment.servlets().addServlet("turbine.stream", new TurbineStreamServlet()).addMapping("/turbine.stream");
 
@@ -154,9 +158,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
         environment.lifecycle().manage(new ManagedTurbine());
 
-        scheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
+        scheduledExecutorService.schedule(() -> {
                 //TODO: The way properties get registered shouldn't need to depend on this strict of ordering.
                 //Need to also move off the static properties file for Turbine configuration and move to something more
                 //dynamic
@@ -170,8 +172,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                     LOGGER.error("Unable to initialize Tenacity/Turbine.");
                     throw new RuntimeException("Unable to initialize Tenacity/Turbine.");
                 }
-            }
-        }, 3, TimeUnit.SECONDS);
+            }, 3, TimeUnit.SECONDS);
     }
 
     private static BreakerboxStore createBreakerboxStore(BreakerboxServiceConfiguration configuration, Environment environment) throws Exception {
@@ -216,5 +217,30 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                 .setRealm("breakerbox")
                                 .buildAuthFilter()));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
+    }
+
+    private static void setupInstanceDiscovery(BreakerboxServiceConfiguration configuration,
+                                               Environment environment) {
+        final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
+                configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
+        final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration);
+        if (customInstanceDiscovery.isPresent()) {
+            PluginsFactory.setInstanceDiscovery(new ConcatenatingInstanceDiscovery(
+                    customInstanceDiscovery.get(), yamlInstanceDiscovery));
+        } else {
+            PluginsFactory.setInstanceDiscovery(yamlInstanceDiscovery);
+        }
+    }
+
+    private static Optional<InstanceDiscovery> createInstanceDiscovery(BreakerboxServiceConfiguration configuration) {
+        if (configuration.getInstanceDiscoveryClass().isPresent()) {
+            try {
+                final Class<?> instanceDiscoveryClass = Class.forName(configuration.getInstanceDiscoveryClass().get());
+                return Optional.of((InstanceDiscovery) instanceDiscoveryClass.newInstance());
+            } catch (Exception err) {
+                LOGGER.warn("No default constructor for {}", configuration.getInstanceDiscoveryClass(), err);
+            }
+        }
+        return Optional.empty();
     }
 }

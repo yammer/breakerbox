@@ -6,8 +6,8 @@ import com.google.common.io.Resources;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.plugins.PluginsFactory;
 import com.yammer.breakerbox.service.core.Instances;
-import com.yammer.breakerbox.service.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.store.ServiceId;
+import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
 import org.junit.BeforeClass;
@@ -16,6 +16,7 @@ import org.junit.Test;
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +44,11 @@ public class InstancesTest {
 
     @Test
     public void propertyKeyUris() {
-        assertThat(Instances.propertyKeyUris())
+        assertThat(Instances
+                .instances()
+                .stream()
+                .map((instance) -> URI.create("http://" + instance.getHostname()))
+                .collect(Collectors.toSet()))
                 .isEqualTo(ImmutableSet.of(
                         URI.create("http://localhost:8080"),
                         URI.create("http://completie-001.sjc1.yammer.com:8080"),
@@ -56,12 +61,16 @@ public class InstancesTest {
     @Test
     public void instancesForCluster() {
         assertThat(Instances.instances(ServiceId.from("mock")))
-                .isEqualTo(ImmutableSet.of(new Instance("localhost:8080", "mock", true)));
+                .containsExactly(new Instance("localhost:8080", "mock", true));
     }
 
     @Test
     public void propertyKeysUrisForCluster() {
-        assertThat(Instances.propertyKeyUris(ServiceId.from("mock")))
+        assertThat(Instances
+                .instances(ServiceId.from("mock"))
+                .stream()
+                .map((instance) -> URI.create("http://" + instance.getHostname()))
+                .collect(Collectors.toSet()))
                 .isEqualTo(ImmutableSet.of(URI.create("http://localhost:8080")));
     }
 }

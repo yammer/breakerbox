@@ -4,63 +4,61 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
-import com.yammer.tenacity.client.TenacityClient;
+import com.netflix.turbine.discovery.Instance;
+import com.yammer.breakerbox.turbine.client.TurbineTenacityClient;
 import com.yammer.tenacity.core.TenacityCommand;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.util.concurrent.Callable;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TenacityConfigurationFetcher extends TenacityCommand<Optional<TenacityConfiguration>> {
     public static class Factory {
-        private final TenacityClient client;
+        private final TurbineTenacityClient client;
 
-        public Factory(TenacityClient client) {
+        public Factory(TurbineTenacityClient client) {
             this.client = client;
         }
 
-        public TenacityConfigurationFetcher create(URI root, TenacityPropertyKey key) {
-            return new TenacityConfigurationFetcher(client, root, key);
+        public TenacityConfigurationFetcher create(Instance instance, TenacityPropertyKey key) {
+            return new TenacityConfigurationFetcher(client, instance, key);
         }
     }
 
     private static class Key {
-        private final URI uri;
+        private final Instance instance;
         private final TenacityPropertyKey tenacityPropertyKey;
 
-        public Key(URI uri, TenacityPropertyKey tenacityPropertyKey) {
-            this.uri = checkNotNull(uri);
+        public Key(Instance instance, TenacityPropertyKey tenacityPropertyKey) {
+            this.instance = checkNotNull(instance);
             this.tenacityPropertyKey = checkNotNull(tenacityPropertyKey);
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Key key = (Key) o;
-
-            if (!tenacityPropertyKey.equals(key.tenacityPropertyKey)) return false;
-            if (!uri.equals(key.uri)) return false;
-
-            return true;
+        public int hashCode() {
+            return Objects.hash(instance, tenacityPropertyKey);
         }
 
         @Override
-        public int hashCode() {
-            int result = uri.hashCode();
-            result = 31 * result + tenacityPropertyKey.hashCode();
-            return result;
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            final Key other = (Key) obj;
+            return Objects.equals(this.instance, other.instance)
+                    && Objects.equals(this.tenacityPropertyKey, other.tenacityPropertyKey);
         }
     }
 
-    private final TenacityClient client;
+    private final TurbineTenacityClient client;
     private final Key key;
     private static final Cache<Key, TenacityConfiguration> cache = CacheBuilder
             .newBuilder()
@@ -68,23 +66,19 @@ public class TenacityConfigurationFetcher extends TenacityCommand<Optional<Tenac
             .build();
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityConfigurationFetcher.class);
 
-    public TenacityConfigurationFetcher(TenacityClient client,
-                                        URI uri,
+    public TenacityConfigurationFetcher(TurbineTenacityClient client,
+                                        Instance instance,
                                         TenacityPropertyKey key) {
         super(BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION);
         this.client = checkNotNull(client);
-        this.key = new Key(checkNotNull(uri), checkNotNull(key));
+        this.key = new Key(checkNotNull(instance), checkNotNull(key));
     }
 
     @Override
     protected Optional<TenacityConfiguration> run() throws Exception {
         try {
-            return Optional.of(cache.get(key, new Callable<TenacityConfiguration>() {
-                @Override
-                public TenacityConfiguration call() throws Exception {
-                    return client.getTenacityConfiguration(key.uri, key.tenacityPropertyKey).orNull();
-                }
-            }));
+            return Optional.of(cache.get(key, () ->
+                client.getTenacityConfiguration(key.instance, key.tenacityPropertyKey).orNull()));
         } catch (CacheLoader.InvalidCacheLoadException err) {
             //null was returned, don't negatively cache results
         } catch (Exception err) {

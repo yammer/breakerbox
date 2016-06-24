@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.managed;
+package com.yammer.breakerbox.turbine.managed;
 
 import com.netflix.turbine.init.TurbineInit;
 import io.dropwizard.lifecycle.Managed;

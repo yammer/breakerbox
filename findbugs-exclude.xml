@@ -9,14 +9,6 @@
         <Class name="com.yammer.breakerbox.azure.model.Entities$2"/>
         <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
     </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.service.core.Instances$1"/>
-        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
-    </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.service.core.Instances$4"/>
-        <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
-    </Match>
 
     <!-- Netflix -->
     <Match>

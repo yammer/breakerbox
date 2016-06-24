@@ -49,9 +49,9 @@ var SynchronizationState = React.createClass({
     return this.state.syncStates.map(function(item) {
       var dt = this._syncStatusElement(item.syncStatus);
       return (
-        <span key={item.uri}>
+        <span key={item.id}>
           {dt}
-          <dd>{item.uri}</dd>
+          <dd>{item.id}</dd>
         </span>
         );
     }, this);

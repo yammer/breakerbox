@@ -2,37 +2,36 @@ package com.yammer.breakerbox.service.tenacity;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.yammer.tenacity.client.TenacityClient;
+import com.netflix.turbine.discovery.Instance;
+import com.yammer.breakerbox.turbine.client.TurbineTenacityClient;
 import com.yammer.tenacity.core.TenacityCommand;
-
-import java.net.URI;
 
 public class TenacityPoller extends TenacityCommand<Optional<ImmutableList<String>>> {
     public static class Factory {
-        private final TenacityClient tenacityClient;
+        private final TurbineTenacityClient tenacityClient;
 
-        public Factory(TenacityClient tenacityClient) {
+        public Factory(TurbineTenacityClient tenacityClient) {
             this.tenacityClient = tenacityClient;
         }
 
-        public TenacityPoller create(URI uri) {
-            return new TenacityPoller(tenacityClient, uri);
+        public TenacityPoller create(Instance instance) {
+            return new TenacityPoller(tenacityClient, instance);
         }
     }
 
-    private final TenacityClient tenacityClient;
-    private final URI uri;
+    private final TurbineTenacityClient tenacityClient;
+    private final Instance instance;
 
-    public TenacityPoller(TenacityClient tenacityClient,
-                          URI uri) {
+    public TenacityPoller(TurbineTenacityClient tenacityClient,
+                          Instance instance) {
         super(BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS);
         this.tenacityClient = tenacityClient;
-        this.uri = uri;
+        this.instance = instance;
     }
 
     @Override
     protected Optional<ImmutableList<String>> run() throws Exception {
-        return tenacityClient.getTenacityPropertyKeys(uri);
+        return tenacityClient.getTenacityPropertyKeys(instance);
     }
 
     @Override

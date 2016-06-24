@@ -9,7 +9,7 @@
     <name>Breakerbox Project</name>
     <description>Frontend for Tenacity + Archaius</description>
 
-    <url>https://github.com/yammer/breakerbox</url>
+    <url>https://github.int.yammer.com/yammer/breakerbox</url>
 
     <prerequisites>
         <maven>3.0.0</maven>
@@ -21,28 +21,30 @@
         <module>breakerbox-azure</module>
         <module>breakerbox-store</module>
         <module>breakerbox-jdbi</module>
+        <module>breakerbox-turbine</module>
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.com/yammer/breakerbox.git</connection>
-        <developerConnection>scm:git:git@github.com:yammer/breakerbox.git</developerConnection>
-        <url>https://github.com/yammer/breakerbox/</url>
+        <connection>scm:git:git://github.int.yammer.com/yammer/breakerbox.git</connection>
+        <developerConnection>scm:git:git@github.int.yammer.com:yammer/breakerbox.git</developerConnection>
+        <url>https://github.int.yammer.com/yammer/breakerbox/</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/yammer/breakerbox/issues</url>
+        <url>https://github.int.yammer.com/yammer/breakerbox/issues</url>
     </issueManagement>
 
     <properties>
-        <dropwizard.version>0.9.2</dropwizard.version>
+        <dropwizard.version>0.9.3</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>0.8.2</tenacity.version>
+        <tenacity.version>0.8.3</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.4.1208.jre7</postgresql.version>
-        <h2.version>1.4.191</h2.version>
+        <h2.version>1.4.192</h2.version>
+        <kubernetes.version>2.2.136</kubernetes.version>
     </properties>
 
     <dependencyManagement>
@@ -62,6 +64,11 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>com.yammer.breakerbox</groupId>
+                <artifactId>breakerbox-turbine</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.yammer.breakerbox</groupId>
                 <artifactId>breakerbox-store</artifactId>
@@ -121,6 +128,17 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-api</artifactId>
+                <version>${kubernetes.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.module</groupId>
+                        <artifactId>jackson-module-jaxb-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -135,19 +153,6 @@
         </developer>
     </developers>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -156,38 +161,29 @@
         </license>
     </licenses>
 
+    <distributionManagement>
+        <repository>
+            <id>maven.int.yammer.com-releases</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.int.yammer.com-snapshots</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>maven.int.yammer.com-releases</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>maven.int.yammer.com-snapshots</id>
+            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
     <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <keyname>28D77313</keyname>
-                            <useAgent>true</useAgent>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>allow-snapshots</id>
             <activation><activeByDefault>true</activeByDefault></activation>

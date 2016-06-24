@@ -16,6 +16,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +58,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull
     private String defaultDashboard;
 
+    @NotNull @UnwrapValidatedValue(false)
+    private Optional<String> instanceDiscoveryClass;
+
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
@@ -68,7 +72,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("database") JdbiConfiguration jdbiConfiguration,
                                           @JsonProperty("breakerboxHostAndPort") HostAndPort breakerboxHostAndPort,
                                           @JsonProperty("defaultDashboard") String defaultDashboard,
-                                          @JsonProperty("turbine") Path turbine) {
+                                          @JsonProperty("turbine") Path turbine,
+                                          @JsonProperty("instanceDiscoveryClass") String instanceDiscoveryClass) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -79,7 +84,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
-        this.turbine = turbine;
+        this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox-instances.yml"));
+        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass)
+                .or(Optional.fromNullable(System.getProperty("InstanceDiscovery.impl")));
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -119,8 +126,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.archaiusOverride = archaiusOverride;
     }
 
-    public void setLdapConfiguration(Optional<LdapConfiguration> ldapConfiguration) {
-        this.ldapConfiguration = ldapConfiguration;
+    public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
+        this.ldapConfiguration = Optional.fromNullable(ldapConfiguration);
     }
 
     @JsonProperty("database")
@@ -128,8 +135,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return jdbiConfiguration;
     }
 
-    public void setJdbiConfiguration(Optional<JdbiConfiguration> jdbiConfiguration) {
-        this.jdbiConfiguration = jdbiConfiguration;
+    public void setJdbiConfiguration(JdbiConfiguration jdbiConfiguration) {
+        this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
     }
 
     public HostAndPort getBreakerboxHostAndPort() {
@@ -144,9 +151,17 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return metaClusters;
     }
 
+    public Optional<String> getInstanceDiscoveryClass() {
+        return instanceDiscoveryClass;
+    }
+
+    public void setInstanceDiscoveryClass(String instanceDiscoveryClass) {
+        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass);
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard);
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, instanceDiscoveryClass);
     }
 
     @Override
@@ -169,6 +184,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                 && Objects.equals(this.jdbiConfiguration, other.jdbiConfiguration)
                 && Objects.equals(this.metaClusters, other.metaClusters)
                 && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort)
-                && Objects.equals(this.defaultDashboard, other.defaultDashboard);
+                && Objects.equals(this.defaultDashboard, other.defaultDashboard)
+                && Objects.equals(this.instanceDiscoveryClass, other.instanceDiscoveryClass);
     }
 }

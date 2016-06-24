@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.turbine;
+package com.yammer.breakerbox.turbine;
 
 import com.google.common.base.Joiner;
 import com.netflix.config.ConfigurationManager;
@@ -10,6 +10,8 @@ import org.apache.commons.configuration.AbstractConfiguration;
 import java.util.Collection;
 
 public class TurbineInstanceDiscovery {
+    public static final String BREAKERBOX_INSTANCE_ID = "Breakerbox-Instance-Id";
+
     private TurbineInstanceDiscovery() {}
 
     public static void registerClusters(Collection<String> clusterNames,

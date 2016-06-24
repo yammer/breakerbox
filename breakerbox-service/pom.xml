@@ -52,20 +52,13 @@
             <artifactId>tenacity-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.netflix.turbine</groupId>
-            <artifactId>turbine-core</artifactId>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-testing</artifactId>
+            <scope>test</scope>
         </dependency>
-        <!-- Allows breakerbox in a Kubernetes cluster to discover instances -->
         <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-api</artifactId>
-            <version>2.2.136</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-turbine</artifactId>
         </dependency>
     </dependencies>
 
@@ -90,6 +83,7 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>normal-shade</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
