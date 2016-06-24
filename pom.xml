@@ -71,11 +71,6 @@
             </dependency>
             <dependency>
                 <groupId>com.yammer.breakerbox</groupId>
-                <artifactId>breakerbox-lodbrok</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yammer.breakerbox</groupId>
                 <artifactId>breakerbox-store</artifactId>
                 <version>${project.version}</version>
             </dependency>

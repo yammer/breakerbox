@@ -15,12 +15,4 @@
         <Class name="com.netflix.hystrix.dashboard.stream.ProxyStreamServlet"/>
         <Bug pattern="WMI_WRONG_MAP_ITERATOR"/>
     </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.lodbrok.turbine.BreakerboxClusterMonitor$UnitTest"/>
-        <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
-    </Match>
-    <Match>
-        <Class name="com.yammer.breakerbox.lodbrok.turbine.BreakerboxInstanceMonitor"/>
-        <Bug pattern="WMI_WRONG_MAP_ITERATOR"/>
-    </Match>
 </FindBugsFilter>
