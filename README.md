@@ -167,7 +167,7 @@ production:
 Instance Discovery Class
 ------------------------
 Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implemention. You can also leverage the 
-`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery class`.
+`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` class.
 
 Meta Clusters
 -------------
