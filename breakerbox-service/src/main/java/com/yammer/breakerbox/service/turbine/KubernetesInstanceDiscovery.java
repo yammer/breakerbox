@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 
 /**
  * Discovers instances in a Kubernetes cluster. The idea is to
- * find ReplicationControllers or ReplicaSets, check if their instances
- * are running Tenacity and return a list of valid instances.
+ * find pods with the 'breakerbox-port' annotation and use their
+ * base names in combination with the namespace to build Hystrix clusters.
  */
 public class KubernetesInstanceDiscovery implements InstanceDiscovery {
 

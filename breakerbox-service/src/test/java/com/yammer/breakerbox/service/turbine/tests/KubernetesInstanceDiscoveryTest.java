@@ -31,6 +31,7 @@ public class KubernetesInstanceDiscoveryTest {
     @Mock PodList podList;
 
     private KubernetesInstanceDiscovery discovery;
+    private List<Pod> pods;
 
     @Before
     public void setupDiscovery() {
@@ -81,7 +82,7 @@ public class KubernetesInstanceDiscoveryTest {
         nonBreakerboxService.getMetadata().setName("service-c-097900");
         nonBreakerboxService.getMetadata().setGenerateName("service-c-");
         nonBreakerboxService.getMetadata().setNamespace("production");
-        List<Pod> pods = Lists.newArrayList(serviceA1, serviceA2, serviceB, nonBreakerboxService);
+        pods = Lists.newArrayList(serviceA1, serviceA2, serviceB, nonBreakerboxService);
 
         stub(podList.getItems()).toReturn(pods);
         this.discovery = new KubernetesInstanceDiscovery(client);
@@ -117,12 +118,40 @@ public class KubernetesInstanceDiscoveryTest {
     }
 
     @Test
-    public void onlyAcceptsCorrectValuesInPortAnnotation() {
-        // TODO: Only valid port values should be accepted
+    public void onlyAcceptsCorrectValuesInPortAnnotation() throws Exception {
+        Pod invalidAnnotation = new Pod();
+        invalidAnnotation.setMetadata(new ObjectMeta());
+        invalidAnnotation.setStatus(new PodStatus());
+        invalidAnnotation.getStatus().setPodIP("10.116.0.8");
+        invalidAnnotation.getStatus().setPhase("Running");
+        invalidAnnotation.getMetadata().setAnnotations(
+                Maps.newHashMap(KubernetesInstanceDiscovery.PORT_ANNOTATION_KEY, "invalid-port"));
+        invalidAnnotation.getMetadata().setName("service-invalid-097fsd");
+        invalidAnnotation.getMetadata().setGenerateName("service-invalid-");
+        invalidAnnotation.getMetadata().setNamespace("production");
+        pods.clear();
+        pods.add(invalidAnnotation);
+        assertThat(discovery.getInstanceList().size()).isEqualTo(0);
     }
 
     @Test
-    public void usesPhasePropertyAsInstanceStatus() {
-        // TODO: Mark instance as 'active' if pod phase is 'Running'
+    public void usesPhasePropertyAsInstanceStatus() throws Exception {
+        Pod invalidAnnotation = new Pod();
+        invalidAnnotation.setMetadata(new ObjectMeta());
+        invalidAnnotation.setStatus(new PodStatus());
+        invalidAnnotation.getStatus().setPodIP("10.116.0.8");
+        invalidAnnotation.getStatus().setPhase("Preparing");
+        invalidAnnotation.getMetadata().setAnnotations(
+                Maps.newHashMap(KubernetesInstanceDiscovery.PORT_ANNOTATION_KEY, "8080"));
+        invalidAnnotation.getMetadata().setName("service-preparing-097fsd");
+        invalidAnnotation.getMetadata().setGenerateName("service-preparing-");
+        invalidAnnotation.getMetadata().setNamespace("production");
+        pods.add(invalidAnnotation);
+        for (Instance instance: discovery.getInstanceList()) {
+            if (instance.getCluster().equals("production-service-preparing"))
+                assertThat(instance.isUp()).isFalse();
+            else
+                assertThat(instance.isUp()).isTrue();
+        }
     }
 }
