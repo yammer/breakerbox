@@ -3,7 +3,7 @@
     <parent>
         <artifactId>breakerbox-parent</artifactId>
         <groupId>com.yammer.breakerbox</groupId>
-        <version>0.4.4-SNAPSHOT</version>
+        <version>0.4.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -52,8 +52,25 @@
             <artifactId>tenacity-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.netflix.turbine</groupId>
-            <artifactId>turbine-core</artifactId>
+            <groupId>com.yammer.tenacity</groupId>
+            <artifactId>tenacity-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-turbine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.breakerbox</groupId>
+            <artifactId>breakerbox-lodbrok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.metrics.reporters</groupId>
+            <artifactId>chute-graphite-reporter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer</groupId>
+            <artifactId>dropwizard-logstash-appender-dw9</artifactId>
         </dependency>
         <!-- Allows breakerbox in a Kubernetes cluster to discover instances -->
         <dependency>
@@ -90,6 +107,7 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>normal-shade</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
@@ -102,6 +120,40 @@
                                 </transformer>
                             </transformers>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>docker-shade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>breakerbox</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.yammer.breakerbox.service.BreakerboxService</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <copy file="./target/breakerbox.jar" tofile="../docker/breakerbox.jar" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

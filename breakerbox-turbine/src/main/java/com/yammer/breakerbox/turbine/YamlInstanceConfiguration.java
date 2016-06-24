@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.turbine;
+package com.yammer.breakerbox.turbine;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
@@ -46,7 +46,11 @@ public class YamlInstanceConfiguration {
                             String clusterName,
                             ImmutableSet<String> visited) {
         acc.addAll(cluster.getInstances().stream()
-                .map(hostAndPort -> new Instance(hostAndPort.toString(), clusterName, true))
+                .map(hostAndPort -> {
+                    final Instance instance = new Instance(hostAndPort.toString(), clusterName, true);
+                    instance.getAttributes().put(TurbineInstanceDiscovery.BREAKERBOX_INSTANCE_ID, hostAndPort.toString());
+                    return instance;
+                })
                 .collect(Collectors.toList()));
         cluster.getClusters()
                 .stream()

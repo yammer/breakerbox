@@ -1,4 +1,4 @@
-package com.yammer.breakerbox.service.turbine.client;
+package com.yammer.breakerbox.turbine.client;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -6,6 +6,8 @@ import com.netflix.turbine.discovery.Instance;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.core.CircuitBreaker;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
+
+import java.net.URI;
 
 public interface TurbineTenacityClient {
     Optional<ImmutableList<String>> getTenacityPropertyKeys(Instance instance);
@@ -19,4 +21,13 @@ public interface TurbineTenacityClient {
     Optional<CircuitBreaker> modifyCircuitBreaker(Instance instance,
                                                   TenacityPropertyKey key,
                                                   CircuitBreaker.State state);
+
+    static URI toUri(Instance instance) {
+        final String rawHostname = instance.getHostname().trim();
+        if (rawHostname.startsWith("http")) {
+            return URI.create(rawHostname);
+        } else {
+            return URI.create("http://" + rawHostname);
+        }
+    }
 }
