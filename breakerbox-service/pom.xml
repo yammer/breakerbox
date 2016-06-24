@@ -55,6 +55,11 @@
             <groupId>com.netflix.turbine</groupId>
             <artifactId>turbine-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-api</artifactId>
+            <version>2.2.136</version>
+        </dependency>
     </dependencies>
 
     <build>
