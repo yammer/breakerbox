@@ -61,28 +61,8 @@
             <artifactId>breakerbox-turbine</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.yammer.breakerbox</groupId>
-            <artifactId>breakerbox-lodbrok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.yammer.metrics.reporters</groupId>
-            <artifactId>chute-graphite-reporter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.yammer</groupId>
-            <artifactId>dropwizard-logstash-appender-dw9</artifactId>
-        </dependency>
-        <!-- Allows breakerbox in a Kubernetes cluster to discover instances -->
-        <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-api</artifactId>
-            <version>2.2.136</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
@@ -120,40 +100,6 @@
                                 </transformer>
                             </transformers>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>docker-shade</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>breakerbox</finalName>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.yammer.breakerbox.service.BreakerboxService</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-                                <copy file="./target/breakerbox.jar" tofile="../docker/breakerbox.jar" />
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>

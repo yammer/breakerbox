@@ -26,20 +26,6 @@ defaultDashboard: production
 
 turbine: breakerbox-instances.yml
 
-lodbrok:
-  regions:
-    -
-      uri: https://elb.stage-east-1.mesos.yammer.com:10014
-      name: stage-east-1
-    -
-      uri: https://elb.stage-central-1.mesos.yammer.com:10014
-      name: stage-central-1
-  pollInterval: 30s
-
-chute:
-  uri:
-  hostname: dev
-
 server:
   applicationConnectors:
     - type: http

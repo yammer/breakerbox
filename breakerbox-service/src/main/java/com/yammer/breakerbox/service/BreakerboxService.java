@@ -9,11 +9,6 @@ import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.dashboard.bundle.BreakerboxDashboardBundle;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiStore;
-import com.yammer.breakerbox.lodbrok.LodbrokDiscoveryBundle;
-import com.yammer.breakerbox.lodbrok.LodbrokInstanceDiscovery;
-import com.yammer.breakerbox.lodbrok.tenacity.DelegatingLodbrokTenacityClient;
-import com.yammer.breakerbox.lodbrok.tenacity.LodbrokTenacityClientBuilder;
-import com.yammer.breakerbox.lodbrok.turbine.BreakerboxAggregatorFactory;
 import com.yammer.breakerbox.service.auth.NullAuthFilter;
 import com.yammer.breakerbox.service.auth.NullAuthenticator;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
@@ -31,11 +26,6 @@ import com.yammer.dropwizard.authenticator.LdapAuthenticator;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.dropwizard.authenticator.ResourceAuthenticator;
 import com.yammer.dropwizard.authenticator.User;
-import com.yammer.lodbrok.discovery.core.config.LodbrokDiscoveryConfiguration;
-import com.yammer.metrics.reporters.chute.graphite.ChuteGraphite;
-import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteConfiguration;
-import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteFactory;
-import com.yammer.metrics.reporters.chute.graphite.ChuteGraphiteReporter;
 import com.yammer.tenacity.client.TenacityClientBuilder;
 import com.yammer.tenacity.core.auth.TenacityAuthenticator;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -121,7 +111,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void run(final BreakerboxServiceConfiguration configuration, final Environment environment) throws Exception {
-        registerChuteReporter(configuration.getChute(), environment);
         setupInstanceDiscovery(configuration, environment);
         setupAuth(configuration, environment);
 
@@ -129,21 +118,15 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         breakerboxStore.initialize();
 
         final TenacityPropertyKeysStore tenacityPropertyKeysStore = new TenacityPropertyKeysStore(
-            new TenacityPoller.Factory(new DelegatingLodbrokTenacityClient(
-                new LodbrokTenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
+            new TenacityPoller.Factory(new DelegatingTenacityClient(
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
                         .using(configuration.getTenacityClient())
-                        .build(),
-                new DelegatingTenacityClient(new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS)
-                        .using(configuration.getTenacityClient())
-                        .build()))));
+                        .build())));
         final SyncComparator syncComparator = new SyncComparator(
-            new TenacityConfigurationFetcher.Factory(new DelegatingLodbrokTenacityClient(
-                new LodbrokTenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
+            new TenacityConfigurationFetcher.Factory(new DelegatingTenacityClient(
+                new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
                         .using(configuration.getTenacityClient())
-                        .build(),
-                new DelegatingTenacityClient(new TenacityClientBuilder(environment, BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION)
-                        .using(configuration.getTenacityClient())
-                        .build()))),
+                        .build())),
             breakerboxStore);
 
         final Set<String> metaClusters = configuration
@@ -234,26 +217,10 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(User.class));
     }
 
-    private static void registerChuteReporter(ChuteGraphiteConfiguration configuration, Environment environment) {
-        final ChuteGraphite chuteGraphite = new ChuteGraphiteFactory(configuration).build(environment);
-        final ChuteGraphiteReporter chuteGraphiteReporter = ChuteGraphiteReporter
-                .forRegistry(environment.metrics())
-                .build(chuteGraphite);
-        chuteGraphiteReporter.start(1, TimeUnit.MINUTES);
-    }
-
     private static void setupInstanceDiscovery(BreakerboxServiceConfiguration configuration,
                                                Environment environment) {
-        final LodbrokInstanceDiscovery lodbrokInstanceDiscovery = new LodbrokDiscoveryBundle<BreakerboxServiceConfiguration>() {
-            @Override
-            protected LodbrokDiscoveryConfiguration getLodbrokDiscoveryConfiguration(BreakerboxServiceConfiguration configuration) {
-                return configuration.getLodbrok();
-            }
-        }.createInstanceDiscovery(configuration, environment);
         final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
                 configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
-        PluginsFactory.setClusterMonitorFactory(new BreakerboxAggregatorFactory());
-        PluginsFactory.setInstanceDiscovery(
-                new ConcatenatingInstanceDiscovery(lodbrokInstanceDiscovery, yamlInstanceDiscovery));
+        PluginsFactory.setInstanceDiscovery(new ConcatenatingInstanceDiscovery(yamlInstanceDiscovery));
     }
 }

@@ -21,7 +21,6 @@
         <module>breakerbox-azure</module>
         <module>breakerbox-store</module>
         <module>breakerbox-jdbi</module>
-        <module>breakerbox-lodbrok</module>
         <module>breakerbox-turbine</module>
     </modules>
 
@@ -46,8 +45,7 @@
         <postgresql.version>9.4.1208.jre7</postgresql.version>
         <lodbrok.version>0.0.3</lodbrok.version>
         <h2.version>1.4.192</h2.version>
-        <chute.reporters.version>0.1.2</chute.reporters.version>
-        <logstash.appender.version>0.0.5</logstash.appender.version>
+        <kubernetes.version>2.2.136</kubernetes.version>
     </properties>
 
     <dependencyManagement>
@@ -137,23 +135,13 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.yammer.lodbrok.discovery</groupId>
-                <artifactId>lodbrok-discovery-core</artifactId>
-                <version>${lodbrok.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yammer.metrics.reporters</groupId>
-                <artifactId>chute-graphite-reporter</artifactId>
-                <version>${chute.reporters.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.yammer</groupId>
-                <artifactId>dropwizard-logstash-appender-dw9</artifactId>
-                <version>${logstash.appender.version}</version>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-api</artifactId>
+                <version>${kubernetes.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
+                        <groupId>com.fasterxml.jackson.module</groupId>
+                        <artifactId>jackson-module-jaxb-annotations</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
