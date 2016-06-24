@@ -85,7 +85,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
         this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
         this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox-instances.yml"));
-        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass);
+        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass)
+                .or(Optional.fromNullable(System.getProperty("InstanceDiscovery.impl")));
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
