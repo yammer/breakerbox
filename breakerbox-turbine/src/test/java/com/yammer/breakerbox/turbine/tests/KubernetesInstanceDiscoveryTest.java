@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,5 +154,26 @@ public class KubernetesInstanceDiscoveryTest {
             else
                 assertThat(instance.isUp()).isTrue();
         }
+    }
+
+    @Test
+    public void removesPodTemplateHashFromClusterName() throws Exception {
+        Pod deploymentPod = new Pod();
+        deploymentPod.setMetadata(new ObjectMeta());
+        deploymentPod.setStatus(new PodStatus());
+        deploymentPod.getStatus().setPodIP("10.116.0.8");
+        deploymentPod.getStatus().setPhase("Running");
+        deploymentPod.getMetadata().setAnnotations(
+                Maps.newHashMap(KubernetesInstanceDiscovery.PORT_ANNOTATION_KEY, "8080"));
+        deploymentPod.getMetadata().setLabels(
+                Maps.newHashMap(KubernetesInstanceDiscovery.POD_HASH_LABEL_KEY, "5432543253"));
+        deploymentPod.getMetadata().setName("service-depl-5432543253-097fsd");
+        deploymentPod.getMetadata().setGenerateName("service-depl-5432543253-");
+        deploymentPod.getMetadata().setNamespace("production");
+        pods.add(deploymentPod);
+        Optional<Instance> instanceOptional = discovery.getInstanceList().stream()
+                .filter(instance -> instance.getCluster().equals("production-service-depl"))
+                .findAny();
+        assertThat(instanceOptional.isPresent()).isTrue();
     }
 }
