@@ -25,9 +25,9 @@
     </modules>
 
     <scm>
-        <connection>scm:git:git://github.int.yammer.com/yammer/breakerbox.git</connection>
-        <developerConnection>scm:git:git@github.int.yammer.com:yammer/breakerbox.git</developerConnection>
-        <url>https://github.int.yammer.com/yammer/breakerbox/</url>
+        <connection>scm:git:git://github.com/yammer/breakerbox.git</connection>
+        <developerConnection>scm:git:git@github.com:yammer/breakerbox.git</developerConnection>
+        <url>https://github.com/yammer/breakerbox/</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -162,28 +162,50 @@
     </licenses>
 
     <distributionManagement>
-        <repository>
-            <id>maven.int.yammer.com-releases</id>
-            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
-        </repository>
         <snapshotRepository>
-            <id>maven.int.yammer.com-snapshots</id>
-            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>maven.int.yammer.com-releases</id>
-            <url>http://maven.int.yammer.com/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>maven.int.yammer.com-snapshots</id>
-            <url>http://maven.int.yammer.com/nexus/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-
     <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <keyname>28D77313</keyname>
+                            <useAgent>true</useAgent>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>allow-snapshots</id>
             <activation><activeByDefault>true</activeByDefault></activation>
