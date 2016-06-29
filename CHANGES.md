@@ -1,3 +1,11 @@
+0.4.4 - June 29, 2016
+---
+* `Dropwizard 0.9.3`
+* `Tenacity 0.8.3`
+* Migrate `Instances` from `FluentIterable` to Java8 `Streams`
+* Allow for custom `InstanceDiscovery` implementations
+* [KubernetesInstanceDiscovery](https://github.com/yammer/breakerbox/pull/23)
+
 0.4.3 - May 23, 2016
 ---
 * `turbine` configuration now references a `yaml` containing the instances configuration which will be reloaded whenever there is a change.
