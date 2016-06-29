@@ -19,7 +19,6 @@ import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.store.BreakerboxStore;
-import com.yammer.breakerbox.turbine.ConcatenatingInstanceDiscovery;
 import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.turbine.client.DelegatingTenacityClient;
 import com.yammer.breakerbox.turbine.managed.ManagedTurbine;
@@ -221,13 +220,13 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     private static void setupInstanceDiscovery(BreakerboxServiceConfiguration configuration,
                                                Environment environment) {
-        final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
-                configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
+
         final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration);
         if (customInstanceDiscovery.isPresent()) {
-            PluginsFactory.setInstanceDiscovery(new ConcatenatingInstanceDiscovery(
-                    customInstanceDiscovery.get(), yamlInstanceDiscovery));
+            PluginsFactory.setInstanceDiscovery(customInstanceDiscovery.get());
         } else {
+            final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
+                    configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
             PluginsFactory.setInstanceDiscovery(yamlInstanceDiscovery);
         }
     }
