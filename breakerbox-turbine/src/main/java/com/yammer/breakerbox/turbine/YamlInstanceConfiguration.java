@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class YamlInstanceConfiguration {
+
+    public static final String DEFAULT_URL_SUFFIX = "/tenacity/metrics.stream";
+
     @JsonUnwrapped
     @Valid
     private ImmutableMap<String, Cluster> clusters = ImmutableMap.of(
@@ -22,7 +25,7 @@ public class YamlInstanceConfiguration {
             "production", Cluster.withClusters("breakerbox"));
 
     @NotNull
-    private String urlSuffix = "/tenacity/metrics.stream";
+    private String urlSuffix = DEFAULT_URL_SUFFIX;
 
     public ImmutableMap<String, Cluster> getClusters() {
         return clusters;
