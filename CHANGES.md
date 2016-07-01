@@ -1,3 +1,7 @@
+0.4.5 - July 1, 2016
+---
+* Make cluster registration part of the normal cycle for `InstanceDiscovery`.
+
 0.4.4 - June 29, 2016
 ---
 * `Dropwizard 0.9.3`
