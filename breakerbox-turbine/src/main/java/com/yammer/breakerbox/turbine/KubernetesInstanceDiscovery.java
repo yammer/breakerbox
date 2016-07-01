@@ -41,7 +41,7 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
         LOGGER.info("Starting Kubernetes instance discovery using master URL: {}", client.getMasterUrl());
-        Collection<Instance> instances = client.pods().inAnyNamespace()
+        return client.pods().inAnyNamespace()
                 .list()
                 .getItems().stream()
                 .filter(pod -> pod.getMetadata().getAnnotations() != null)  // Ignore pods without annotations
@@ -60,13 +60,6 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
                 })
                 .filter(pod -> pod != null)
                 .collect(Collectors.toList());
-        // Register instance clusters with turbine
-        TurbineInstanceDiscovery.registerClusters(instances
-                        .stream()
-                        .map(Instance::getCluster)
-                        .collect(Collectors.toList()),
-                YamlInstanceConfiguration.DEFAULT_URL_SUFFIX);
-        return instances;
     }
 
     private static String extractClusterNameFor(Pod pod) {

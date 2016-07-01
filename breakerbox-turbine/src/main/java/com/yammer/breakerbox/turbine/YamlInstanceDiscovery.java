@@ -38,10 +38,7 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
 
     private Optional<YamlInstanceConfiguration> parseYamlInstanceConfiguration() {
         try {
-            final YamlInstanceConfiguration yamlInstanceConfiguration = configurationFactory.build(path.toFile());
-            TurbineInstanceDiscovery.registerClusters(yamlInstanceConfiguration.getClusters().keySet(),
-                    yamlInstanceConfiguration.getUrlSuffix());
-            return Optional.of(yamlInstanceConfiguration);
+            return Optional.of(configurationFactory.build(path.toFile()));
         } catch (Exception err) {
             LOGGER.error("Unable to parse {}", path.toAbsolutePath(), err);
         }
