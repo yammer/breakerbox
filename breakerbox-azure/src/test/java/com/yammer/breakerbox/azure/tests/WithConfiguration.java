@@ -5,7 +5,7 @@ import com.google.common.io.Resources;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.azure.TableClientFactory;
 import com.yammer.breakerbox.azure.core.TableId;
-import io.dropwizard.configuration.ConfigurationFactory;
+import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
@@ -18,7 +18,7 @@ public abstract class WithConfiguration {
 
     @Before
     public void setupTest() throws Exception {
-        azureTableConfiguration = new ConfigurationFactory<>(
+        azureTableConfiguration = new YamlConfigurationFactory<>(
                 AzureTableConfiguration.class,
                 Validation.buildDefaultValidatorFactory().getValidator(),
                 Jackson.newObjectMapper(),

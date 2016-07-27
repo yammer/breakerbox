@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.service.auth;
 
-import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthFilter;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.basic.BasicCredentials;
@@ -13,6 +12,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Optional;
 
 public class NullAuthFilter<P extends Principal> extends AuthFilter<BasicCredentials, P> {
     private static final Logger LOGGER = LoggerFactory.getLogger(NullAuthFilter.class);

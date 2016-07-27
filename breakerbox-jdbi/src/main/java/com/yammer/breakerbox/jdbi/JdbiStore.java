@@ -14,6 +14,7 @@ import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.CloseableLiquibase;
+import io.dropwizard.migrations.CloseableLiquibaseWithClassPathMigrationsFile;
 import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JdbiStore extends BreakerboxStore {
+    public static final String MIGRATIONS_FILENAME = "migrations.xml";
     private static final Logger LOGGER = LoggerFactory.getLogger(JdbiStore.class);
     protected final ServiceDB serviceDB;
     protected final DependencyDB dependencyDB;
@@ -53,9 +55,9 @@ public class JdbiStore extends BreakerboxStore {
 
     @Override
     public boolean initialize() {
-        try (CloseableLiquibase liquibase = new CloseableLiquibase(configuration
+        try (CloseableLiquibase liquibase = new CloseableLiquibaseWithClassPathMigrationsFile(configuration
                 .getDataSourceFactory()
-                .build(metricRegistry, "liquibase"))) {
+                .build(metricRegistry, "liquibase"), MIGRATIONS_FILENAME)) {
             liquibase.update("");
             return true;
         } catch (Exception err) {

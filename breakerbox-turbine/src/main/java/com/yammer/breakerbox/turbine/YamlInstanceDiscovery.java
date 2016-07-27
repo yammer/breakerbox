@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
 import io.dropwizard.configuration.ConfigurationFactory;
+import io.dropwizard.configuration.YamlConfigurationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class YamlInstanceDiscovery implements InstanceDiscovery {
                                  Validator validator,
                                  ObjectMapper objectMapper) {
         this.path = path;
-        this.configurationFactory = new ConfigurationFactory<>(
+        this.configurationFactory = new YamlConfigurationFactory<>(
                 YamlInstanceConfiguration.class,
                 validator,
                 objectMapper,
