@@ -44,7 +44,7 @@
         <dropwizard-auth-ldap.version>1.0.0</dropwizard-auth-ldap.version>
         <postgresql.version>9.4.1209.jre7</postgresql.version>
         <h2.version>1.4.192</h2.version>
-        <kubernetes.version>2.2.136</kubernetes.version>
+        <kubernetes.version>2.2.144</kubernetes.version>
     </properties>
 
     <dependencyManagement>
