@@ -2,6 +2,7 @@ package com.yammer.breakerbox.jdbi.tests;
 
 import com.codahale.metrics.MetricRegistry;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
+import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.jdbi.args.DateTimeArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.DependencyIdArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.ServiceIdArgumentFactory;
@@ -14,6 +15,7 @@ import com.yammer.tenacity.core.config.TenacityConfiguration;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.CloseableLiquibase;
+import io.dropwizard.migrations.CloseableLiquibaseWithClassPathMigrationsFile;
 import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -37,9 +39,9 @@ public class H2Test {
 
     @Before
     public void setupH2Test() throws Exception {
-        liquibase = new CloseableLiquibase(hsqlConfig
+        liquibase = new CloseableLiquibaseWithClassPathMigrationsFile(hsqlConfig
                 .getDataSourceFactory()
-                .build(new MetricRegistry(), "liquibase"));
+                .build(new MetricRegistry(), "liquibase"), JdbiStore.MIGRATIONS_FILENAME);
         liquibase.update("");
         database = new DBIFactory().build(environment(), hsqlConfig.getDataSourceFactory(), "h2test");
         database.registerArgumentFactory(new DependencyIdArgumentFactory());

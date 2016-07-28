@@ -7,6 +7,7 @@ import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.turbine.YamlInstanceConfiguration;
 import io.dropwizard.configuration.ConfigurationFactory;
+import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import java.io.File;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class YamlInstanceConfigurationTest {
-    private ConfigurationFactory<YamlInstanceConfiguration> configFactory = new ConfigurationFactory<>(
+    private ConfigurationFactory<YamlInstanceConfiguration> configFactory = new YamlConfigurationFactory<>(
             YamlInstanceConfiguration.class,
             Validators.newValidator(),
             Jackson.newObjectMapper(),

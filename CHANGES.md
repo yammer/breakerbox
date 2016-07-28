@@ -1,3 +1,12 @@
+0.5.0 - July ??, 2016
+---
+* [Dropwizard 1.0](http://www.dropwizard.io/1.0.0/docs/)
+* Tenacity 1.0.0
+* PostgreSQL 9.4.1209.jre7
+* Dropwizard-auth-ldap 1.0.0
+* Maven-findbugs 3.0.4  
+* Kubernetes-api 2.2.144
+
 0.4.5 - July 1, 2016
 ---
 * Make cluster registration part of the normal cycle for `InstanceDiscovery`.

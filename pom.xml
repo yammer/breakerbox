@@ -37,14 +37,14 @@
     </issueManagement>
 
     <properties>
-        <dropwizard.version>0.9.3</dropwizard.version>
+        <dropwizard.version>1.0.0</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>0.8.3</tenacity.version>
+        <tenacity.version>1.0.0</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
-        <dropwizard-auth-ldap.version>0.3.0</dropwizard-auth-ldap.version>
-        <postgresql.version>9.4.1208.jre7</postgresql.version>
+        <dropwizard-auth-ldap.version>1.0.0</dropwizard-auth-ldap.version>
+        <postgresql.version>9.4.1209.jre7</postgresql.version>
         <h2.version>1.4.192</h2.version>
-        <kubernetes.version>2.2.136</kubernetes.version>
+        <kubernetes.version>2.2.144</kubernetes.version>
     </properties>
 
     <dependencyManagement>
@@ -299,7 +299,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Default</threshold>
