@@ -1,4 +1,4 @@
-0.5.0 - July ??, 2016
+0.5.0 - July 28, 2016
 ---
 * [Dropwizard 1.0](http://www.dropwizard.io/1.0.0/docs/)
 * Tenacity 1.0.0
