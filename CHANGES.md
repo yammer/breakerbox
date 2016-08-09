@@ -1,4 +1,4 @@
-0.5.1 - ??
+0.5.1 - August 9, 2016
 ---
 * [Tenacity 1.0.1](https://github.com/yammer/tenacity)
 
