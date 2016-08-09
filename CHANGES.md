@@ -1,3 +1,7 @@
+0.5.1 - ??
+---
+* [Tenacity 1.0.1](https://github.com/yammer/tenacity)
+
 0.5.0 - July 28, 2016
 ---
 * [Dropwizard 1.0](http://www.dropwizard.io/1.0.0/docs/)
