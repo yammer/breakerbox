@@ -4,7 +4,7 @@
 
     <groupId>com.yammer.breakerbox</groupId>
     <artifactId>breakerbox-parent</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.1</version>
     <packaging>pom</packaging>
     <name>Breakerbox Project</name>
     <description>Frontend for Tenacity + Archaius</description>
@@ -28,7 +28,7 @@
         <connection>scm:git:git://github.com/yammer/breakerbox.git</connection>
         <developerConnection>scm:git:git@github.com:yammer/breakerbox.git</developerConnection>
         <url>https://github.com/yammer/breakerbox/</url>
-        <tag>HEAD</tag>
+        <tag>breakerbox-parent-0.5.1</tag>
     </scm>
 
     <issueManagement>
