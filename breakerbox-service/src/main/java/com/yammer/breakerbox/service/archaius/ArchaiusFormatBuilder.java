@@ -15,6 +15,7 @@ public class ArchaiusFormatBuilder {
 
     public ArchaiusFormatBuilder hystrixMetricsStreamServletMaxConnections(int value) {
         appender("hystrix.stream.maxConcurrentConnections", value);
+        appender("hystrix.config.stream.maxConcurrentConnections", value);
         return this;
     }
 

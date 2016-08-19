@@ -1,3 +1,8 @@
+0.5.2 - August 18, 2016
+---
+* `Hystrix 1.5.4` changed the `HystrixMetricsStreamServlet` to use a new parameter to
+control the max number of concurrent connections: `hystrix.config.stream.maxConcurrentConnections`.
+
 0.5.1 - August 9, 2016
 ---
 * [Tenacity 1.0.1](https://github.com/yammer/tenacity)
