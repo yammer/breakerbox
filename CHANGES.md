@@ -1,3 +1,9 @@
+0.5.3 - Sept. 28, 2016
+---
+* [Dropwizard 1.0.2](http://www.dropwizard.io/1.0.2/docs/about/release-notes.html#v1-0-2-sep-23-2016)
+* [Tenacity 1.0.2](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
+* PostgreSQL 9.4.1211.jre7
+
 0.5.2 - August 18, 2016
 ---
 * `Hystrix 1.5.4` changed the `HystrixMetricsStreamServlet` to use a new parameter to
