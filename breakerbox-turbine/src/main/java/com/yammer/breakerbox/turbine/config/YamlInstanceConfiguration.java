@@ -1,18 +1,20 @@
-package com.yammer.breakerbox.turbine;
+package com.yammer.breakerbox.turbine.config;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.yammer.breakerbox.turbine.TurbineInstanceDiscovery;
 
 public class YamlInstanceConfiguration {
 

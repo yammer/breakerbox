@@ -45,6 +45,8 @@
         <postgresql.version>9.4.1211.jre7</postgresql.version>
         <h2.version>1.4.192</h2.version>
         <kubernetes.version>2.2.144</kubernetes.version>
+        <powermock.version>1.6.5</powermock.version>
+        <mockito-all.version>1.10.19</mockito-all.version>
     </properties>
 
     <dependencyManagement>
@@ -138,6 +140,30 @@
                         <artifactId>jackson-module-jaxb-annotations</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>mockito-core</artifactId>
+                        <groupId>org.mockito</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${mockito-all.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

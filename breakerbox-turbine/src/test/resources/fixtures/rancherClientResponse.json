@@ -1,0 +1,102 @@
+{
+  "type": "collection",
+  "resourceType": "service",
+  "data": [
+    {
+      "id": "1s14",
+      "type": "service",
+      "name": "xyz-service",
+      "state": "active",
+      "accountId": "1a5",
+      "assignServiceIpAddress": false,
+      "createIndex": 9,
+      "created": "2016-10-08T07:35:43Z",
+      "createdTS": 1475912143000,
+      "currentScale": 1,
+      "description": null,
+      "environmentId": "1e4",
+      "externalId": null,
+      "fqdn": null,
+      "healthState": "healthy",
+      "kind": "service",
+      "launchConfig": {
+        "capAdd": [],
+        "capDrop": [],
+        "count": null,
+        "cpuSet": null,
+        "cpuShares": null,
+        "dataVolumes": [],
+        "dataVolumesFrom": [],
+        "description": null,
+        "devices": [],
+        "dns": [],
+        "dnsSearch": [],
+        "domainName": null,
+        "hostname": null,
+        "kind": "container",
+        "labels": {
+          "tenacity.metrics.stream.enabled": "true",
+          "tenacity.metrics.stream.port": "8081",
+          "service.cluster.name": "xyz"
+        },
+        "logConfig": {
+          "config": {},
+          "driver": ""
+        },
+        "memory": null,
+        "memoryMb": null,
+        "memorySwap": null,
+        "networkMode": "managed",
+        "pidMode": null,
+        "ports": [
+          "8080:8080\/tcp",
+          "8081:8081\/tcp"
+        ],
+        "privileged": false,
+        "publishAllPorts": false,
+        "readOnly": false,
+        "requestedIpAddress": null,
+        "startOnCreate": true,
+        "stdinOpen": true,
+        "tty": true,
+        "user": null,
+        "userdata": null,
+        "version": "32036538-9a7a-4d45-9e8a-61483113f458",
+        "volumeDriver": null,
+        "workingDir": null,
+        "dataVolumesFromLaunchConfigs": [],
+        "networkLaunchConfig": null,
+        "vcpu": 1
+      },
+      "metadata": null,
+      "publicEndpoints": [
+        {
+          "ipAddress": "192.168.1.109",
+          "port": 8080,
+          "serviceId": "1s14",
+          "hostId": "1h1",
+          "instanceId": "1i46"
+        },
+        {
+          "ipAddress": "192.168.1.109",
+          "port": 8081,
+          "serviceId": "1s14",
+          "hostId": "1h1",
+          "instanceId": "1i46"
+        }
+      ],
+      "removed": null,
+      "retainIp": null,
+      "scale": 1,
+      "scalePolicy": null,
+      "selectorContainer": null,
+      "selectorLink": null,
+      "startOnCreate": true,
+      "transitioning": "no",
+      "transitioningMessage": null,
+      "transitioningProgress": null,
+      "uuid": "2f14081d-651f-4dcc-8aa6-9ce36a0460a8",
+      "vip": null
+    }
+  ]
+}
