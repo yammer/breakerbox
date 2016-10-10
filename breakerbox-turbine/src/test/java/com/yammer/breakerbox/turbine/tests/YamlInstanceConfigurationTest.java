@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
-import com.yammer.breakerbox.turbine.YamlInstanceConfiguration;
+import com.yammer.breakerbox.turbine.config.YamlInstanceConfiguration;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.jackson.Jackson;

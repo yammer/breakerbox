@@ -19,6 +19,7 @@ import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.store.BreakerboxStore;
+import com.yammer.breakerbox.turbine.RancherInstanceDiscovery;
 import com.yammer.breakerbox.turbine.RegisterClustersInstanceDiscoveryWrapper;
 import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
 import com.yammer.breakerbox.turbine.client.DelegatingTenacityClient;
@@ -221,8 +222,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     private static void setupInstanceDiscovery(BreakerboxServiceConfiguration configuration,
                                                Environment environment) {
-
-        final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration);
+        final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration, environment);
         if (customInstanceDiscovery.isPresent()) {
             PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
                     customInstanceDiscovery.get()));
@@ -233,15 +233,29 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         }
     }
 
-    private static Optional<InstanceDiscovery> createInstanceDiscovery(BreakerboxServiceConfiguration configuration) {
+    private static Optional<InstanceDiscovery> createInstanceDiscovery(BreakerboxServiceConfiguration configuration,
+                                                                       Environment environment) {
         if (configuration.getInstanceDiscoveryClass().isPresent()) {
             try {
-                final Class<?> instanceDiscoveryClass = Class.forName(configuration.getInstanceDiscoveryClass().get());
-                return Optional.of((InstanceDiscovery) instanceDiscoveryClass.newInstance());
+                final Class<InstanceDiscovery> instanceDiscoveryClass =
+                  (Class<InstanceDiscovery>) Class.forName(configuration.getInstanceDiscoveryClass().get());
+                return Optional.of(createClassInstance(instanceDiscoveryClass, configuration, environment));
             } catch (Exception err) {
                 LOGGER.warn("No default constructor for {}", configuration.getInstanceDiscoveryClass(), err);
             }
         }
         return Optional.empty();
+    }
+
+    private static InstanceDiscovery createClassInstance(Class<InstanceDiscovery> instanceDiscoveryClass,
+                                                    BreakerboxServiceConfiguration configuration,
+                                                    Environment environment) throws Exception {
+        if(instanceDiscoveryClass.equals(RancherInstanceDiscovery.class)
+              && configuration.getRancherInstanceConfiguration().isPresent()) {
+            return new RancherInstanceDiscovery(configuration.getRancherInstanceConfiguration().get(), environment.getObjectMapper());
+        } else if (instanceDiscoveryClass.equals(YamlInstanceDiscovery.class)) {
+            return new YamlInstanceDiscovery(configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
+        }
+        return instanceDiscoveryClass.newInstance();
     }
 }

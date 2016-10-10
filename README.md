@@ -70,6 +70,11 @@ turbine:
       clusters:
         - breakerbox
 
+rancherDiscovery:
+  serviceApiUrl: http://localhost:8080/v1/projects/1a5/services
+  accessKey: 3E0F7DB0A2B601981F1B
+  secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
+  
 server:
   applicationConnectors:
     - type: http
@@ -166,8 +171,23 @@ production:
 
 Instance Discovery Class
 ------------------------
-Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implemention. You can also leverage the 
-`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` class.
+Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implementation. You can also leverage the 
+`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` and `com.yammer.breakerbox.turbine.RancherInstanceDiscovery` classes.
+
+To integrate with RancherInstanceDiscovery, 
+    
+    1. specify rancher services Api url, accessKey and secret key.
+        rancherDiscovery:
+            serviceApiUrl: http://localhost:8080/v1/projects/1a5/services
+            accessKey: 3E0F7DB0A2B601981F1B
+            secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
+        
+    2. add labels in rancher service containers:
+         a. tenacity.metrics.stream.enabled: true
+         b. tenacity.metrics.stream.port: 8080
+         c. service.cluster.name: clusterName
+        
+    3. RancherInstanceDiscovery will create dashboards per service-cluster with service.cluster.name label and one aggregated production dashboard. Dashboards can be created, enabled, disabled by updating labels at runtime.
 
 Meta Clusters
 -------------

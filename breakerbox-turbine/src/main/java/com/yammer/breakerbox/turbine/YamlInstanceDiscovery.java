@@ -3,6 +3,7 @@ package com.yammer.breakerbox.turbine;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
+import com.yammer.breakerbox.turbine.config.YamlInstanceConfiguration;
 import io.dropwizard.configuration.ConfigurationFactory;
 import io.dropwizard.configuration.YamlConfigurationFactory;
 import org.slf4j.Logger;
