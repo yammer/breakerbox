@@ -1,3 +1,9 @@
+0.5.4 - Oct. 10, 2016
+---
+* [Dropwizard-auth-ldap 1.0.2](https://github.com/yammer/dropwizard-auth-ldap)
+* [Tenacity 1.0.3](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
+* Rancher Instance Discovery support (thanks @gauravic08)[Pull Request 29](https://github.com/yammer/breakerbox/pull/29)
+
 0.5.3 - Sept. 28, 2016
 ---
 * [Dropwizard 1.0.2](http://www.dropwizard.io/1.0.2/docs/about/release-notes.html#v1-0-2-sep-23-2016)
