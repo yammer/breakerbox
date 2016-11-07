@@ -1,3 +1,9 @@
+0.5.5 - Nov. 7, 2016
+---
+* [Dropwizard 1.0.3](http://www.dropwizard.io/1.0.2/docs/about/release-notes.html)
+* [Tenacity 1.0.4](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
+* H2 1.4.193
+
 0.5.4 - Oct. 10, 2016
 ---
 * [Dropwizard-auth-ldap 1.0.2](https://github.com/yammer/dropwizard-auth-ldap)
