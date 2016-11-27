@@ -29,7 +29,7 @@ public class AzureTableConfiguration {
                                    @JsonProperty("retryInterval") Duration retryInterval,
                                    @JsonProperty("retryAttempts") int retryAttempts) {
         this.retryInterval = checkNotNull(retryInterval, "retryInterval cannot be null");
-        this.retryAttempts = checkNotNull(retryAttempts, "retryAttempts cannot be null");
+        this.retryAttempts = retryAttempts;
         this.timeout = checkNotNull(timeout, "timeout cannot be null");
         this.storageCredentialsAccountAndKey =
                 new StorageCredentialsAccountAndKey(

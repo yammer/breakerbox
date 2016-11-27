@@ -256,6 +256,6 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         } else if (instanceDiscoveryClass.equals(YamlInstanceDiscovery.class)) {
             return new YamlInstanceDiscovery(configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
         }
-        return instanceDiscoveryClass.newInstance();
+        return instanceDiscoveryClass.getConstructor().newInstance();
     }
 }

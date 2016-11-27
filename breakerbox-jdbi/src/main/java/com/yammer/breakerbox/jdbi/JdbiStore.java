@@ -70,7 +70,7 @@ public class JdbiStore extends BreakerboxStore {
     public boolean store(DependencyModel dependencyModel) {
         try {
             final Optional<DependencyModel> storedModel = retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime());
-            return storedModel.isPresent() && storedModel.get().equals(dependencyModel) || dependencyDB.insert(dependencyModel) == 1;
+            return (storedModel.isPresent() && storedModel.get().equals(dependencyModel)) || dependencyDB.insert(dependencyModel) == 1;
         } catch (DBIException err) {
             LOGGER.warn("Failed to store: {}", dependencyModel, err);
         }
