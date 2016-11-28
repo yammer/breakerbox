@@ -33,7 +33,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.int.yammer.com/yammer/breakerbox/issues</url>
+        <url>https://github.com/yammer/breakerbox/issues</url>
     </issueManagement>
 
     <properties>
