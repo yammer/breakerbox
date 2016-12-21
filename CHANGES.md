@@ -1,6 +1,13 @@
+0.5.6 - Dec. 21, 2016
+---
+* [Dropwizard 1.0.5](http://www.dropwizard.io/1.0.5/docs/about/release-notes.html)
+* [Tenacity 1.0.5](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.0.5)
+* PostgreSQL 9.4.1212.jre7
+* Added [Google Error-Prone](https://github.com/google/error-prone) to the build
+
 0.5.5 - Nov. 7, 2016
 ---
-* [Dropwizard 1.0.3](http://www.dropwizard.io/1.0.2/docs/about/release-notes.html)
+* [Dropwizard 1.0.3](http://www.dropwizard.io/1.0.3/docs/about/release-notes.html)
 * [Tenacity 1.0.4](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
 * H2 1.4.193
 
