@@ -10,3 +10,4 @@ breakerbox-ui/node_modules
 *.swp
 docker/vault
 docker/logs
+release.properties
