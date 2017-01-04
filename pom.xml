@@ -42,7 +42,7 @@
         <tenacity.version>1.0.5</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>1.0.3</dropwizard-auth-ldap.version>
-        <postgresql.version>9.4.1212.jre7</postgresql.version>
+        <postgresql.version>9.4.1212</postgresql.version>
         <h2.version>1.4.193</h2.version>
         <kubernetes.version>2.2.144</kubernetes.version>
         <powermock.version>1.6.5</powermock.version>
