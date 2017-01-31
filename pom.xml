@@ -37,7 +37,7 @@
     </issueManagement>
 
     <properties>
-        <dropwizard.version>1.0.5</dropwizard.version>
+        <dropwizard.version>1.0.6</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
         <tenacity.version>1.0.5</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
