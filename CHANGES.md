@@ -1,3 +1,10 @@
+Next
+---
+* [Dropwizard 1.0.6](http://www.dropwizard.io/1.0.6/docs/about/release-notes.html)
+* PostgreSQL 42.0.0
+* [Dropwizard-auth-ldap 1.0.4](https://github.com/yammer/dropwizard-auth-ldap)
+* H2 1.4.194
+
 0.5.6 - Dec. 21, 2016
 ---
 * [Dropwizard 1.0.5](http://www.dropwizard.io/1.0.5/docs/about/release-notes.html)
