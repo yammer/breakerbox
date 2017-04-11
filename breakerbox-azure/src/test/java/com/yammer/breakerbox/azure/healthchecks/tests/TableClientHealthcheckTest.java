@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.azure.healthchecks.tests;
 
-import com.codahale.metrics.health.HealthCheck;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.breakerbox.azure.core.TableId;
@@ -19,7 +18,7 @@ public class TableClientHealthcheckTest {
         final TableClientHealthcheck tableClientHealthcheck = new TableClientHealthcheck(mockTableClient);
 
         when(mockTableClient.listTables()).thenReturn(ImmutableList.of(TableId.SERVICE.toString()));
-        assertThat(tableClientHealthcheck.check()).isEqualTo(HealthCheck.Result.healthy());
+        assertThat(tableClientHealthcheck.check().isHealthy()).isTrue();
     }
 
     @Test
@@ -28,6 +27,6 @@ public class TableClientHealthcheckTest {
         final TableClientHealthcheck tableClientHealthcheck = new TableClientHealthcheck(mockTableClient);
 
         when(mockTableClient.listTables()).thenReturn(ImmutableList.<String>of());
-        assertThat(tableClientHealthcheck.check()).isEqualTo(HealthCheck.Result.unhealthy("Could not list tables"));
+        assertThat(tableClientHealthcheck.check().isHealthy()).isFalse();
     }
 }
