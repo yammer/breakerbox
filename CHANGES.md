@@ -4,9 +4,6 @@
 * [Tenacity 1.1.0](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
 * Dropped dependency on PowerMock
 * Mockito 2.7.22
-
----
-* [Dropwizard 1.0.6](http://www.dropwizard.io/1.0.6/docs/about/release-notes.html)
 * PostgreSQL 42.0.0
 * [Dropwizard-auth-ldap 1.0.4](https://github.com/yammer/dropwizard-auth-ldap)
 * H2 1.4.194
