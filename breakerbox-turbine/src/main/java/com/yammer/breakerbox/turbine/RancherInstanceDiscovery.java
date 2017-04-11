@@ -1,17 +1,5 @@
 package com.yammer.breakerbox.turbine;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -21,15 +9,29 @@ import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.yammer.breakerbox.turbine.client.RancherClient;
 import com.yammer.breakerbox.turbine.config.RancherInstanceConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RancherInstanceDiscovery implements InstanceDiscovery {
     private static final Logger LOGGER = LoggerFactory.getLogger(RancherInstanceDiscovery.class);
-    private RancherClient rancherClient;
-    private ObjectMapper mapper;
+    private final RancherClient rancherClient;
+    private final ObjectMapper mapper;
 
     public RancherInstanceDiscovery(RancherInstanceConfiguration instanceConfiguration,
                                     ObjectMapper mapper) {
-        this.rancherClient = new RancherClient(instanceConfiguration);
+        this(new RancherClient(instanceConfiguration), mapper);
+    }
+
+    public RancherInstanceDiscovery(RancherClient rancherClient, ObjectMapper mapper) {
+        this.rancherClient = rancherClient;
         this.mapper = mapper;
     }
 
