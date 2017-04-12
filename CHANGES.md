@@ -1,7 +1,7 @@
 0.6.0 - Apr. 11, 2017
 ---
 * [Dropwizard 1.1.0](http://www.dropwizard.io/1.1.0/docs/about/release-notes.html)
-* [Tenacity 1.1.0](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
+* [Tenacity 1.1.1](https://github.com/yammer/tenacity/blob/master/CHANGES.md)
 * Dropped dependency on PowerMock
 * Mockito 2.7.22
 * PostgreSQL 42.0.0
