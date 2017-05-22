@@ -43,6 +43,7 @@
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>1.0.4</dropwizard-auth-ldap.version>
         <postgresql.version>42.1.1</postgresql.version>
+        <mysql.version>5.1.38</mysql.version>
         <h2.version>1.4.195</h2.version>
         <kubernetes.version>2.2.144</kubernetes.version>
         <mockito-core.version>2.8.9</mockito-core.version>
@@ -104,6 +105,11 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
