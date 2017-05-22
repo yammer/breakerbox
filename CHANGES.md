@@ -1,3 +1,10 @@
+0.6.1 - May 22, 2017
+---
+* [Dropwizard 1.1.1](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.1)
+* [Tenacity 1.1.2](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.1.2)
+* Mockito 2.8.9
+* H2 1.4.195
+
 0.6.0 - Apr. 11, 2017
 ---
 * [Dropwizard 1.1.0](http://www.dropwizard.io/1.1.0/docs/about/release-notes.html)
