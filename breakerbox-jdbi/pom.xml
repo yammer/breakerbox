@@ -15,6 +15,10 @@
             <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.yammer.breakerbox</groupId>
             <artifactId>breakerbox-store</artifactId>
         </dependency>
