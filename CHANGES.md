@@ -1,3 +1,7 @@
+Next
+---
+* [MySQL Support](https://github.com/yammer/breakerbox/pull/33) Thanks @sriniprash!
+
 0.6.1 - May 22, 2017
 ---
 * [Dropwizard 1.1.1](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.1)
