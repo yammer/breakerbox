@@ -74,6 +74,12 @@ rancherDiscovery:
   serviceApiUrl: http://localhost:8080/v1/projects/1a5/services
   accessKey: 3E0F7DB0A2B601981F1B
   secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
+
+marathonDiscovery:
+  marathonApiUrl: http://localhost:8080/v2/apps
+  marathonAppPort: 8080
+  marathonAppNameSpace: /orc/prod-ola/partner-api-java
+
   
 server:
   applicationConnectors:
@@ -172,7 +178,7 @@ production:
 Instance Discovery Class
 ------------------------
 Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implementation. You can also leverage the 
-`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` and `com.yammer.breakerbox.turbine.RancherInstanceDiscovery` classes.
+`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` , `com.yammer.breakerbox.turbine.RancherInstanceDiscovery` , `com.yammer.breakerbox.turbine.MarathonInstanceDiscovery`and classes.
 
 To integrate with RancherInstanceDiscovery, 
     
