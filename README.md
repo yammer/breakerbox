@@ -76,9 +76,10 @@ rancherDiscovery:
   secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
 
 marathonDiscovery:
-  marathonApiUrl: http://localhost:8080/v2/apps
-  marathonAppPort: 8080
-  marathonAppNameSpace: /orc/prod-ola/partner-api-java
+  marathonApiUrl: http://localhost:8080
+  marathonAppPort: 12345
+  marathonAppNameSpace: /exampleNameSpace
+  cluster: exampleCluster
 
   
 server:
@@ -194,6 +195,16 @@ To integrate with RancherInstanceDiscovery,
          c. service.cluster.name: clusterName
         
     3. RancherInstanceDiscovery will create dashboards per service-cluster with service.cluster.name label and one aggregated production dashboard. Dashboards can be created, enabled, disabled by updating labels at runtime.
+
+To integrate with MarathonInstanceDiscovery,
+    1. specify marathon services Api url, marathonAppPort(your application port), marathonAppNameSpace and clusterName.
+        marathonDiscovery:
+            marathonApiUrl: http://localhost:8080
+            marathonAppPort: 12345
+            marathonAppNameSpace: /exampleNameSpace
+            cluster: exampleCluster
+
+    2. MarathonInstanceDiscovery will create dashboards per unique cluster specified in the config.   
 
 Meta Clusters
 -------------
