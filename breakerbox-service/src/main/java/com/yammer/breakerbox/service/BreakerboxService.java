@@ -258,7 +258,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
             return new YamlInstanceDiscovery(configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
         }
         else if (instanceDiscoveryClass.equals(MarathonInstanceDiscovery.class)){
-            return new MarathonInstanceDiscovery(configuration.getMarathonClientConfiguration().get(),environment.getObjectMapper());
+            System.out.println("marathon instance discovery");
+            return new MarathonInstanceDiscovery(environment.getObjectMapper(),configuration.getMarathonClientConfiguration().get());
         }
         return instanceDiscoveryClass.getConstructor().newInstance();
     }

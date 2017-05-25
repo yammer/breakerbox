@@ -8,11 +8,13 @@ import com.yammer.breakerbox.turbine.config.MarathonClientConfiguration;
 import com.yammer.breakerbox.turbine.model.MarathonClientResponse;
 import com.yammer.breakerbox.turbine.model.PortMapping;
 import com.yammer.breakerbox.turbine.model.Task;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,30 +25,35 @@ import java.util.stream.Collectors;
  */
 public class MarathonInstanceDiscovery implements InstanceDiscovery {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarathonInstanceDiscovery.class);
-    private final MarathonClient marathonClient;
     private final ObjectMapper mapper;
-    private final MarathonClientConfiguration marathonClientConfiguration;
+    private  MarathonClient marathonClient;
+    private final List<MarathonClientConfiguration> marathonClientConfigurations;
 
-    public MarathonInstanceDiscovery(MarathonClientConfiguration marathonClientConfiguration, ObjectMapper mapper) {
 
-        this(new MarathonClient(marathonClientConfiguration), mapper, marathonClientConfiguration);
-    }
 
-    public MarathonInstanceDiscovery(MarathonClient marathonClient, ObjectMapper mapper, MarathonClientConfiguration marathonClientConfiguration) {
-        this.marathonClient = marathonClient;
+    public MarathonInstanceDiscovery(ObjectMapper mapper, List<MarathonClientConfiguration> marathonClientConfigurations) {
         this.mapper = mapper;
-        this.marathonClientConfiguration = marathonClientConfiguration;
+        this.marathonClientConfigurations = marathonClientConfigurations;
     }
 
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
-        Response response = marathonClient.getServiceInstanceDetails();
-        return response.getStatus() == 200
-                ? createServiceInstanceList(response.readEntity(String.class))
-                : Collections.emptyList();
+        List<Instance> instances = new ArrayList<>();
+        marathonClientConfigurations.parallelStream().forEach(marathonClientConfiguration -> {
+            marathonClient = new MarathonClient(marathonClientConfiguration);
+            Response response = marathonClient.getServiceInstanceDetails();
+            if(response.getStatus() == HttpStatus.SC_OK){
+                try {
+                    instances.addAll(createServiceInstanceList(response.readEntity(String.class),marathonClientConfiguration));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return instances;
     }
 
-    private Collection<Instance> createServiceInstanceList(String marathonApiResponse) throws IOException {
+     public List<Instance> createServiceInstanceList(String marathonApiResponse,MarathonClientConfiguration marathonClientConfiguration) throws IOException {
         MarathonClientResponse marathonClientResponse = mapper.readValue(marathonApiResponse, MarathonClientResponse.class);
         if (marathonClientResponse != null && marathonClientResponse.getApp() != null) {
             List<PortMapping> portMappingList = marathonClientResponse.getApp().getContainer().getDocker().getPortMappings();
@@ -67,11 +74,11 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
 
             int finalPortIndex = portIndex;
             List<Instance> instances = tasks.stream()
-                    .map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex), marathonClientConfiguration.getMarathonAppNameSpace(), true)).collect(Collectors.toList());
+                    .map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex), marathonClientConfiguration.getCluster(), true)).collect(Collectors.toList());
             return instances;
         } else {
             LOGGER.error("tasks not available for the given namespace");
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
     }
 }

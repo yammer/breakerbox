@@ -67,7 +67,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private final Optional<RancherInstanceConfiguration> rancherInstanceConfiguration;
 
     @NotNull @UnwrapValidatedValue(false)
-    public final Optional<MarathonClientConfiguration> marathonClientConfiguration;
+    public final Optional<List<MarathonClientConfiguration>> marathonClientConfiguration;
 
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
@@ -83,7 +83,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("turbine") Path turbine,
                                           @JsonProperty("instanceDiscoveryClass") String instanceDiscoveryClass,
                                           @JsonProperty("rancherDiscovery") RancherInstanceConfiguration rancherInstanceConfiguration,
-                                          @JsonProperty("marathonDiscovery")MarathonClientConfiguration marathonClientConfiguration) {
+                                          @JsonProperty("marathonDiscovery")List<MarathonClientConfiguration> marathonClientConfiguration) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -175,7 +175,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return rancherInstanceConfiguration;
     }
 
-    public Optional<MarathonClientConfiguration> getMarathonClientConfiguration(){
+    public Optional<List<MarathonClientConfiguration>> getMarathonClientConfiguration(){
         return marathonClientConfiguration;
     }
     @Override

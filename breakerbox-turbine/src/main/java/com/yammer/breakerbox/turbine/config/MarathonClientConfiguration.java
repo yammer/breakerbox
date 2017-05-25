@@ -12,6 +12,11 @@ public class MarathonClientConfiguration {
     private String marathonAppNameSpace;
     @NotEmpty
     private Integer marathonAppPort;
+    // this is the custom clustername that you can have for the services cluster
+    @NotEmpty
+    private String cluster;
+
+    public String getCluster() { return cluster; }
 
     public String getMarathonApiUrl() {
         return marathonApiUrl;
@@ -25,37 +30,20 @@ public class MarathonClientConfiguration {
         return marathonAppPort;
     }
 
-    @Override
-    public String toString() {
-        return "MarathonClientConfiguration{" +
-                "marathonApiUrl='" + marathonApiUrl + '\'' +
-                ", marathonAppNameSpace='" + marathonAppNameSpace + '\'' +
-                ", marathonAppPort='" + marathonAppPort + '\'' +
-                '}';
+
+    public void setMarathonApiUrl(String marathonApiUrl) {
+        this.marathonApiUrl = marathonApiUrl;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MarathonClientConfiguration that = (MarathonClientConfiguration) o;
-
-        if (marathonApiUrl != null ? !marathonApiUrl.equals(that.marathonApiUrl) : that.marathonApiUrl != null)
-            return false;
-        if (marathonAppNameSpace != null ? !marathonAppNameSpace.equals(that.marathonAppNameSpace) : that.marathonAppNameSpace != null)
-            return false;
-        return marathonAppPort != null ? marathonAppPort.equals(that.marathonAppPort) : that.marathonAppPort == null;
-
+    public void setMarathonAppNameSpace(String marathonAppNameSpace) {
+        this.marathonAppNameSpace = marathonAppNameSpace;
     }
 
-    @Override
-    public int hashCode() {
-        int result = marathonApiUrl != null ? marathonApiUrl.hashCode() : 0;
-        result = 31 * result + (marathonAppNameSpace != null ? marathonAppNameSpace.hashCode() : 0);
-        result = 31 * result + (marathonAppPort != null ? marathonAppPort.hashCode() : 0);
-        return result;
+    public void setMarathonAppPort(Integer marathonAppPort) {
+        this.marathonAppPort = marathonAppPort;
     }
 
-
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
+    }
 }

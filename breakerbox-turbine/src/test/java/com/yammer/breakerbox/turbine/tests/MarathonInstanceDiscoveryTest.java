@@ -11,12 +11,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by supreeth.vp on 24/05/17.
@@ -24,24 +22,22 @@ import static org.mockito.Mockito.when;
 public class MarathonInstanceDiscoveryTest {
     private static final ObjectMapper MAPPER = Jackson.newObjectMapper();
     private MarathonClient marathonClient = mock(MarathonClient.class);
-    private Response response = mock(Response.class);
-    private MarathonClientConfiguration marathonClientConfiguration = mock(MarathonClientConfiguration.class);
+    private MarathonClientConfiguration marathonClientConfiguration;
     private MarathonInstanceDiscovery marathonInstanceDiscovery;
 
     @Before
     public void setUp() throws Exception {
-        when(marathonClient.getServiceInstanceDetails()).thenReturn(response);
-        when(response.getStatus()).thenReturn(Response.Status.OK.getStatusCode());
-        when(response.readEntity(String.class))
-                .thenReturn(FixtureHelpers.fixture("fixtures/marathonClientResponse.json"));
-        when(marathonClientConfiguration.getMarathonAppPort()).thenReturn(8080);
-        when(marathonClientConfiguration.getMarathonAppNameSpace()).thenReturn("production");
-        marathonInstanceDiscovery = new MarathonInstanceDiscovery(marathonClient, MAPPER, marathonClientConfiguration);
+
+        marathonClientConfiguration = new MarathonClientConfiguration();
+        marathonClientConfiguration.setMarathonAppPort(8080);
+        marathonClientConfiguration.setCluster("production");
+        marathonClientConfiguration.setMarathonAppNameSpace("xyz");
+        marathonInstanceDiscovery = new MarathonInstanceDiscovery( MAPPER, Arrays.asList(marathonClientConfiguration));
     }
 
     @Test
-    public void testGetInstanceList() throws Exception {
-        Collection<Instance> instanceList = marathonInstanceDiscovery.getInstanceList();
+    public void testCreateServiceInstanceList() throws Exception {
+        List<Instance> instanceList = marathonInstanceDiscovery.createServiceInstanceList(FixtureHelpers.fixture("fixtures/marathonClientResponse.json"),marathonClientConfiguration);
         Assert.assertEquals(Arrays.asList(
                 new Instance("msr-apps4.prod-ola-dcos.olacabs.net:28083", "production", true)),
                 instanceList);

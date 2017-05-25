@@ -46,10 +46,16 @@
         <h2.version>1.4.195</h2.version>
         <kubernetes.version>2.2.144</kubernetes.version>
         <mockito-core.version>2.7.22</mockito-core.version>
+        <commons-lang.version>2.6</commons-lang.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons-lang.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.yammer.tenacity</groupId>
                 <artifactId>tenacity-bom</artifactId>
