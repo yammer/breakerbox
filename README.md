@@ -76,12 +76,11 @@ rancherDiscovery:
   secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
 
 marathonDiscovery:
-  marathonApiUrl: http://localhost:8080
-  marathonAppPort: 12345
-  marathonAppNameSpace: /exampleNameSpace
-  cluster: exampleCluster
+  - marathonApiUrl: http://localhost:8080
+    marathonAppPort: 12345
+    marathonAppNameSpace: /exampleNameSpace
+    cluster: exampleCluster
 
-  
 server:
   applicationConnectors:
     - type: http
@@ -207,12 +206,12 @@ To integrate with RancherInstanceDiscovery,
 To integrate with MarathonInstanceDiscovery,
     1. specify marathon services Api url, marathonAppPort(your application port), marathonAppNameSpace and clusterName.
         marathonDiscovery:
-            marathonApiUrl: http://localhost:8080
-            marathonAppPort: 12345
-            marathonAppNameSpace: /exampleNameSpace
-            cluster: exampleCluster
+        - marathonApiUrl: http://localhost:8080
+          marathonAppPort: 12345
+          marathonAppNameSpace: /exampleNameSpace
+          cluster: exampleCluster
 
-    2. MarathonInstanceDiscovery will create dashboards per unique cluster specified in the config.   
+    2. MarathonInstanceDiscovery will create dashboards per unique cluster specified in the config.  MarathonDiscovery supports multiple marathon namespaces and cluster support.
 
 Meta Clusters
 -------------
