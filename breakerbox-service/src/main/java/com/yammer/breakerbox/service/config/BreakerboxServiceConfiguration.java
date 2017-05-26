@@ -180,7 +180,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
     @Override
     public int hashCode() {
-        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, instanceDiscoveryClass, rancherInstanceConfiguration);
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, instanceDiscoveryClass, rancherInstanceConfiguration,marathonClientConfiguration);
     }
 
     @Override
