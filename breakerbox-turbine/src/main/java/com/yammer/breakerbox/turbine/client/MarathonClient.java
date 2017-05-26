@@ -20,7 +20,7 @@ public class MarathonClient {
 
      public Response getServiceInstanceDetails() {
             Client client = ClientBuilder.newClient();
-            WebTarget webTarget = client.target(marathonClientConfiguration.getMarathonApiUrl() + marathonClientConfiguration   .getMarathonAppNameSpace());
+            WebTarget webTarget = client.target(marathonClientConfiguration.getMarathonApiUrl() + "/v2/apps"+ marathonClientConfiguration.getMarathonAppNameSpace());
             return webTarget.request().get();
 
     }
