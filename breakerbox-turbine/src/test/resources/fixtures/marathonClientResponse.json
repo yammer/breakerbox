@@ -13,7 +13,7 @@
     },
     "tasks": [
       {
-        "host": "msr-apps4.prod-ola-dcos.olacabs.net",
+        "host": "xyz.net",
         "ports": [
           28083,
           28084,

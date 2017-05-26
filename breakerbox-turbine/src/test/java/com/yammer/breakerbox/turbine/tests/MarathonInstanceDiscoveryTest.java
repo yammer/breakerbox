@@ -39,7 +39,7 @@ public class MarathonInstanceDiscoveryTest {
     public void testCreateServiceInstanceList() throws Exception {
         List<Instance> instanceList = marathonInstanceDiscovery.createServiceInstanceList(FixtureHelpers.fixture("fixtures/marathonClientResponse.json"),marathonClientConfiguration);
         Assert.assertEquals(Arrays.asList(
-                new Instance("msr-apps4.prod-ola-dcos.olacabs.net:28083", "production", true)),
+                new Instance("xyz.net:28083", "production", true)),
                 instanceList);
     }
 }
