@@ -4,7 +4,7 @@
 
     <groupId>com.yammer.breakerbox</groupId>
     <artifactId>breakerbox-parent</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.6.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Breakerbox Project</name>
     <description>Frontend for Tenacity + Archaius</description>
@@ -37,16 +37,18 @@
     </issueManagement>
 
     <properties>
-        <dropwizard.version>1.1.0</dropwizard.version>
+        <dropwizard.version>1.1.1</dropwizard.version>
         <windowsazure.version>0.4.6</windowsazure.version>
-        <tenacity.version>1.1.1</tenacity.version>
+        <tenacity.version>1.1.2</tenacity.version>
         <turbine.version>1.0.0</turbine.version>
         <dropwizard-auth-ldap.version>1.0.4</dropwizard-auth-ldap.version>
         <postgresql.version>42.1.1</postgresql.version>
+        <mysql.version>5.1.38</mysql.version>
         <h2.version>1.4.195</h2.version>
         <kubernetes.version>2.2.144</kubernetes.version>
         <mockito-core.version>2.7.22</mockito-core.version>
         <commons-lang.version>2.6</commons-lang.version>
+        <mockito-core.version>2.8.9</mockito-core.version>
     </properties>
 
     <dependencyManagement>
@@ -110,6 +112,11 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>

@@ -114,7 +114,7 @@ Javascript's EventSource doesn't support gzip encoded streams.
 Persistence Storage
 -------------------
 
-You can choose between using an in-memory database, Postgresql (potentially other RDBMSes, I've just only tested with Postgresql for now), and Azure Table.
+You can choose between using an in-memory database (h2), Postgresql, MySQL (potentially other RDBMSes) and Azure Table.
 
 For Postgresql simply modify the `database` section to (assumes the database "breakerbox" is created):
 
@@ -122,6 +122,14 @@ For Postgresql simply modify the `database` section to (assumes the database "br
 database:
   driverClass: org.postgresql.Driver
   url: jdbc:postgresql://localhost/breakerbox
+```
+
+For MySQL:
+
+```yaml
+database:
+  driverClass: com.mysql.jdbc.Driver
+  url: jdbc:mysql://localhost/breakerbox
 ```
 
 If you wish to use Azure Table remove the `database` section entirely and add
