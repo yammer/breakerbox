@@ -74,7 +74,7 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
 
             int finalPortIndex = portIndex;
             List<Instance> instances = tasks.stream()
-                    .map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex), marathonClientConfiguration.getCluster(), true)).collect(Collectors.toList());
+                    .map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex)+"/v2/apps", marathonClientConfiguration.getCluster(), true)).collect(Collectors.toList());
             return instances;
         } else {
             LOGGER.error("tasks not available for the given namespace");
