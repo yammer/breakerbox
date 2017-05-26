@@ -19,6 +19,7 @@ import com.yammer.breakerbox.service.store.ScheduledTenacityPoller;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.*;
 import com.yammer.breakerbox.store.BreakerboxStore;
+import com.yammer.breakerbox.turbine.MarathonInstanceDiscovery;
 import com.yammer.breakerbox.turbine.RancherInstanceDiscovery;
 import com.yammer.breakerbox.turbine.RegisterClustersInstanceDiscoveryWrapper;
 import com.yammer.breakerbox.turbine.YamlInstanceDiscovery;
@@ -255,6 +256,9 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
             return new RancherInstanceDiscovery(configuration.getRancherInstanceConfiguration().get(), environment.getObjectMapper());
         } else if (instanceDiscoveryClass.equals(YamlInstanceDiscovery.class)) {
             return new YamlInstanceDiscovery(configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
+        }
+        else if (instanceDiscoveryClass.equals(MarathonInstanceDiscovery.class) && configuration.getMarathonClientConfiguration().isPresent()){
+            return new MarathonInstanceDiscovery(environment.getObjectMapper(),configuration.getMarathonClientConfiguration().get());
         }
         return instanceDiscoveryClass.getConstructor().newInstance();
     }

@@ -74,7 +74,13 @@ rancherDiscovery:
   serviceApiUrl: http://localhost:8080/v1/projects/1a5/services
   accessKey: 3E0F7DB0A2B601981F1B
   secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
-  
+
+marathonDiscovery:
+  - marathonApiUrl: http://localhost:8080
+    marathonAppPort: 12345
+    marathonAppNameSpace: /exampleNameSpace
+    cluster: exampleCluster
+
 server:
   applicationConnectors:
     - type: http
@@ -180,7 +186,7 @@ production:
 Instance Discovery Class
 ------------------------
 Specifies the `Java` canonical class name. It defaults to the `YamlInstanceDiscovery` implementation. You can also leverage the 
-`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` and `com.yammer.breakerbox.turbine.RancherInstanceDiscovery` classes.
+`com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery` , `com.yammer.breakerbox.turbine.RancherInstanceDiscovery` , `com.yammer.breakerbox.turbine.MarathonInstanceDiscovery`and classes.
 
 To integrate with RancherInstanceDiscovery, 
     
@@ -196,6 +202,16 @@ To integrate with RancherInstanceDiscovery,
          c. service.cluster.name: clusterName
         
     3. RancherInstanceDiscovery will create dashboards per service-cluster with service.cluster.name label and one aggregated production dashboard. Dashboards can be created, enabled, disabled by updating labels at runtime.
+
+To integrate with MarathonInstanceDiscovery,
+    1. specify marathon services Api url, marathonAppPort(your application port), marathonAppNameSpace and clusterName.
+        marathonDiscovery:
+        - marathonApiUrl: http://localhost:8080
+          marathonAppPort: 12345
+          marathonAppNameSpace: /exampleNameSpace
+          cluster: exampleCluster
+
+    2. MarathonInstanceDiscovery will create dashboards per unique cluster specified in the config.  MarathonDiscovery supports multiple marathon namespaces and cluster support.
 
 Meta Clusters
 -------------
