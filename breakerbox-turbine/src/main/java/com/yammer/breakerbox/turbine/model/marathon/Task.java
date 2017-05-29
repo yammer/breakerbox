@@ -1,5 +1,5 @@
 
-package com.yammer.breakerbox.turbine.model;
+package com.yammer.breakerbox.turbine.model.marathon;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

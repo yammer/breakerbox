@@ -5,19 +5,17 @@ import com.netflix.turbine.discovery.Instance;
 import com.netflix.turbine.discovery.InstanceDiscovery;
 import com.yammer.breakerbox.turbine.client.MarathonClient;
 import com.yammer.breakerbox.turbine.config.MarathonClientConfiguration;
-import com.yammer.breakerbox.turbine.model.MarathonClientResponse;
-import com.yammer.breakerbox.turbine.model.PortMapping;
-import com.yammer.breakerbox.turbine.model.Task;
+import com.yammer.breakerbox.turbine.model.marathon.MarathonClientResponse;
+import com.yammer.breakerbox.turbine.model.marathon.PortMapping;
+import com.yammer.breakerbox.turbine.model.marathon.Task;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,23 +26,33 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
     private final ObjectMapper mapper;
     private  MarathonClient marathonClient;
     private final List<MarathonClientConfiguration> marathonClientConfigurations;
-
-
+    Map<MarathonClientConfiguration,Invocation.Builder> marathonClientConfigurationBuilderMap;
 
     public MarathonInstanceDiscovery(ObjectMapper mapper, List<MarathonClientConfiguration> marathonClientConfigurations) {
         this.mapper = mapper;
         this.marathonClientConfigurations = marathonClientConfigurations;
+         constructMarathonClientConfigurationBuilderMap();
+    }
+
+    private void constructMarathonClientConfigurationBuilderMap() {
+        marathonClientConfigurationBuilderMap = new HashMap<>();
+        marathonClientConfigurations.parallelStream().forEach(marathonClientConfiguration -> {
+            marathonClient = new MarathonClient(marathonClientConfiguration);
+            Invocation.Builder builder = marathonClient.getServiceInstanceDetails();
+            marathonClientConfigurationBuilderMap.put(marathonClientConfiguration,builder);
+        });
+
     }
 
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
         List<Instance> instances = new ArrayList<>();
-        marathonClientConfigurations.parallelStream().forEach(marathonClientConfiguration -> {
-            marathonClient = new MarathonClient(marathonClientConfiguration);
-            Response response = marathonClient.getServiceInstanceDetails();
-            if(response.getStatus() == HttpStatus.SC_OK){
+        marathonClientConfigurationBuilderMap.entrySet().parallelStream().forEach(entry -> {
+            Response response = entry.getValue().get();
+            if(response.getStatus() == HttpStatus.SC_OK)
+            {
                 try {
-                    instances.addAll(createServiceInstanceList(response.readEntity(String.class),marathonClientConfiguration));
+                    instances.addAll(createServiceInstanceList(response.readEntity(String.class),entry.getKey()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
