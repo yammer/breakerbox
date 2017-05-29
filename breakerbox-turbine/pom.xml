@@ -10,10 +10,6 @@
     <artifactId>breakerbox-turbine</artifactId>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>commons-lang</groupId>-->
-            <!--<artifactId>commons-lang</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.netflix.turbine</groupId>
             <artifactId>turbine-core</artifactId>

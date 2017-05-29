@@ -52,11 +52,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!--<dependency>-->
-                <!--<groupId>commons-lang</groupId>-->
-                <!--<artifactId>commons-lang</artifactId>-->
-                <!--<version>${commons-lang.version}</version>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>com.yammer.tenacity</groupId>
                 <artifactId>tenacity-bom</artifactId>
