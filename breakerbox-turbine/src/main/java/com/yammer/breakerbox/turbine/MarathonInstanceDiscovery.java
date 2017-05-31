@@ -26,7 +26,7 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
     private final ObjectMapper mapper;
     private  MarathonClient marathonClient;
     private final List<MarathonClientConfiguration> marathonClientConfigurations;
-    Map<MarathonClientConfiguration,Invocation.Builder> marathonClientConfigurationBuilderMap;
+    private Map<MarathonClientConfiguration,Invocation.Builder> marathonClientConfigurationBuilderMap;
 
     public MarathonInstanceDiscovery(ObjectMapper mapper, List<MarathonClientConfiguration> marathonClientConfigurations) {
         this.mapper = mapper;
@@ -49,21 +49,22 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
         List<Instance> instances = new ArrayList<>();
         marathonClientConfigurationBuilderMap.entrySet().parallelStream().forEach(entry -> {
             Response response = entry.getValue().get();
-            if(response.getStatus() == HttpStatus.SC_OK)
-            {
-                try {
-                    instances.addAll(createServiceInstanceList(response.readEntity(String.class),entry.getKey()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if(response.getStatus() == HttpStatus.SC_OK) {
+                    instances.addAll(createServiceInstanceList(response.readEntity(String.class), entry.getKey()));
             }
+            response.close();
         });
         return instances;
     }
 
-     public List<Instance> createServiceInstanceList(String marathonApiResponse,MarathonClientConfiguration marathonClientConfiguration) throws IOException {
-        MarathonClientResponse marathonClientResponse = mapper.readValue(marathonApiResponse, MarathonClientResponse.class);
-        if (marathonClientResponse != null && marathonClientResponse.getApp() != null) {
+     public List<Instance> createServiceInstanceList(String marathonApiResponse,MarathonClientConfiguration marathonClientConfiguration) {
+         MarathonClientResponse marathonClientResponse = null;
+         try {
+             marathonClientResponse = mapper.readValue(marathonApiResponse, MarathonClientResponse.class);
+         } catch (IOException e) {
+             LOGGER.error("io exception",e);
+         }
+         if (marathonClientResponse != null && marathonClientResponse.getApp() != null) {
             List<PortMapping> portMappingList = marathonClientResponse.getApp().getContainer().getDocker().getPortMappings();
             int portIndex = -1;
             for (int i = 0; i < portMappingList.size(); i++) {
@@ -84,7 +85,7 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
             return instances;
         } else {
             LOGGER.error("tasks not available for the given namespace");
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 }
