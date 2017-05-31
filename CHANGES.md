@@ -1,6 +1,7 @@
 Next
 ---
 * [MySQL Support](https://github.com/yammer/breakerbox/pull/33) Thanks @sriniprash!
+* [Marathon Discovery](https://github.com/yammer/breakerbox/pull/37) Thanks @supreethnag!
 
 0.6.1 - May 22, 2017
 ---
