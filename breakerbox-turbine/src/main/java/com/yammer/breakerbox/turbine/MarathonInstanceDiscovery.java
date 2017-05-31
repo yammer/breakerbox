@@ -48,11 +48,17 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
     public Collection<Instance> getInstanceList() throws Exception {
         List<Instance> instances = new ArrayList<>();
         marathonClientConfigurationBuilderMap.entrySet().parallelStream().forEach(entry -> {
-            Response response = entry.getValue().get();
-            if(response.getStatus() == HttpStatus.SC_OK) {
-                    instances.addAll(createServiceInstanceList(response.readEntity(String.class), entry.getKey()));
+            Response response = null;
+            try {
+                response = entry.getValue().get();
+                if (response.getStatus() == HttpStatus.SC_OK) {
+                   instances.addAll(createServiceInstanceList(response.readEntity(String.class), entry.getKey()));
+                }
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
             }
-            response.close();
         });
         return instances;
     }
@@ -80,9 +86,7 @@ public class MarathonInstanceDiscovery implements InstanceDiscovery {
 
             List<Task> tasks = marathonClientResponse.getApp().getTasks();
             int finalPortIndex = portIndex;
-            List<Instance> instances = tasks.stream()
-                    .map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex), marathonClientConfiguration.getCluster(), true)).collect(Collectors.toList());
-            return instances;
+            return tasks.stream().map(task -> new Instance(task.getHost() + ":" + task.getPorts().get(finalPortIndex), marathonClientConfiguration.getCluster(), true)).collect(Collectors.toList());
         } else {
             LOGGER.error("tasks not available for the given namespace");
             return Collections.emptyList();
