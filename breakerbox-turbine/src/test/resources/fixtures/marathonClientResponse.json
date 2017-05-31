@@ -1,0 +1,26 @@
+{
+  "app": {
+    "container": {
+      "docker": {
+        "portMappings": [
+          {
+            "containerPort": 8080,
+            "servicePort": 10426
+          }
+        ]
+      }
+
+    },
+    "tasks": [
+      {
+        "host": "xyz.net",
+        "ports": [
+          28083,
+          28084,
+          28085
+        ],
+        "state": "TASK_RUNNING"
+      }
+    ]
+  }
+}

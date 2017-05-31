@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
+import com.yammer.breakerbox.turbine.config.MarathonClientConfiguration;
 import com.yammer.breakerbox.turbine.config.RancherInstanceConfiguration;
 import com.yammer.dropwizard.authenticator.LdapConfiguration;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
@@ -65,6 +66,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @UnwrapValidatedValue(false)
     private final Optional<RancherInstanceConfiguration> rancherInstanceConfiguration;
 
+    @NotNull @UnwrapValidatedValue(false)
+    public final Optional<List<MarathonClientConfiguration>> marathonClientConfiguration;
+
     @JsonCreator
     public BreakerboxServiceConfiguration(@JsonProperty("azure") AzureTableConfiguration azure,
                                           @JsonProperty("tenacityClient") JerseyClientConfiguration tenacityClientConfiguration,
@@ -78,7 +82,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("defaultDashboard") String defaultDashboard,
                                           @JsonProperty("turbine") Path turbine,
                                           @JsonProperty("instanceDiscoveryClass") String instanceDiscoveryClass,
-                                          @JsonProperty("rancherDiscovery") RancherInstanceConfiguration rancherInstanceConfiguration) {
+                                          @JsonProperty("rancherDiscovery") RancherInstanceConfiguration rancherInstanceConfiguration,
+                                          @JsonProperty("marathonDiscovery")List<MarathonClientConfiguration> marathonClientConfiguration) {
         this.azure = Optional.fromNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
         this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
@@ -93,6 +98,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass)
                 .or(Optional.fromNullable(System.getProperty("InstanceDiscovery.impl")));
         this.rancherInstanceConfiguration = Optional.fromNullable(rancherInstanceConfiguration);
+        this.marathonClientConfiguration = Optional.fromNullable(marathonClientConfiguration);
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -169,9 +175,12 @@ public class BreakerboxServiceConfiguration extends Configuration {
         return rancherInstanceConfiguration;
     }
 
+    public Optional<List<MarathonClientConfiguration>> getMarathonClientConfiguration(){
+        return marathonClientConfiguration;
+    }
     @Override
     public int hashCode() {
-        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, instanceDiscoveryClass, rancherInstanceConfiguration);
+        return Objects.hash(azure, tenacityClient, breakerboxServicesPropertyKeys, breakerboxServicesConfiguration, breakerboxConfiguration, turbine, ldapConfiguration, archaiusOverride, jdbiConfiguration, metaClusters, breakerboxHostAndPort, defaultDashboard, instanceDiscoveryClass, rancherInstanceConfiguration,marathonClientConfiguration);
     }
 
     @Override
@@ -196,6 +205,8 @@ public class BreakerboxServiceConfiguration extends Configuration {
                 && Objects.equals(this.breakerboxHostAndPort, other.breakerboxHostAndPort)
                 && Objects.equals(this.defaultDashboard, other.defaultDashboard)
                 && Objects.equals(this.instanceDiscoveryClass, other.instanceDiscoveryClass)
-                && Objects.equals(this.rancherInstanceConfiguration, other.rancherInstanceConfiguration);
+                && Objects.equals(this.rancherInstanceConfiguration, other.rancherInstanceConfiguration)
+                && Objects.equals(this.marathonClientConfiguration, other.marathonClientConfiguration);
+
     }
 }
