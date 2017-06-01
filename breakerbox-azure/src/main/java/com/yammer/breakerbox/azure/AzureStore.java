@@ -101,14 +101,12 @@ public class AzureStore extends BreakerboxStore {
 
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
-        try (Timer.Context timerContext = dependencyConfigs.time()) {
-            return Entities.toDependencyModelList(tableClient.search(TableQuery
-                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
-                    .where(TableQuery.combineFilters(
-                            partitionEquals(dependencyId),
-                            TableQuery.Operators.AND,
-                            serviceIdEquals(serviceId)))));
-        }
+        return Entities.toDependencyModelList(tableClient.search(TableQuery
+                .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+                .where(TableQuery.combineFilters(
+                        partitionEquals(dependencyId),
+                        TableQuery.Operators.AND,
+                        serviceIdEquals(serviceId)))));
     }
 
     private static Optional<DependencyModel> fetchLatest(Iterable<DependencyModel> dependencyModels) {
@@ -133,11 +131,9 @@ public class AzureStore extends BreakerboxStore {
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities(ServiceId serviceId) {
-        try (Timer.Context timerContext = listService.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.SERVICE.toString(), ServiceEntity.class)
-                    .where(partitionKeyEquals(serviceId)));
-        }
+        return tableClient.search(TableQuery
+                .from(TableId.SERVICE.toString(), ServiceEntity.class)
+                .where(partitionKeyEquals(serviceId)));
     }
 
     private static String partitionKeyEquals(ServiceId serviceId) {
@@ -149,21 +145,18 @@ public class AzureStore extends BreakerboxStore {
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities() {
-        try (Timer.Context timerContext = listService.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.SERVICE.toString(), ServiceEntity.class));
-        }
+        return tableClient.search(TableQuery
+                .from(TableId.SERVICE.toString(), ServiceEntity.class));
     }
 
     private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
-        try (Timer.Context timerContext = dependencyConfigs.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
-                    .where(TableQuery.combineFilters(
-                                partitionEquals(dependencyId),
-                                TableQuery.Operators.AND,
-                                timestampEquals(targetTimeStamp))));
-        }
+        return tableClient.search(TableQuery
+                .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+                .where(TableQuery.combineFilters(
+                            partitionEquals(dependencyId),
+                            TableQuery.Operators.AND,
+                            timestampEquals(targetTimeStamp))));
+    
     }
 
     private static String serviceIdEquals(ServiceId serviceId) {
