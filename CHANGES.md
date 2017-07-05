@@ -1,3 +1,11 @@
+Next
+---
+* [Dropwizard 1.1.2](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.2)
+* Mockito-core 2.8.47
+* MySQL 5.1.42
+* H2 1.4.196
+* [Dropwizard-auth-ldap 1.0.5](https://github.com/yammer/dropwizard-auth-ldap/blob/master/CHANGELOG.md#105---may-26-2017)
+
 0.6.2 -- May 31, 2017
 ---
 * [MySQL Support](https://github.com/yammer/breakerbox/pull/33) Thanks @sriniprash!
