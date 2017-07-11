@@ -225,8 +225,13 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                                Environment environment) {
         final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration, environment);
         if (customInstanceDiscovery.isPresent()) {
-            PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
-                    customInstanceDiscovery.get()));
+            if(configuration.getHystrixStreamSuffix().isPresent()){
+                PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
+                        customInstanceDiscovery.get(),configuration.getHystrixStreamSuffix().get()));
+            } else {
+                PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
+                        customInstanceDiscovery.get()));
+            }
         } else {
             final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
                     configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
