@@ -55,6 +55,8 @@ defaultDashboard: production
 
 instanceDiscoveryClass: com.yammer.breakerbox.turbine.YamlInstanceDiscovery #default
 
+hystrixStreamSuffix: /tenacity/metrics.stream #default
+
 metaClusters: 
   - production
   - stage
@@ -200,8 +202,10 @@ To integrate with RancherInstanceDiscovery,
          a. tenacity.metrics.stream.enabled: true
          b. tenacity.metrics.stream.port: 8080
          c. service.cluster.name: clusterName
+    
+    3. Use hystrixStreamSuffix to provide custom path for hystrix metrics stream. It defaults to /tenacity/metrics.stream
         
-    3. RancherInstanceDiscovery will create dashboards per service-cluster with service.cluster.name label and one aggregated production dashboard. Dashboards can be created, enabled, disabled by updating labels at runtime.
+    4. RancherInstanceDiscovery will create dashboards per service-cluster with service.cluster.name label and one aggregated production dashboard. Dashboards can be created, enabled, disabled by updating labels at runtime.
 
 To integrate with MarathonInstanceDiscovery,
     1. specify marathon services Api url, marathonAppPort(your application port), marathonAppNameSpace and clusterName.
