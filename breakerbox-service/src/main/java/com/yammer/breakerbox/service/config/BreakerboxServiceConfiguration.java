@@ -64,6 +64,9 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private Optional<String> instanceDiscoveryClass;
 
     @NotNull @UnwrapValidatedValue(false)
+    private Optional<String> hystrixStreamSuffix;
+
+    @NotNull @UnwrapValidatedValue(false)
     private final Optional<RancherInstanceConfiguration> rancherInstanceConfiguration;
 
     @NotNull @UnwrapValidatedValue(false)
@@ -82,6 +85,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("defaultDashboard") String defaultDashboard,
                                           @JsonProperty("turbine") Path turbine,
                                           @JsonProperty("instanceDiscoveryClass") String instanceDiscoveryClass,
+                                          @JsonProperty("hystrixStreamSuffix") String hystrixStreamSuffix,
                                           @JsonProperty("rancherDiscovery") RancherInstanceConfiguration rancherInstanceConfiguration,
                                           @JsonProperty("marathonDiscovery")List<MarathonClientConfiguration> marathonClientConfiguration) {
         this.azure = Optional.fromNullable(azure);
@@ -97,6 +101,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
         this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox-instances.yml"));
         this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass)
                 .or(Optional.fromNullable(System.getProperty("InstanceDiscovery.impl")));
+        this.hystrixStreamSuffix = Optional.fromNullable(hystrixStreamSuffix);
         this.rancherInstanceConfiguration = Optional.fromNullable(rancherInstanceConfiguration);
         this.marathonClientConfiguration = Optional.fromNullable(marathonClientConfiguration);
     }
@@ -165,6 +170,10 @@ public class BreakerboxServiceConfiguration extends Configuration {
 
     public Optional<String> getInstanceDiscoveryClass() {
         return instanceDiscoveryClass;
+    }
+
+    public Optional<String> getHystrixStreamSuffix() {
+        return hystrixStreamSuffix;
     }
 
     public void setInstanceDiscoveryClass(String instanceDiscoveryClass) {
