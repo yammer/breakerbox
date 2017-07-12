@@ -1,5 +1,5 @@
-FROM java:openjdk-8-jre-alpine
-MAINTAINER Marco Lamina <mlamina09@gmail.com>
+FROM docker.travelguru.com/base/tgos-jre8
+MAINTAINER Priyadarsh Kankipati <priyadarsh.kankipati@yatra.com>
 
 RUN mkdir /opt
 

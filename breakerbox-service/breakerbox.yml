@@ -3,6 +3,8 @@ breakerbox:
   initialDelay: 0s
   delay: 60s
 
+breakerboxHostAndPort: ${HOST-AND-PORT:-localhost:8080}
+
 database:
   driverClass: org.h2.Driver
   url: jdbc:h2:mem:inMemory;DB_CLOSE_DELAY=-1
@@ -11,12 +13,7 @@ database:
   maxSize: 10
   minSize: 2
   checkConnectionWhileIdle: true
-  validationInterval: 30s
-
-metaClusters: 
-  - production
-  - stage
-  - staging
+  checkConnectionHealthWhenIdleFor: 1s
 
 tenacityClient:
   connectionTimeout: 500ms
@@ -24,7 +21,29 @@ tenacityClient:
 
 defaultDashboard: production
 
-turbine: breakerbox-instances.yml
+instanceDiscoveryClass: com.yammer.breakerbox.turbine.RancherInstanceDiscovery
+
+hystrixStreamSuffix: /hystrix.stream
+
+metaClusters:
+  - production
+  - stage
+  - staging
+
+#turbine:
+#  urlSuffix: /hystrix.stream
+#  clusters:
+#    breakerbox:
+#      instances:
+#        - localhost:8080
+#    production:
+#      clusters:
+#        - breakerbox
+
+rancherDiscovery:
+  serviceApiUrl: ${RANCHER-URL:-http://192.168.17.116:5000/v1/projects/1a12/services}
+  accessKey: ${RANCHER-ACCESS-KEY:-85623C687E6E2A42DA49}
+  secretKey: ${RANCHER-SECRET-KEY:-k1xkiKKQiq5688wBmXHJKpQWwqSsrPbTmKZwFvPJ}
 
 server:
   applicationConnectors:
@@ -35,8 +54,17 @@ server:
       port: 8081
   gzip:
     enabled: false
+  requestLog:
+    timeZone: IST
 
 logging:
   level: INFO
   appenders:
-    - type: console
+    - type: file
+      currentLogFilename: /var/log/breakerbox/breakerbox.log
+      archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log
+      archivedFileCount: 5
+    - type: gelf-console
+      threshold: ${GELF-LOGGER-LEVEL:-INFO}
+      threadNameEnabled: true
+      loggerNameEnabled: true
