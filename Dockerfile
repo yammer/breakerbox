@@ -1,8 +1,6 @@
 FROM docker.travelguru.com/base/tgos-jre8
 MAINTAINER Priyadarsh Kankipati <priyadarsh.kankipati@yatra.com>
 
-RUN mkdir /opt
-
 ADD docker/breakerbox.jar /opt/
 ADD breakerbox-service/breakerbox.yml /opt/
 ADD breakerbox-service/breakerbox-instances.yml /opt/

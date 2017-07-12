@@ -64,6 +64,12 @@
             <groupId>com.travelguru</groupId>
             <artifactId>logback-gelf</artifactId>
             <version>0.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

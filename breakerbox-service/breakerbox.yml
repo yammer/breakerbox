@@ -1,5 +1,5 @@
 breakerbox:
-  urls: http://localhost:8080/archaius/breakerbox
+  urls: file:config.properties,http://localhost:8080/archaius/breakerbox
   initialDelay: 0s
   delay: 60s
 
@@ -55,7 +55,11 @@ server:
   gzip:
     enabled: false
   requestLog:
-    timeZone: IST
+    appenders:
+      - type: file
+        currentLogFilename: /var/log/breakerbox/requests.log
+        archivedLogFilenamePattern: /var/log/breakerbox/requests-%d.log.gz
+        archivedFileCount: 5
 
 logging:
   level: INFO
@@ -64,7 +68,3 @@ logging:
       currentLogFilename: /var/log/breakerbox/breakerbox.log
       archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log
       archivedFileCount: 5
-    - type: gelf-console
-      threshold: ${GELF-LOGGER-LEVEL:-INFO}
-      threadNameEnabled: true
-      loggerNameEnabled: true
