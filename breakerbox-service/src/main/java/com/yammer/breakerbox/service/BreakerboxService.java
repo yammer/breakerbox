@@ -46,6 +46,8 @@ import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.CachingAuthenticator;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.auth.basic.BasicCredentials;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.bundles.DBIExceptionsBundle;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -73,6 +75,8 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
 
     @Override
     public void initialize(Bootstrap<BreakerboxServiceConfiguration> bootstrap) {
+        bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
+                bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
         bootstrap.addBundle(new DBIExceptionsBundle());
         bootstrap.addBundle(new MigrationsBundle<BreakerboxServiceConfiguration>() {
             @Override
@@ -225,8 +229,13 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
                                                Environment environment) {
         final Optional<InstanceDiscovery> customInstanceDiscovery = createInstanceDiscovery(configuration, environment);
         if (customInstanceDiscovery.isPresent()) {
-            PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
-                    customInstanceDiscovery.get()));
+            if(configuration.getHystrixStreamSuffix().isPresent()){
+                PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
+                        customInstanceDiscovery.get(),configuration.getHystrixStreamSuffix().get()));
+            } else {
+                PluginsFactory.setInstanceDiscovery(RegisterClustersInstanceDiscoveryWrapper.wrap(
+                        customInstanceDiscovery.get()));
+            }
         } else {
             final YamlInstanceDiscovery yamlInstanceDiscovery = new YamlInstanceDiscovery(
                     configuration.getTurbine(), environment.getValidator(), environment.getObjectMapper());
