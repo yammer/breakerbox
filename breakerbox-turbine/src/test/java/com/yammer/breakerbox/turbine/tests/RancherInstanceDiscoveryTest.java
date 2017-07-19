@@ -39,7 +39,9 @@ public class RancherInstanceDiscoveryTest {
         Collection<Instance> instanceList = rancherInstanceDiscovery.getInstanceList();
         Assert.assertEquals(Arrays.asList(
                 new Instance("192.168.1.109:8081", "xyz", true),
-                new Instance("192.168.1.109:8081", "production", true)),
+                new Instance("192.168.1.109:8082", "abc", true),
+                new Instance("192.168.1.109:8081", "production", true),
+                new Instance("192.168.1.109:8082", "production", true)),
                 instanceList);
     }
 }

@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.turbine.client;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Objects;
+import com.yammer.breakerbox.turbine.config.RancherInstanceConfiguration;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -9,8 +8,8 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
-
-import com.yammer.breakerbox.turbine.config.RancherInstanceConfiguration;
+import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 public class RancherClient {
     private final Invocation.Builder builder;
@@ -29,11 +28,12 @@ public class RancherClient {
     }
 
     private String createRancherServiceUrl() {
-        String filterParameters = "state=active&kind=service";
+        String filterParameters = instanceConfiguration.getQueryString();
         String apiUrl = instanceConfiguration.getServiceApiUrl();
         String serviceUrl = apiUrl.charAt(apiUrl.length() - 1) == '?' ? apiUrl : apiUrl + "?";
         return serviceUrl.replaceAll("\\s", "") + filterParameters;
     }
+
 
     private String getBasicAuthentication() {
         String token = instanceConfiguration.getAccessKey() + ":" + instanceConfiguration.getSecretKey();

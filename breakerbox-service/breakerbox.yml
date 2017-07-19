@@ -42,6 +42,8 @@ metaClusters:
 
 rancherDiscovery:
   serviceApiUrl: ${RANCHER-URL:-http://192.168.17.116:5000/v1/projects/1a12/services}
+  parameters:
+     type: service
   accessKey: ${RANCHER-ACCESS-KEY:-85623C687E6E2A42DA49}
   secretKey: ${RANCHER-SECRET-KEY:-k1xkiKKQiq5688wBmXHJKpQWwqSsrPbTmKZwFvPJ}
 
