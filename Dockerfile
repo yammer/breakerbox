@@ -1,5 +1,7 @@
-FROM docker.travelguru.com/base/tgos-jre8
-MAINTAINER Priyadarsh Kankipati <priyadarsh.kankipati@yatra.com>
+FROM java:openjdk-8-jre-alpine
+MAINTAINER Marco Lamina <mlamina09@gmail.com>
+
+RUN mkdir /opt
 
 ADD docker/breakerbox.jar /opt/
 ADD breakerbox-service/breakerbox.yml /opt/
