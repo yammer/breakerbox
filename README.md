@@ -74,6 +74,8 @@ turbine:
 
 rancherDiscovery:
   serviceApiUrl: http://localhost:8080/v1/projects/1a5/services
+  parameters:
+    kind: 'service'
   accessKey: 3E0F7DB0A2B601981F1B
   secretKey: fWWKGNvmuWpSngyVYHXFMSnE5cDhZWKNkVmQS8zn
 
