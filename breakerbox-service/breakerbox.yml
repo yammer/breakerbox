@@ -1,9 +1,7 @@
 breakerbox:
-  urls: file:config.properties,http://localhost:8080/archaius/breakerbox
+  urls: http://localhost:8080/archaius/breakerbox
   initialDelay: 0s
   delay: 60s
-
-breakerboxHostAndPort: ${HOST-AND-PORT:-localhost:8080}
 
 database:
   driverClass: org.h2.Driver
@@ -13,7 +11,12 @@ database:
   maxSize: 10
   minSize: 2
   checkConnectionWhileIdle: true
-  checkConnectionHealthWhenIdleFor: 1s
+  validationInterval: 30s
+
+metaClusters:
+  - production
+  - stage
+  - staging
 
 tenacityClient:
   connectionTimeout: 500ms
@@ -21,31 +24,7 @@ tenacityClient:
 
 defaultDashboard: production
 
-instanceDiscoveryClass: com.yammer.breakerbox.turbine.RancherInstanceDiscovery
-
-hystrixStreamSuffix: /hystrix.stream
-
-metaClusters:
-  - production
-  - stage
-  - staging
-
-#turbine:
-#  urlSuffix: /hystrix.stream
-#  clusters:
-#    breakerbox:
-#      instances:
-#        - localhost:8080
-#    production:
-#      clusters:
-#        - breakerbox
-
-rancherDiscovery:
-  serviceApiUrl: ${RANCHER-URL:-http://192.168.17.116:5000/v1/projects/1a12/services}
-  parameters:
-     type: service
-  accessKey: ${RANCHER-ACCESS-KEY:-85623C687E6E2A42DA49}
-  secretKey: ${RANCHER-SECRET-KEY:-k1xkiKKQiq5688wBmXHJKpQWwqSsrPbTmKZwFvPJ}
+turbine: breakerbox-instances.yml
 
 server:
   applicationConnectors:
@@ -56,17 +35,8 @@ server:
       port: 8081
   gzip:
     enabled: false
-  requestLog:
-    appenders:
-      - type: file
-        currentLogFilename: /var/log/breakerbox/requests.log
-        archivedLogFilenamePattern: /var/log/breakerbox/requests-%d.log.gz
-        archivedFileCount: 5
 
 logging:
   level: INFO
   appenders:
-    - type: file
-      currentLogFilename: /var/log/breakerbox/breakerbox.log
-      archivedLogFilenamePattern: /var/log/breakerbox/breakerbox-%d.log
-      archivedFileCount: 5
+    - type: console
