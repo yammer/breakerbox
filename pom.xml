@@ -229,14 +229,6 @@
                     <releases><enabled>false</enabled></releases>
                     <snapshots><enabled>true</enabled></snapshots>
                 </repository>
-                <repository>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <id>libs-release</id>
-                    <name>libs-release</name>
-                    <url>http://tools.travelguru.com/nexus/content/groups/libs-release</url>
-                </repository>
             </repositories>
         </profile>
     </profiles>
