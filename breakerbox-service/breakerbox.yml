@@ -13,7 +13,7 @@ database:
   checkConnectionWhileIdle: true
   validationInterval: 30s
 
-metaClusters: 
+metaClusters:
   - production
   - stage
   - staging
