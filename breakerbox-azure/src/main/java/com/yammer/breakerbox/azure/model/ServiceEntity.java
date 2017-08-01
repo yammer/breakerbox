@@ -1,6 +1,6 @@
 package com.yammer.breakerbox.azure.model;
 
-import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
+import com.microsoft.azure.storage.table.TableServiceEntity;
 import com.yammer.breakerbox.azure.core.AzureTableName;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableKey;

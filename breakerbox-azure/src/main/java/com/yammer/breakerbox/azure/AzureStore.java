@@ -5,8 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.microsoft.windowsazure.services.table.client.TableConstants;
-import com.microsoft.windowsazure.services.table.client.TableQuery;
+import com.microsoft.azure.storage.table.TableQuery;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableType;
 import com.yammer.breakerbox.azure.healthchecks.TableClientHealthcheck;
@@ -23,6 +22,8 @@ import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
 
 public class AzureStore extends BreakerboxStore {
+    public static final String PARTITION_KEY = "PartitionKey";
+    public static final String ROW_KEY = "RowKey";
     protected final TableClient tableClient;
 
     public AzureStore(AzureTableConfiguration azureTableConfiguration,
@@ -102,8 +103,9 @@ public class AzureStore extends BreakerboxStore {
     @Override
     public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
         try (Timer.Context timerContext = dependencyConfigs.time()) {
-            return Entities.toDependencyModelList(tableClient.search(TableQuery
-                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+            return Entities.toDependencyModelList(tableClient.search(
+                    TableId.DEPENDENCY, TableQuery
+                    .from(DependencyEntity.class)
                     .where(TableQuery.combineFilters(
                             partitionEquals(dependencyId),
                             TableQuery.Operators.AND,
@@ -134,8 +136,8 @@ public class AzureStore extends BreakerboxStore {
 
     private ImmutableList<ServiceEntity> allServiceEntities(ServiceId serviceId) {
         try (Timer.Context timerContext = listService.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.SERVICE.toString(), ServiceEntity.class)
+            return tableClient.search(TableId.SERVICE, TableQuery
+                    .from(ServiceEntity.class)
                     .where(partitionKeyEquals(serviceId)));
         }
     }
@@ -143,22 +145,22 @@ public class AzureStore extends BreakerboxStore {
     private static String partitionKeyEquals(ServiceId serviceId) {
         return TableQuery
                 .generateFilterCondition(
-                        TableConstants.PARTITION_KEY,
+                        PARTITION_KEY,
                         TableQuery.QueryComparisons.EQUAL,
                         serviceId.getId());
     }
 
     private ImmutableList<ServiceEntity> allServiceEntities() {
         try (Timer.Context timerContext = listService.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.SERVICE.toString(), ServiceEntity.class));
+            return tableClient.search(TableId.SERVICE, TableQuery
+                    .from(ServiceEntity.class));
         }
     }
 
     private ImmutableList<DependencyEntity> getConfiguration(DependencyId dependencyId, long targetTimeStamp) {
         try (Timer.Context timerContext = dependencyConfigs.time()) {
-            return tableClient.search(TableQuery
-                    .from(TableId.DEPENDENCY.toString(), DependencyEntity.class)
+            return tableClient.search(TableId.DEPENDENCY, TableQuery
+                    .from(DependencyEntity.class)
                     .where(TableQuery.combineFilters(
                                 partitionEquals(dependencyId),
                                 TableQuery.Operators.AND,
@@ -175,7 +177,7 @@ public class AzureStore extends BreakerboxStore {
 
     private static String timestampEquals(long timestamp) {
         return TableQuery.generateFilterCondition(
-                TableConstants.ROW_KEY,
+                ROW_KEY,
                 TableQuery.QueryComparisons.EQUAL,
                 String.valueOf(timestamp)
         );
@@ -183,7 +185,7 @@ public class AzureStore extends BreakerboxStore {
 
     private static String partitionEquals(DependencyId dependencyId) {
         return TableQuery.generateFilterCondition(
-                TableConstants.PARTITION_KEY,
+                PARTITION_KEY,
                 TableQuery.QueryComparisons.EQUAL,
                 dependencyId.getId());
     }

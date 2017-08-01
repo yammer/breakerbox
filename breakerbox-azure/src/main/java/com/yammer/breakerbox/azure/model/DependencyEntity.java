@@ -3,7 +3,7 @@ package com.yammer.breakerbox.azure.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.microsoft.windowsazure.services.table.client.TableServiceEntity;
+import com.microsoft.azure.storage.table.TableServiceEntity;
 import com.yammer.breakerbox.azure.core.AzureTableName;
 import com.yammer.breakerbox.azure.core.TableId;
 import com.yammer.breakerbox.azure.core.TableKey;

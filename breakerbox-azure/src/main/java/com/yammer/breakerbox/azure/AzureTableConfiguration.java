@@ -3,7 +3,7 @@ package com.yammer.breakerbox.azure;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.microsoft.windowsazure.services.core.storage.StorageCredentialsAccountAndKey;
+import com.microsoft.azure.storage.StorageCredentialsAccountAndKey;
 import io.dropwizard.util.Duration;
 
 import javax.validation.Valid;
