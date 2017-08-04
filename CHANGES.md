@@ -1,4 +1,4 @@
-Next
+0.6.4 -- Aug. 4, 2017
 ---
 * [Removed hardcoding of rancher query parameters](https://github.com/yammer/breakerbox/pull/42) Thanks @priyadarsh
 * [Dropwizard 1.1.3](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.3)
