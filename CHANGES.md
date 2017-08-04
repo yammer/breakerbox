@@ -2,6 +2,7 @@ Next
 ---
 * [Removed hardcoding of rancher query parameters](https://github.com/yammer/breakerbox/pull/42) Thanks @priyadarsh
 * [Dropwizard 1.1.3](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.3)
+* [azure-storage-java 5.4.0](https://github.com/Azure/azure-storage-java/releases/tag/v5.4.0)
 
 0.6.3 -- July 13, 2017
 ---
