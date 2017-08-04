@@ -2,8 +2,8 @@ package com.yammer.breakerbox.azure;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.microsoft.windowsazure.services.core.storage.StorageException;
-import com.microsoft.windowsazure.services.table.client.*;
+import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.table.*;
 import com.yammer.breakerbox.azure.core.AzureTableName;
 import com.yammer.breakerbox.azure.core.TableKey;
 import com.yammer.breakerbox.azure.core.TableType;
@@ -24,13 +24,21 @@ public class TableClient {
         this.cloudTableClient = checkNotNull(cloudTableClient, "cloudTableClient cannot be null");
     }
 
+    private CloudTable tableRefrence(AzureTableName table) {
+        try {
+            return cloudTableClient.getTableReference(table.toString());
+        } catch (URISyntaxException e) {
+            LOG.warn("URI exception creating table: {},", table, e);
+        } catch (StorageException e) {
+            LOG.warn("Error generating TableClient: {}", table, e);
+        }
+        throw new IllegalStateException("Could not create table: " + table);
+    }
+
     public void create(AzureTableName table) {
         try {
-            final CloudTable cloudTable = new CloudTable(table.toString(), cloudTableClient);
-            cloudTable.createIfNotExist();
+            tableRefrence(table).createIfNotExists();
             return;
-        } catch (URISyntaxException e) {
-            LOG.warn("URI exception creating table", e);
         } catch (StorageException e) {
             LOG.warn("Error creating table: {}", table, e);
         }
@@ -39,9 +47,9 @@ public class TableClient {
 
     public boolean insert(TableType entity) {
         try {
-            final TableResult tableResult = cloudTableClient.execute(
-                    entity.getAzureTableName().toString(), TableOperation.insert(entity));
-            return tableResult.getHttpStatusCode() == Response.Status.CREATED.getStatusCode();
+            return tableRefrence(entity.getAzureTableName())
+                    .execute(TableOperation.insert(entity))
+                    .getHttpStatusCode() == Response.Status.NO_CONTENT.getStatusCode();
         } catch (StorageException e) {
             LOG.warn("Error performing operation on Storage service", e);
         }
@@ -50,8 +58,8 @@ public class TableClient {
 
     public boolean insertOrReplace(TableType entity) {
         try {
-            final TableResult tableResult = cloudTableClient.execute(
-                    entity.getAzureTableName().toString(), TableOperation.insertOrReplace(entity));
+            final TableResult tableResult = tableRefrence(entity.getAzureTableName())
+                    .execute(TableOperation.insertOrReplace(entity));
             switch (Response.Status.fromStatusCode(tableResult.getHttpStatusCode())) {
                 case CREATED:
                 case NO_CONTENT:
@@ -67,12 +75,9 @@ public class TableClient {
 
     public <EntityType extends TableServiceEntity> Optional<EntityType> retrieve(TableKey tableKey) {
         try {
-            final TableResult tableResult = cloudTableClient.execute(
-                    tableKey.getTable().toString(),
-                    TableOperation.retrieve(
-                            tableKey.getPartitionKey(), tableKey.getRowKey(), tableKey.getEntityClass()));
-            final EntityType entityType = tableResult.getResultAsType();
-            return Optional.fromNullable(entityType);
+            return Optional.fromNullable(tableRefrence(tableKey.getTable())
+                    .execute(TableOperation.retrieve(tableKey.getPartitionKey(), tableKey.getRowKey(), tableKey.getEntityClass()))
+                    .getResultAsType());
         } catch (StorageException e) {
             LOG.warn("Error retrieving entity from table: {}", tableKey.getTable(), e);
         }
@@ -81,10 +86,9 @@ public class TableClient {
 
     public boolean update(TableType entity) {
         try {
-            final TableResult result = cloudTableClient.execute(
-                    entity.getAzureTableName().toString(),
-                    TableOperation.replace(entity));
-            return result.getHttpStatusCode() == Response.Status.NO_CONTENT.getStatusCode();
+            return tableRefrence(entity.getAzureTableName())
+                    .execute(TableOperation.replace(entity))
+                    .getHttpStatusCode() == Response.Status.NO_CONTENT.getStatusCode();
         } catch (StorageException e) {
             LOG.warn("Error updating row in table: {}", entity.getAzureTableName(), e);
         }
@@ -93,10 +97,7 @@ public class TableClient {
 
     public boolean destroy(AzureTableName azureTableName) {
         try {
-            final CloudTable cloudTable = new CloudTable(azureTableName.toString(), cloudTableClient);
-            return cloudTable.deleteIfExists();
-        } catch (URISyntaxException e) {
-            LOG.warn("Invalid Azure table URL specified {}", azureTableName, e);
+            return tableRefrence(azureTableName).deleteIfExists();
         } catch (StorageException e) {
             LOG.warn("Error deleting table from Azure", e);
         }
@@ -105,18 +106,16 @@ public class TableClient {
 
     public boolean exists(AzureTableName azureTableName) {
         try {
-            final CloudTable cloudTable = new CloudTable(azureTableName.toString(), cloudTableClient);
-            return cloudTable.exists();
-        } catch (URISyntaxException e) {
-            LOG.warn("Invalid Azure table URL specified {}", azureTableName, e);
+            return tableRefrence(azureTableName).exists();
         } catch (StorageException e) {
             LOG.warn("Error accessing azure table", e);
         }
         throw new IllegalStateException("Error verifying if table " + azureTableName + " exists");
     }
 
-    public <EntityType extends TableEntity> ImmutableList<EntityType> search(TableQuery<EntityType> query) {
-        return ImmutableList.copyOf(cloudTableClient.execute(query));
+    public <EntityType extends TableEntity> ImmutableList<EntityType> search(AzureTableName azureTableName,
+                                                                             TableQuery<EntityType> query) {
+        return ImmutableList.copyOf(tableRefrence(azureTableName).execute(query));
     }
 
     public Iterable<String> listTables() {
@@ -125,9 +124,9 @@ public class TableClient {
 
     public boolean remove(TableType entity) {
         try {
-            final TableResult result = cloudTableClient.execute(
-                    entity.getAzureTableName().toString(), TableOperation.delete(entity));
-            return result.getHttpStatusCode() == Response.Status.NO_CONTENT.getStatusCode();
+            return tableRefrence(entity.getAzureTableName())
+                    .execute(TableOperation.delete(entity))
+                    .getHttpStatusCode() == Response.Status.NO_CONTENT.getStatusCode();
         } catch (StorageException e) {
             LOG.warn("Error updating row in table: {}", entity.getAzureTableName(), e);
         }

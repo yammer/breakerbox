@@ -1,8 +1,10 @@
 package com.yammer.breakerbox.azure;
 
-import com.microsoft.windowsazure.services.core.storage.CloudStorageAccount;
-import com.microsoft.windowsazure.services.core.storage.RetryLinearRetry;
-import com.microsoft.windowsazure.services.table.client.CloudTableClient;
+import com.google.common.primitives.Ints;
+import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.RetryLinearRetry;
+import com.microsoft.azure.storage.table.CloudTableClient;
+import com.microsoft.azure.storage.table.TableRequestOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,11 +25,12 @@ public class TableClientFactory {
             final CloudStorageAccount storageAccount =
                     new CloudStorageAccount(azureTableConfiguration.getStorageCredentialsAccountAndKey(), true);
             final CloudTableClient cloudTableClient = storageAccount.createCloudTableClient();
-            cloudTableClient.setRetryPolicyFactory(
-                    new RetryLinearRetry(
-                            (int) azureTableConfiguration.getRetryInterval().toMilliseconds(),
-                            azureTableConfiguration.getRetryAttempts()));
-            cloudTableClient.setTimeoutInMs((int) azureTableConfiguration.getTimeout().toMilliseconds());
+            final TableRequestOptions defaultOptions = new TableRequestOptions();
+            defaultOptions.setRetryPolicyFactory(new RetryLinearRetry(
+                    Ints.checkedCast(azureTableConfiguration.getRetryInterval().toMilliseconds()),
+                    azureTableConfiguration.getRetryAttempts()));
+            defaultOptions.setTimeoutIntervalInMs(Ints.checkedCast(azureTableConfiguration.getTimeout().toMilliseconds()));
+            cloudTableClient.setDefaultRequestOptions(defaultOptions);
             return new TableClient(cloudTableClient);
         } catch (URISyntaxException err) {
             LOGGER.error("Failed to create a TableClient", err);
