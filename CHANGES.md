@@ -1,6 +1,7 @@
 0.6.5 -- TBD
 ---
 * [Tenacity 1.1.4](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.1.4)
+* PostgreSQL 42.1.4
 
 0.6.4 -- Aug. 4, 2017
 ---
