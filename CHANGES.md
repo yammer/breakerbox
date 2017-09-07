@@ -1,7 +1,11 @@
 0.6.5 -- TBD
 ---
 * [Tenacity 1.1.4](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.1.4)
+* [Dropwizard 1.1.4](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.4)
 * PostgreSQL 42.1.4
+* MySQL 5.1.44
+* Mockito-core 2.9.0
+* Azure-storage 5.5.0
 
 0.6.4 -- Aug. 4, 2017
 ---
