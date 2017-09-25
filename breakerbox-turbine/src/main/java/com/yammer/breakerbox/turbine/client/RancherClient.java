@@ -7,8 +7,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
 
 public class RancherClient {
@@ -37,11 +37,8 @@ public class RancherClient {
 
     private String getBasicAuthentication() {
         String token = instanceConfiguration.getAccessKey() + ":" + instanceConfiguration.getSecretKey();
-        try {
-            return "BASIC " + DatatypeConverter.printBase64Binary(token.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            throw new IllegalStateException("Cannot encode with UTF-8", ex);
-        }
+        return "BASIC " + new String(Base64.getEncoder().encode(token.getBytes(StandardCharsets.UTF_8)),
+                        StandardCharsets.UTF_8);
     }
 
     public Response getServiceInstanceDetails() {
