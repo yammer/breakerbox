@@ -1,8 +1,20 @@
+/**
+ * Copyright 2015 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.netflix.hystrix.dashboard.stream;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +22,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Simulate an event stream URL by retrieving pre-canned data instead of going to live servers.
@@ -27,7 +39,6 @@ public class MockStreamServlet extends HttpServlet {
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String filename = request.getParameter("file");
         if (filename == null) {
@@ -90,7 +101,20 @@ public class MockStreamServlet extends HttpServlet {
 
     private String getFileFromPackage(String filename) {
         try {
-            return Files.toString(new File(Resources.getResource("assets/" + filename).toURI()), Charsets.UTF_8);
+            String file = "/" + this.getClass().getPackage().getName().replace('.', '/') + "/" + filename;
+            InputStream is = this.getClass().getResourceAsStream(file);
+            try {
+                 /* this is FAR too much work just to get a string from a file */
+                BufferedReader in = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+                StringWriter s = new StringWriter();
+                int c = -1;
+                while ((c = in.read()) > -1) {
+                    s.write(c);
+                }
+                return s.toString();
+            } finally {
+                is.close();
+            }
         } catch (Exception e) {
             throw new RuntimeException("Could not find file: " + filename, e);
         }

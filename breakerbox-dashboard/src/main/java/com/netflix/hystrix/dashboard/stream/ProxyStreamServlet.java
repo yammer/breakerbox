@@ -1,6 +1,22 @@
+/**
+ * Copyright 2015 Netflix, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.netflix.hystrix.dashboard.stream;
 
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -36,15 +52,16 @@ public class ProxyStreamServlet extends HttpServlet {
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String origin = request.getParameter("origin");
+        String authorization = request.getParameter("authorization");
         if (origin == null) {
             response.setStatus(500);
             response.getWriter().println("Required parameter 'origin' missing. Example: 107.20.175.135:7001");
+            return;
         }
         origin = origin.trim();
-        
+
         HttpGet httpget = null;
         InputStream is = null;
         boolean hasFirstParameter = false;
@@ -59,7 +76,7 @@ public class ProxyStreamServlet extends HttpServlet {
         @SuppressWarnings("unchecked")
         Map<String, String[]> params = request.getParameterMap();
         for (String key : params.keySet()) {
-            if (!key.equals("origin")) {
+            if (!key.equals("origin") && !key.equals("authorization")) {
                 String[] values = params.get(key);
                 String value = values[0].trim();
                 if (hasFirstParameter) {
@@ -72,9 +89,12 @@ public class ProxyStreamServlet extends HttpServlet {
             }
         }
         String proxyUrl = url.toString();
-        logger.info("\n\nProxy opening connection to: " + proxyUrl + "\n\n");
+        logger.info("\n\nProxy opening connection to: {}\n\n", proxyUrl);
         try {
             httpget = new HttpGet(proxyUrl);
+            if (authorization != null) {
+                httpget.addHeader("Authorization", authorization);
+            }
             HttpClient client = ProxyConnectionManager.httpClient;
             HttpResponse httpResponse = client.execute(httpget);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -86,7 +106,9 @@ public class ProxyStreamServlet extends HttpServlet {
 
                 // set headers
                 for (Header header : httpResponse.getAllHeaders()) {
-                    response.addHeader(header.getName(), header.getValue());
+                    if (!HttpHeaders.TRANSFER_ENCODING.equals(header.getName())) {
+                        response.addHeader(header.getName(), header.getValue());
+                    }
                 }
 
                 // copy data from source to response
