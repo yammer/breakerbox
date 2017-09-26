@@ -22,8 +22,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Simulate an event stream URL by retrieving pre-canned data instead of going to live servers.
@@ -102,18 +105,14 @@ public class MockStreamServlet extends HttpServlet {
     private String getFileFromPackage(String filename) {
         try {
             String file = "/" + this.getClass().getPackage().getName().replace('.', '/') + "/" + filename;
-            InputStream is = this.getClass().getResourceAsStream(file);
-            try {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(file), StandardCharsets.UTF_8))) {
                  /* this is FAR too much work just to get a string from a file */
-                BufferedReader in = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
                 StringWriter s = new StringWriter();
                 int c = -1;
                 while ((c = in.read()) > -1) {
                     s.write(c);
                 }
                 return s.toString();
-            } finally {
-                is.close();
             }
         } catch (Exception e) {
             throw new RuntimeException("Could not find file: " + filename, e);
