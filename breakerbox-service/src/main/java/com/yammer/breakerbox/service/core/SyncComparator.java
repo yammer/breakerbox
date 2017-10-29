@@ -71,7 +71,7 @@ public class SyncComparator {
                 .collect(Collectors.toList());
     }
 
-    public ImmutableList<SyncPropertyKeyState> allInSync(ServiceId serviceId, Iterable<String> propertyKeys) {
+    public List<SyncPropertyKeyState> allInSync(ServiceId serviceId, Iterable<String> propertyKeys) {
         final ImmutableList.Builder<SyncPropertyKeyState> propertyKeyStateBuilder = ImmutableList.builder();
         for (String propertyKey : propertyKeys) {
             propertyKeyStateBuilder.add(propertyKeySyncStatus(propertyKey, serviceId, DependencyId.from(propertyKey)));
