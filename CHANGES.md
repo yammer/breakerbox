@@ -4,7 +4,7 @@
 * [Dropwizard 1.2.0](https://github.com/dropwizard/dropwizard/releases/tag/v1.2.0)
 * PostgreSQL 42.1.4
 * MySQL 5.1.44
-* Mockito-core 2.11.0
+* Mockito-core 2.12.0
 * Azure-storage 6.1.0
 * [Support also other databases, not only H2 and PostgreSQL](https://github.com/yammer/breakerbox/pull/45) Thanks @maksymgendin
 * [Dependencies / Java8](https://github.com/yammer/breakerbox/pull/46)
