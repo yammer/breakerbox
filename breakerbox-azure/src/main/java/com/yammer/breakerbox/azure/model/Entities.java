@@ -1,15 +1,12 @@
 package com.yammer.breakerbox.azure.model;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Entities {
     private Entities() {}
@@ -48,29 +45,17 @@ public class Entities {
                 dependencyModel.getServiceId());
     }
 
-    public static ImmutableList<ServiceModel> toServiceModelList(Iterable<ServiceEntity> serviceEntities) {
-
-
-        return FluentIterable
-                .from(serviceEntities)
-                .transform(new Function<ServiceEntity, ServiceModel>() {
-                    @Override
-                    public ServiceModel apply(ServiceEntity input) {
-                        return Entities.toModel(checkNotNull(input));
-                    }
-                })
-                .toList();
+    public static Collection<ServiceModel> toServiceModelList(Collection<ServiceEntity> serviceEntities) {
+        return serviceEntities
+                .stream()
+                .map(Entities::toModel)
+                .collect(ImmutableList.toImmutableList());
     }
 
-    public static ImmutableList<DependencyModel> toDependencyModelList(Iterable<DependencyEntity> dependencyEntities) {
-        return FluentIterable
-                .from(dependencyEntities)
-                .transform(new Function<DependencyEntity, DependencyModel>() {
-                    @Override
-                    public DependencyModel apply(DependencyEntity input) {
-                        return Entities.toModel(checkNotNull(input));
-                    }
-                })
-                .toList();
+    public static Collection<DependencyModel> toDependencyModelList(Collection<DependencyEntity> dependencyEntities) {
+        return dependencyEntities
+                .stream()
+                .map(Entities::toModel)
+                .collect(ImmutableList.toImmutableList());
     }
 }
