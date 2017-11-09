@@ -7,6 +7,7 @@
 * Mockito-core 2.11.0
 * Azure-storage 6.1.0
 * [Support also other databases, not only H2 and PostgreSQL](https://github.com/yammer/breakerbox/pull/45) Thanks @maksymgendin
+* [Dependencies / Java8](https://github.com/yammer/breakerbox/pull/46)
 
 0.6.4 -- Aug. 4, 2017
 ---
