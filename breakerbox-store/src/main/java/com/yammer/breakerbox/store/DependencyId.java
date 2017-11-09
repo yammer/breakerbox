@@ -2,6 +2,8 @@ package com.yammer.breakerbox.store;
 
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 
+import java.util.Objects;
+
 public class DependencyId implements TenacityPropertyKey {
     private final String id;
 
@@ -23,20 +25,20 @@ public class DependencyId implements TenacityPropertyKey {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DependencyId that = (DependencyId) o;
-
-        if (!id.equals(that.id)) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
-    public int hashCode() {
-        return id.hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final DependencyId other = (DependencyId) obj;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override

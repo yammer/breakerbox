@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.service.tenacity;
 
-import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -78,17 +78,17 @@ public class TenacityConfigurationFetcher extends TenacityCommand<Optional<Tenac
     protected Optional<TenacityConfiguration> run() throws Exception {
         try {
             return Optional.of(cache.get(key, () ->
-                client.getTenacityConfiguration(key.instance, key.tenacityPropertyKey).orNull()));
+                client.getTenacityConfiguration(key.instance, key.tenacityPropertyKey).orElse(null)));
         } catch (CacheLoader.InvalidCacheLoadException err) {
             //null was returned, don't negatively cache results
         } catch (Exception err) {
             LOGGER.warn("Unexpected exception", err);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
     protected Optional<TenacityConfiguration> getFallback() {
-        return Optional.absent();
+        return Optional.empty();
     }
 }

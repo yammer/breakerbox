@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.azure;
 
 import com.codahale.metrics.Timer;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -20,6 +19,9 @@ import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
+
+import java.util.Collection;
+import java.util.Optional;
 
 public class AzureStore extends BreakerboxStore {
     public static final String PARTITION_KEY = "PartitionKey";
@@ -77,7 +79,7 @@ public class AzureStore extends BreakerboxStore {
 
     @Override
     public Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId) {
-        return Entities.toServiceModel(tableClient.<ServiceEntity>retrieve(ServiceEntity.build(serviceId, dependencyId)));
+        return Entities.toServiceModel(tableClient.retrieve(ServiceEntity.build(serviceId, dependencyId)));
     }
 
     @Override
@@ -91,17 +93,17 @@ public class AzureStore extends BreakerboxStore {
     }
 
     @Override
-    public Iterable<ServiceModel> allServiceModels() {
+    public Collection<ServiceModel> allServiceModels() {
         return Entities.toServiceModelList(allServiceEntities());
     }
 
     @Override
-    public Iterable<ServiceModel> listDependenciesFor(final ServiceId serviceId) {
+    public Collection<ServiceModel> listDependenciesFor(final ServiceId serviceId) {
         return Entities.toServiceModelList(allServiceEntities(serviceId));
     }
 
     @Override
-    public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
+    public Collection<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
         try (Timer.Context timerContext = dependencyConfigs.time()) {
             return Entities.toDependencyModelList(tableClient.search(
                     TableId.DEPENDENCY, TableQuery
@@ -115,7 +117,7 @@ public class AzureStore extends BreakerboxStore {
 
     private static Optional<DependencyModel> fetchLatest(Iterable<DependencyModel> dependencyModels) {
         if (Iterables.isEmpty(dependencyModels)) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(Ordering
                     .from(new DependencyModelByTimestamp())
@@ -128,7 +130,7 @@ public class AzureStore extends BreakerboxStore {
     private Optional<DependencyEntity> fetchByTimestamp(DependencyId dependencyId, long timestamp) {
         final ImmutableList<DependencyEntity> dependencyEntities = getConfiguration(dependencyId, timestamp);
         if (dependencyEntities.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(dependencyEntities.get(0));
         }

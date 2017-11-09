@@ -26,7 +26,7 @@ public class TableClientHealthcheckTest {
         final TableClient mockTableClient = mock(TableClient.class);
         final TableClientHealthcheck tableClientHealthcheck = new TableClientHealthcheck(mockTableClient);
 
-        when(mockTableClient.listTables()).thenReturn(ImmutableList.<String>of());
+        when(mockTableClient.listTables()).thenReturn(ImmutableList.of());
         assertThat(tableClientHealthcheck.check().isHealthy()).isFalse();
     }
 }

@@ -1,5 +1,7 @@
 package com.yammer.breakerbox.store;
 
+import java.util.Objects;
+
 public class ServiceId {
     private final String id;
 
@@ -16,20 +18,20 @@ public class ServiceId {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ServiceId serviceId = (ServiceId) o;
-
-        if (!id.equals(serviceId.id)) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
-    public int hashCode() {
-        return id.hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final ServiceId other = (ServiceId) obj;
+        return Objects.equals(this.id, other.id);
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import org.joda.time.DateTime;
 
+import java.util.Objects;
+
 public class DependencyModel {
     private final DependencyId dependencyId;
     private final DateTime dateTime;
@@ -45,28 +47,23 @@ public class DependencyModel {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DependencyModel that = (DependencyModel) o;
-
-        if (!dateTime.equals(that.dateTime)) return false;
-        if (!dependencyId.equals(that.dependencyId)) return false;
-        if (!serviceId.equals(that.serviceId)) return false;
-        if (!tenacityConfiguration.equals(that.tenacityConfiguration)) return false;
-        if (!user.equals(that.user)) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(dependencyId, dateTime, tenacityConfiguration, user, serviceId);
     }
 
     @Override
-    public int hashCode() {
-        int result = dependencyId.hashCode();
-        result = 31 * result + dateTime.hashCode();
-        result = 31 * result + tenacityConfiguration.hashCode();
-        result = 31 * result + user.hashCode();
-        result = 31 * result + serviceId.hashCode();
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final DependencyModel other = (DependencyModel) obj;
+        return Objects.equals(this.dependencyId, other.dependencyId)
+                && Objects.equals(this.dateTime, other.dateTime)
+                && Objects.equals(this.tenacityConfiguration, other.tenacityConfiguration)
+                && Objects.equals(this.user, other.user)
+                && Objects.equals(this.serviceId, other.serviceId);
     }
 }

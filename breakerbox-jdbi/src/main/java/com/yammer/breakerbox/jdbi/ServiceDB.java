@@ -11,17 +11,17 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 @RegisterMapper(Mappers.ServiceModelMapper.class)
 public interface ServiceDB {
     @SqlQuery("select * from service where name = :service.serviceId and dependency = :service.dependencyId")
-    public ServiceModel find(@BindBean("service") ServiceModel service);
+    ServiceModel find(@BindBean("service") ServiceModel service);
 
     @SqlUpdate("insert into service (name, dependency) values (:service.serviceId, :service.dependencyId)")
-    public int insert(@BindBean("service") ServiceModel service);
+    int insert(@BindBean("service") ServiceModel service);
 
     @SqlUpdate("delete from service where name = :service.serviceId and dependency = :service.dependencyId")
-    public int delete(@BindBean("service") ServiceModel serviceModel);
+    int delete(@BindBean("service") ServiceModel serviceModel);
 
     @SqlQuery("select * from service")
-    public ImmutableList<ServiceModel> all();
+    ImmutableList<ServiceModel> all();
 
     @SqlQuery("select * from service where name = :serviceId.id")
-    public ImmutableList<ServiceModel> all(@BindBean("serviceId") ServiceId serviceId);
+    ImmutableList<ServiceModel> all(@BindBean("serviceId") ServiceId serviceId);
 }

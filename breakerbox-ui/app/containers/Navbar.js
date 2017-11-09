@@ -5,7 +5,7 @@ var $ = require('jquery');
 global.jQuery = $;
 require('bootstrap');
 
-var DropdownItems = require('../components/DropdownItems')
+var DropdownItems = require('../components/DropdownItems');
 
 var Navbar = React.createClass({
   getInitialState: function() {

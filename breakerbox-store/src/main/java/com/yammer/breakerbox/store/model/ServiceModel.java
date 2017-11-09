@@ -3,6 +3,8 @@ package com.yammer.breakerbox.store.model;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 
+import java.util.Objects;
+
 public class ServiceModel {
     private final ServiceId serviceId;
     private final DependencyId dependencyId;
@@ -21,22 +23,20 @@ public class ServiceModel {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ServiceModel that = (ServiceModel) o;
-
-        if (!dependencyId.equals(that.dependencyId)) return false;
-        if (!serviceId.equals(that.serviceId)) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(serviceId, dependencyId);
     }
 
     @Override
-    public int hashCode() {
-        int result = serviceId.hashCode();
-        result = 31 * result + dependencyId.hashCode();
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final ServiceModel other = (ServiceModel) obj;
+        return Objects.equals(this.serviceId, other.serviceId)
+                && Objects.equals(this.dependencyId, other.dependencyId);
     }
 }

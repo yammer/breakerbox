@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.azure.tests;
 
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.azure.AzureStore;
 import com.yammer.breakerbox.azure.TableClient;
 import com.yammer.breakerbox.azure.TableClientFactory;
@@ -20,6 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +41,7 @@ public class AzureStoreTest extends WithConfiguration {
         breakerboxStore = new AzureStore(azureTableConfiguration, environment());
         testServiceId = ServiceId.from(UUID.randomUUID().toString());
         testDependencyId = DependencyId.from(UUID.randomUUID().toString());
-        timestamp = 1345938944000l;
+        timestamp = 1345938944000L;
         dependencyConfiguration = new TenacityConfiguration(
                 new ThreadPoolConfiguration(12, 23, 34, 45, 56, 67),
                 new CircuitBreakerConfiguration(1, 2, 3, 4, 5),
@@ -64,9 +64,7 @@ public class AzureStoreTest extends WithConfiguration {
     }
 
     private void removeDependencyModel(Optional<DependencyModel> dependencyModel) {
-        if (dependencyModel.isPresent()) {
-            assertTrue(breakerboxStore.delete(dependencyModel.get()));
-        }
+        dependencyModel.ifPresent((value) -> assertTrue(breakerboxStore.delete(value)));
     }
 
     @Test
@@ -128,7 +126,7 @@ public class AzureStoreTest extends WithConfiguration {
         assertTrue(breakerboxStore.store(new DependencyModel(testDependencyId, DateTime.now(), new TenacityConfiguration(), user, testServiceId)));
         assertEquals(breakerboxStore.retrieve(testServiceId, testDependencyId), Optional.of(new ServiceModel(testServiceId, testDependencyId)));
         final Optional<DependencyModel> dependencyModel = breakerboxStore.retrieveLatest(testDependencyId, testServiceId);
-        assertNotEquals(dependencyModel, Optional.absent());
+        assertNotEquals(dependencyModel, Optional.empty());
         assertEquals(dependencyModel.get(), new DependencyModel(
                 testDependencyId,
                 dependencyModel.get().getDateTime(),

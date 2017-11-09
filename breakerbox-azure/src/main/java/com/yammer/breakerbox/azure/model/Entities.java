@@ -1,12 +1,13 @@
 package com.yammer.breakerbox.azure.model;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import org.joda.time.DateTime;
+
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -14,10 +15,7 @@ public class Entities {
     private Entities() {}
 
     public static Optional<ServiceModel> toServiceModel(Optional<ServiceEntity> serviceEntity) {
-        if (serviceEntity.isPresent()) {
-            return Optional.of(Entities.toModel(serviceEntity.get()));
-        }
-        return Optional.absent();
+        return serviceEntity.map(Entities::toModel);
     }
     
     public static ServiceModel toModel(ServiceEntity serviceEntity) {
@@ -29,10 +27,7 @@ public class Entities {
     }
 
     public static Optional<DependencyModel> toDependencyModel(Optional<DependencyEntity> dependencyEntity) {
-        if (dependencyEntity.isPresent()) {
-            return Optional.of(Entities.toModel(dependencyEntity.get()));
-        }
-        return Optional.absent();
+        return dependencyEntity.map(Entities::toModel);
     }
     
     public static DependencyModel toModel(DependencyEntity dependencyEntity) {
@@ -54,6 +49,8 @@ public class Entities {
     }
 
     public static ImmutableList<ServiceModel> toServiceModelList(Iterable<ServiceEntity> serviceEntities) {
+
+
         return FluentIterable
                 .from(serviceEntities)
                 .transform(new Function<ServiceEntity, ServiceModel>() {

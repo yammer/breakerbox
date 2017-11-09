@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.azure;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.table.*;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -75,13 +75,13 @@ public class TableClient {
 
     public <EntityType extends TableServiceEntity> Optional<EntityType> retrieve(TableKey tableKey) {
         try {
-            return Optional.fromNullable(tableRefrence(tableKey.getTable())
+            return Optional.ofNullable(tableRefrence(tableKey.getTable())
                     .execute(TableOperation.retrieve(tableKey.getPartitionKey(), tableKey.getRowKey(), tableKey.getEntityClass()))
                     .getResultAsType());
         } catch (StorageException e) {
             LOG.warn("Error retrieving entity from table: {}", tableKey.getTable(), e);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public boolean update(TableType entity) {

@@ -1,11 +1,13 @@
 package com.yammer.breakerbox.store;
 
 import com.codahale.metrics.Timer;
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.store.model.DependencyModel;
 import com.yammer.breakerbox.store.model.ServiceModel;
 import io.dropwizard.setup.Environment;
 import org.joda.time.DateTime;
+
+import java.util.Collection;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -33,7 +35,7 @@ public abstract class BreakerboxStore {
     public abstract Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId);
     public abstract Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime);
     public abstract Optional<DependencyModel> retrieveLatest(DependencyId dependencyId, ServiceId serviceId);
-    public abstract Iterable<ServiceModel> allServiceModels();
-    public abstract Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId);
-    public abstract Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId);
+    public abstract Collection<ServiceModel> allServiceModels();
+    public abstract Collection<ServiceModel> listDependenciesFor(ServiceId serviceId);
+    public abstract Collection<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId);
 }

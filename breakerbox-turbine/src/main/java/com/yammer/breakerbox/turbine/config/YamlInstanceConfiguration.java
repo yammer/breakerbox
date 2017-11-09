@@ -1,20 +1,19 @@
 package com.yammer.breakerbox.turbine.config;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.HostAndPort;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.turbine.TurbineInstanceDiscovery;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class YamlInstanceConfiguration {
 
@@ -127,11 +126,11 @@ public class YamlInstanceConfiguration {
         }
 
         public static Cluster withInstances(HostAndPort... hostAndPorts) {
-            return new Cluster(ImmutableSet.copyOf(hostAndPorts), Collections.<String>emptySet());
+            return new Cluster(ImmutableSet.copyOf(hostAndPorts), Collections.emptySet());
         }
 
         public static Cluster withClusters(String... clusters) {
-            return new Cluster(Collections.<HostAndPort>emptySet(), ImmutableSet.copyOf(clusters));
+            return new Cluster(Collections.emptySet(), ImmutableSet.copyOf(clusters));
         }
 
         @Override

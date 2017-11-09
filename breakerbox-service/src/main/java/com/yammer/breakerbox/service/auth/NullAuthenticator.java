@@ -11,6 +11,6 @@ import java.util.Optional;
 public class NullAuthenticator implements Authenticator<BasicCredentials, User> {
     @Override
     public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
-        return Optional.of(new User("anonymous", Collections.<String>emptySet()));
+        return Optional.of(new User("anonymous", Collections.emptySet()));
     }
 }
