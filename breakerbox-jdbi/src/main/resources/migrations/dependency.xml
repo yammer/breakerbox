@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.3.xsd">
     <!-- Defining this database driven property as MySQL has a constraint while creating indexes on VARCHAR columns
     Refer: https://stackoverflow.com/questions/15157227/mysql-varchar-index-length -->
-    <property name="name.type" value="varchar(1024)" dbms="h2,postgresql"/>
+    <property name="name.type" value="varchar(1024)"/>
     <property name="name.type" value="varchar(255)" dbms="mysql"/>
     <changeSet id="1" author="chrisgray">
         <createTable tableName="dependency">
