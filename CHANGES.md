@@ -1,4 +1,4 @@
-0.6.5 -- TBD
+0.6.5 -- Nov. 10, 2017
 ---
 * [Tenacity 1.2.0](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.2.0)
 * [Dropwizard 1.2.0](https://github.com/dropwizard/dropwizard/releases/tag/v1.2.0)
