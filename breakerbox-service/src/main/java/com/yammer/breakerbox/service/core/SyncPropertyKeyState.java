@@ -2,6 +2,8 @@ package com.yammer.breakerbox.service.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Objects;
+
 public class SyncPropertyKeyState {
     private final String propertyKey;
     private final SyncStatus syncStatus;
@@ -47,23 +49,21 @@ public class SyncPropertyKeyState {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SyncPropertyKeyState that = (SyncPropertyKeyState) o;
-
-        if (!propertyKey.equals(that.propertyKey)) return false;
-        if (syncStatus != that.syncStatus) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(propertyKey, syncStatus);
     }
 
     @Override
-    public int hashCode() {
-        int result = propertyKey.hashCode();
-        result = 31 * result + syncStatus.hashCode();
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final SyncPropertyKeyState other = (SyncPropertyKeyState) obj;
+        return Objects.equals(this.propertyKey, other.propertyKey)
+                && Objects.equals(this.syncStatus, other.syncStatus);
     }
 
     @Override

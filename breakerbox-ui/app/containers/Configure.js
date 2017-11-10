@@ -2,7 +2,7 @@ var React = require('react');
 var $ = require('jquery');
 var _ = require('lodash');
 
-var TenacityConfiguration = require('./TenacityConfiguration')
+var TenacityConfiguration = require('./TenacityConfiguration');
 var PropertyKeys = require('../components/PropertyKeys');
 var SynchronizationState = require('./SynchronizationState');
 

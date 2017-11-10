@@ -3,6 +3,8 @@ package com.yammer.breakerbox.service.config;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.util.Duration;
 
+import java.util.Objects;
+
 public class ArchaiusOverrideConfiguration {
     @JsonProperty
     private Duration turbineHostRetry = Duration.seconds(1);
@@ -48,26 +50,22 @@ public class ArchaiusOverrideConfiguration {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ArchaiusOverrideConfiguration that = (ArchaiusOverrideConfiguration) o;
-
-        if (hystrixMetricsStreamServletMaxConnections != that.hystrixMetricsStreamServletMaxConnections) return false;
-        if (!turbineHostRetry.equals(that.turbineHostRetry)) return false;
-        if (!turbineLatencyThreshold.equals(that.turbineLatencyThreshold)) return false;
-        if (!turbineSkipLineDelay.equals(that.turbineSkipLineDelay)) return false;
-
-        return true;
+    public int hashCode() {
+        return Objects.hash(turbineHostRetry, hystrixMetricsStreamServletMaxConnections, turbineLatencyThreshold, turbineSkipLineDelay);
     }
 
     @Override
-    public int hashCode() {
-        int result = turbineHostRetry.hashCode();
-        result = 31 * result + hystrixMetricsStreamServletMaxConnections;
-        result = 31 * result + turbineLatencyThreshold.hashCode();
-        result = 31 * result + turbineSkipLineDelay.hashCode();
-        return result;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final ArchaiusOverrideConfiguration other = (ArchaiusOverrideConfiguration) obj;
+        return Objects.equals(this.turbineHostRetry, other.turbineHostRetry)
+                && Objects.equals(this.hystrixMetricsStreamServletMaxConnections, other.hystrixMetricsStreamServletMaxConnections)
+                && Objects.equals(this.turbineLatencyThreshold, other.turbineLatencyThreshold)
+                && Objects.equals(this.turbineSkipLineDelay, other.turbineSkipLineDelay);
     }
 }

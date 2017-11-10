@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.service.core;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.tenacity.TenacityConfigurationFetcher;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Function;

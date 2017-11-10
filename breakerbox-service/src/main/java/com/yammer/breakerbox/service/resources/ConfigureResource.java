@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.yammer.breakerbox.store.BreakerboxStore;
 import com.yammer.breakerbox.store.DependencyId;
@@ -20,6 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Optional;
 
 @Path("/configure/{service}")
 public class ConfigureResource {

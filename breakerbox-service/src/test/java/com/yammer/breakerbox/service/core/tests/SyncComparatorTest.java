@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.service.core.tests;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;
 import com.netflix.turbine.discovery.Instance;
@@ -28,6 +27,7 @@ import org.junit.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -114,7 +114,7 @@ public class SyncComparatorTest {
      public void noBreakerboxConfiguration() {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
-        when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.<DependencyModel>absent());
+        when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.empty());
         when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
 
@@ -126,9 +126,9 @@ public class SyncComparatorTest {
     public void noConfigurations() {
         final SyncComparator syncComparator = new SyncComparator(mockFactory, mockTenacityStory);
 
-        when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.<DependencyModel>absent());
+        when(mockTenacityStory.retrieveLatest(dependencyId, serviceId)).thenReturn(Optional.empty());
         when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
-        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
+        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.empty()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
                 .isEqualTo(unsynchronized());
@@ -204,7 +204,7 @@ public class SyncComparatorTest {
         when(mockFactory.create(eq(differentInstance), any(TenacityPropertyKey.class)))
                 .thenReturn(differentFetcher);
         when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.of(new TenacityConfiguration())));
-        when(differentFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
+        when(differentFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.empty()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
                 .isEqualTo(allSynchronizedExceptUnknown(differentInstance));
@@ -219,7 +219,7 @@ public class SyncComparatorTest {
         when(mockTenacityStory.retrieveLatest(dependencyId, serviceId))
                 .thenReturn(Optional.of(new DependencyModel(dependencyId, new DateTime(testTimestamp), DependencyEntity.defaultConfiguration(), "fooUser", serviceId)));
         when(mockFactory.create(any(Instance.class), any(TenacityPropertyKey.class))).thenReturn(mockFetcher);
-        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.<TenacityConfiguration>absent()));
+        when(mockFetcher.queue()).thenReturn(Futures.immediateFuture(Optional.empty()));
 
         assertThat(syncComparator.inSync(serviceId, dependencyId))
                 .isEqualTo(unknown());

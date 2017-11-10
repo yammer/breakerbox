@@ -2,7 +2,6 @@ package com.yammer.breakerbox.jdbi;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.jdbi.args.DateTimeArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.DependencyIdArgumentFactory;
 import com.yammer.breakerbox.jdbi.args.ServiceIdArgumentFactory;
@@ -21,6 +20,9 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.exceptions.DBIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Optional;
 
 public class JdbiStore extends BreakerboxStore {
     public static final String MIGRATIONS_FILENAME = "migrations.xml";
@@ -126,49 +128,49 @@ public class JdbiStore extends BreakerboxStore {
     @Override
     public Optional<ServiceModel> retrieve(ServiceId serviceId, DependencyId dependencyId) {
         try {
-            return Optional.fromNullable(serviceDB.find(new ServiceModel(serviceId, dependencyId)));
+            return Optional.ofNullable(serviceDB.find(new ServiceModel(serviceId, dependencyId)));
         } catch (DBIException err) {
             LOGGER.warn("Failed to retrieve {}:{}", serviceId, dependencyId, err);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     @Override
     public Optional<DependencyModel> retrieve(DependencyId dependencyId, DateTime dateTime) {
         try {
-            return Optional.fromNullable(dependencyDB.find(dependencyId, dateTime));
+            return Optional.ofNullable(dependencyDB.find(dependencyId, dateTime));
         } catch (DBIException err) {
             LOGGER.warn("Failed to retrieve {}, {}", dependencyId, dateTime.getMillis(), err);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     @Override
     public Optional<DependencyModel> retrieveLatest(DependencyId dependencyId, ServiceId serviceId) {
         try {
-            return Optional.fromNullable(dependencyDB.findLatest(dependencyId, serviceId));
+            return Optional.ofNullable(dependencyDB.findLatest(dependencyId, serviceId));
         } catch (DBIException err) {
             LOGGER.warn("Failed to retrieve {}, {}", dependencyId, serviceId, err);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     @Override
-    public Iterable<ServiceModel> allServiceModels() {
+    public Collection<ServiceModel> allServiceModels() {
         try (Timer.Context timerContext = listServices.time()) {
             return serviceDB.all();
         }
     }
 
     @Override
-    public Iterable<ServiceModel> listDependenciesFor(ServiceId serviceId) {
+    public Collection<ServiceModel> listDependenciesFor(ServiceId serviceId) {
         try (Timer.Context timerContext = listService.time()) {
             return serviceDB.all(serviceId);
         }
     }
 
     @Override
-    public Iterable<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
+    public Collection<DependencyModel> allDependenciesFor(DependencyId dependencyId, ServiceId serviceId) {
         try (Timer.Context timerContext = dependencyConfigs.time()) {
             return dependencyDB.all(dependencyId, serviceId);
         }

@@ -2,7 +2,6 @@ package com.yammer.breakerbox.azure.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.microsoft.azure.storage.table.TableServiceEntity;
 import com.yammer.breakerbox.azure.core.AzureTableName;
 import com.yammer.breakerbox.azure.core.TableId;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -78,7 +78,7 @@ public class DependencyEntity extends TableType implements TableKey {
         } catch (Exception err) {
             LOGGER.warn("Failed to parse TenacityConfiguration", err);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public long getConfigurationTimestamp() {

@@ -2,7 +2,6 @@ package com.yammer.breakerbox.service.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Optional;
 import com.google.common.net.HostAndPort;
 import com.yammer.breakerbox.azure.AzureTableConfiguration;
 import com.yammer.breakerbox.jdbi.JdbiConfiguration;
@@ -22,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class BreakerboxServiceConfiguration extends Configuration {
     @NotNull @UnwrapValidatedValue(false) @Valid
@@ -43,13 +43,13 @@ public class BreakerboxServiceConfiguration extends Configuration {
     private final Path turbine;
 
     @NotNull @Valid @UnwrapValidatedValue(false) @JsonProperty("ldap")
-    private Optional<LdapConfiguration> ldapConfiguration = Optional.absent();
+    private Optional<LdapConfiguration> ldapConfiguration = Optional.empty();
 
     @NotNull @Valid
     private ArchaiusOverrideConfiguration archaiusOverride;
 
     @NotNull @UnwrapValidatedValue(false) @Valid @JsonProperty("database")
-    private Optional<JdbiConfiguration> jdbiConfiguration = Optional.absent();
+    private Optional<JdbiConfiguration> jdbiConfiguration = Optional.empty();
 
     private List<String> metaClusters = Collections.emptyList();
 
@@ -88,22 +88,21 @@ public class BreakerboxServiceConfiguration extends Configuration {
                                           @JsonProperty("hystrixStreamSuffix") String hystrixStreamSuffix,
                                           @JsonProperty("rancherDiscovery") RancherInstanceConfiguration rancherInstanceConfiguration,
                                           @JsonProperty("marathonDiscovery")List<MarathonClientConfiguration> marathonClientConfiguration) {
-        this.azure = Optional.fromNullable(azure);
+        this.azure = Optional.ofNullable(azure);
         this.tenacityClient = tenacityClientConfiguration;
-        this.breakerboxServicesPropertyKeys = Optional.fromNullable(breakerboxServicesPropertyKeys).or(new TenacityConfiguration());
-        this.breakerboxServicesConfiguration = Optional.fromNullable(breakerboxServicesConfiguration).or(new TenacityConfiguration());
+        this.breakerboxServicesPropertyKeys = Optional.ofNullable(breakerboxServicesPropertyKeys).orElse(new TenacityConfiguration());
+        this.breakerboxServicesConfiguration = Optional.ofNullable(breakerboxServicesConfiguration).orElse(new TenacityConfiguration());
         this.breakerboxConfiguration = breakerboxConfiguration;
-        this.ldapConfiguration = Optional.fromNullable(ldapConfiguration);
-        this.archaiusOverride = Optional.fromNullable(archaiusOverride).or(new ArchaiusOverrideConfiguration());
-        this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
-        this.breakerboxHostAndPort = Optional.fromNullable(breakerboxHostAndPort).or(HostAndPort.fromParts("localhost", 8080));
-        this.defaultDashboard = Optional.fromNullable(defaultDashboard).or("production");
-        this.turbine = Optional.fromNullable(turbine).or(Paths.get("breakerbox-instances.yml"));
-        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass)
-                .or(Optional.fromNullable(System.getProperty("InstanceDiscovery.impl")));
-        this.hystrixStreamSuffix = Optional.fromNullable(hystrixStreamSuffix);
-        this.rancherInstanceConfiguration = Optional.fromNullable(rancherInstanceConfiguration);
-        this.marathonClientConfiguration = Optional.fromNullable(marathonClientConfiguration);
+        this.ldapConfiguration = Optional.ofNullable(ldapConfiguration);
+        this.archaiusOverride = Optional.ofNullable(archaiusOverride).orElse(new ArchaiusOverrideConfiguration());
+        this.jdbiConfiguration = Optional.ofNullable(jdbiConfiguration);
+        this.breakerboxHostAndPort = Optional.ofNullable(breakerboxHostAndPort).orElse(HostAndPort.fromParts("localhost", 8080));
+        this.defaultDashboard = Optional.ofNullable(defaultDashboard).orElse("production");
+        this.turbine = Optional.ofNullable(turbine).orElse(Paths.get("breakerbox-instances.yml"));
+        this.instanceDiscoveryClass = Objects.isNull(instanceDiscoveryClass) ? Optional.ofNullable(System.getProperty("InstanceDiscovery.impl")) : Optional.of(instanceDiscoveryClass);
+        this.hystrixStreamSuffix = Optional.ofNullable(hystrixStreamSuffix);
+        this.rancherInstanceConfiguration = Optional.ofNullable(rancherInstanceConfiguration);
+        this.marathonClientConfiguration = Optional.ofNullable(marathonClientConfiguration);
     }
 
     public Optional<AzureTableConfiguration> getAzure() {
@@ -144,7 +143,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
 
     public void setLdapConfiguration(LdapConfiguration ldapConfiguration) {
-        this.ldapConfiguration = Optional.fromNullable(ldapConfiguration);
+        this.ldapConfiguration = Optional.ofNullable(ldapConfiguration);
     }
 
     @JsonProperty("database")
@@ -153,7 +152,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
 
     public void setJdbiConfiguration(JdbiConfiguration jdbiConfiguration) {
-        this.jdbiConfiguration = Optional.fromNullable(jdbiConfiguration);
+        this.jdbiConfiguration = Optional.ofNullable(jdbiConfiguration);
     }
 
     public HostAndPort getBreakerboxHostAndPort() {
@@ -177,7 +176,7 @@ public class BreakerboxServiceConfiguration extends Configuration {
     }
 
     public void setInstanceDiscoveryClass(String instanceDiscoveryClass) {
-        this.instanceDiscoveryClass = Optional.fromNullable(instanceDiscoveryClass);
+        this.instanceDiscoveryClass = Optional.ofNullable(instanceDiscoveryClass);
     }
 
     public Optional<RancherInstanceConfiguration> getRancherInstanceConfiguration() {

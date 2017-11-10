@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class TenacityPropertyKeysStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityPropertyKeysStore.class);
-    private final Cache<Instance, ImmutableList<String>> tenacityPropertyKeyCache = CacheBuilder
+    private final Cache<Instance, Collection<String>> tenacityPropertyKeyCache = CacheBuilder
             .newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
             .build();
@@ -31,10 +31,10 @@ public class TenacityPropertyKeysStore {
         this.tenacityPollerFactory = tenacityPollerFactory;
     }
 
-    public ImmutableList<String> getTenacityPropertyKeys(Instance instance) {
+    public Collection<String> getTenacityPropertyKeys(Instance instance) {
         try {
             return tenacityPropertyKeyCache.get(instance, () ->
-                    tenacityPollerFactory.create(instance).execute().orNull());
+                    tenacityPollerFactory.create(instance).execute().orElse(null));
         } catch (CacheLoader.InvalidCacheLoadException err) {
             //null was returned
         } catch (Exception err) {
@@ -48,7 +48,6 @@ public class TenacityPropertyKeysStore {
                 .stream()
                 .map(this::getTenacityPropertyKeys)
                 .flatMap(Collection::stream)
-                .sorted()
                 .collect(Collectors.toSet());
     }
 }

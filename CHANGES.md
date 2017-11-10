@@ -1,11 +1,13 @@
 0.6.5 -- TBD
 ---
-* [Tenacity 1.1.4](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.1.4)
-* [Dropwizard 1.1.4](https://github.com/dropwizard/dropwizard/releases/tag/v1.1.4)
+* [Tenacity 1.2.0](https://github.com/yammer/tenacity/releases/tag/tenacity-parent-1.2.0)
+* [Dropwizard 1.2.0](https://github.com/dropwizard/dropwizard/releases/tag/v1.2.0)
 * PostgreSQL 42.1.4
 * MySQL 5.1.44
-* Mockito-core 2.9.0
-* Azure-storage 5.5.0
+* Mockito-core 2.12.0
+* Azure-storage 6.1.0
+* [Support also other databases, not only H2 and PostgreSQL](https://github.com/yammer/breakerbox/pull/45) Thanks @maksymgendin
+* [Dependencies / Java8](https://github.com/yammer/breakerbox/pull/46)
 
 0.6.4 -- Aug. 4, 2017
 ---

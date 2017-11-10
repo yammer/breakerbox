@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.service.tenacity;
 
-import com.google.common.base.Optional;
 import com.netflix.hystrix.strategy.executionhook.HystrixCommandExecutionHook;
 import com.yammer.breakerbox.service.config.BreakerboxServiceConfiguration;
 import com.yammer.tenacity.core.bundle.TenacityBundleConfigurationFactory;
@@ -10,6 +9,7 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Map;
+import java.util.Optional;
 
 public class DelayedTenacityConfiguredBundle extends TenacityConfiguredBundle<BreakerboxServiceConfiguration> {
     public DelayedTenacityConfiguredBundle(TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration> tenacityBundleConfigurationFactory,

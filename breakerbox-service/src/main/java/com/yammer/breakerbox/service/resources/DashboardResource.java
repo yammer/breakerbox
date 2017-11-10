@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
@@ -14,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Path("/")
 public class DashboardResource {
@@ -28,17 +28,15 @@ public class DashboardResource {
         this.defaultDashboard = defaultDashboard;
         this.breakerboxHostAndPort = breakerboxHostAndPort;
         this.specifiedMetaClusters = specifiedMetaClusters;
-        indexSupplier = Suppliers.memoize(new Supplier<byte[]>() {
-            @Override
-            public byte[] get() {
-                try {
-                    return Resources.asByteSource(Resources.getResource("index.html"))
-                            .read();
-                } catch (IOException err) {
-                    throw new IllegalStateException(err);
-                }
-            }
-        });
+        indexSupplier = Suppliers.memoize(
+                () -> {
+                    try {
+                        return Resources.asByteSource(Resources.getResource("index.html"))
+                                .read();
+                    } catch (IOException err) {
+                        throw new IllegalStateException(err);
+                    }
+                });
     }
 
     @GET @Timed @Produces(MediaType.TEXT_HTML)

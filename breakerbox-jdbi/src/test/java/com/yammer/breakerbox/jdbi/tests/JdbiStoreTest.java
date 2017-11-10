@@ -1,6 +1,5 @@
 package com.yammer.breakerbox.jdbi.tests;
 
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.jdbi.JdbiStore;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
@@ -11,6 +10,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,28 +68,28 @@ public class JdbiStoreTest extends H2Test {
                 .isEqualTo(Optional.of(serviceModel));
         assertTrue(jdbiStore.delete(serviceModel));
         assertThat(jdbiStore.retrieve(serviceModel.getServiceId(), serviceModel.getDependencyId()))
-                .isEqualTo(Optional.<ServiceModel>absent());
+                .isEqualTo(Optional.empty());
     }
 
     @Test
     public void simpleDeleteDependency() {
         final DependencyModel dependencyModel = dependencyModel();
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
-                .isEqualTo(Optional.<DependencyModel>absent());
+                .isEqualTo(Optional.empty());
 
         assertTrue(jdbiStore.store(dependencyModel));
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
         assertTrue(jdbiStore.delete(dependencyModel));
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
-                .isEqualTo(Optional.<DependencyModel>absent());
+                .isEqualTo(Optional.empty());
 
         assertTrue(jdbiStore.store(dependencyModel));
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
                 .isEqualTo(Optional.of(dependencyModel));
         assertTrue(jdbiStore.delete(dependencyModel.getDependencyId(), dependencyModel.getDateTime()));
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
-                .isEqualTo(Optional.<DependencyModel>absent());
+                .isEqualTo(Optional.empty());
 
     }
 
@@ -105,7 +105,7 @@ public class JdbiStoreTest extends H2Test {
     public void deleteDependencyTwiceShouldWork() {
         final DependencyModel dependencyModel = dependencyModel();
         assertThat(jdbiStore.retrieve(dependencyModel.getDependencyId(), dependencyModel.getDateTime()))
-                .isEqualTo(Optional.<DependencyModel>absent());
+                .isEqualTo(Optional.empty());
 
         assertTrue(jdbiStore.store(dependencyModel));
         assertTrue(jdbiStore.delete(dependencyModel));
@@ -154,7 +154,7 @@ public class JdbiStoreTest extends H2Test {
                 earlyDependencyModel.getUser(),
                 earlyDependencyModel.getServiceId());
         assertThat(jdbiStore.retrieveLatest(earlyDependencyModel.getDependencyId(), earlyDependencyModel.getServiceId()))
-                .isEqualTo(Optional.<DependencyModel>absent());
+                .isEqualTo(Optional.empty());
         assertTrue(jdbiStore.store(earlyDependencyModel));
         assertThat(jdbiStore.retrieveLatest(earlyDependencyModel.getDependencyId(), earlyDependencyModel.getServiceId()))
                 .isEqualTo(Optional.of(earlyDependencyModel));

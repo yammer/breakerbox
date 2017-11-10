@@ -1,20 +1,20 @@
 package com.yammer.breakerbox.turbine.client;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.tenacity.core.config.TenacityConfiguration;
 import com.yammer.tenacity.core.core.CircuitBreaker;
 import com.yammer.tenacity.core.properties.TenacityPropertyKey;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Optional;
 
 public interface TurbineTenacityClient {
-    Optional<ImmutableList<String>> getTenacityPropertyKeys(Instance instance);
+    Optional<Collection<String>> getTenacityPropertyKeys(Instance instance);
 
     Optional<TenacityConfiguration> getTenacityConfiguration(Instance instance, TenacityPropertyKey key);
 
-    Optional<ImmutableList<CircuitBreaker>> getCircuitBreakers(Instance instance);
+    Optional<Collection<CircuitBreaker>> getCircuitBreakers(Instance instance);
 
     Optional<CircuitBreaker> getCircuitBreaker(Instance instance, TenacityPropertyKey key);
 

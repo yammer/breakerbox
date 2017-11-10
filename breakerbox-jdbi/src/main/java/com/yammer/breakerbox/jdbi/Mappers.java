@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.jdbi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.store.DependencyId;
 import com.yammer.breakerbox.store.ServiceId;
 import com.yammer.breakerbox.store.model.DependencyModel;
@@ -18,6 +17,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Set;
 
 public class Mappers {
@@ -54,7 +54,7 @@ public class Mappers {
             } catch (Exception err) {
                 LOGGER.warn("Failed to parse TenacityConfiguration", err);
             }
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

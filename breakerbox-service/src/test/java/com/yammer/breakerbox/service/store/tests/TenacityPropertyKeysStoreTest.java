@@ -1,12 +1,13 @@
 package com.yammer.breakerbox.service.store.tests;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.service.store.TenacityPropertyKeysStore;
 import com.yammer.breakerbox.service.tenacity.TenacityPoller;
 import org.junit.Test;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

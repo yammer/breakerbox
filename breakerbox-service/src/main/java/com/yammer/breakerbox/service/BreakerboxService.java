@@ -81,7 +81,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
         bootstrap.addBundle(new MigrationsBundle<BreakerboxServiceConfiguration>() {
             @Override
             public DataSourceFactory getDataSourceFactory(BreakerboxServiceConfiguration configuration) {
-                return configuration.getJdbiConfiguration().or(new JdbiConfiguration()).getDataSourceFactory();
+                return configuration.getJdbiConfiguration().orElse(new JdbiConfiguration()).getDataSourceFactory();
             }
         });
 
@@ -90,7 +90,7 @@ public class BreakerboxService extends Application<BreakerboxServiceConfiguratio
             .configurationFactory(new TenacityBundleConfigurationFactory<BreakerboxServiceConfiguration>() {
                 @Override
                 public Map<TenacityPropertyKey, TenacityConfiguration> getTenacityConfigurations(BreakerboxServiceConfiguration applicationConfiguration) {
-                    return ImmutableMap.<TenacityPropertyKey, TenacityConfiguration>of(
+                    return ImmutableMap.of(
                             BreakerboxDependencyKey.BRKRBX_SERVICES_PROPERTYKEYS, applicationConfiguration.getBreakerboxServicesPropertyKeys(),
                             BreakerboxDependencyKey.BRKRBX_SERVICES_CONFIGURATION, applicationConfiguration.getBreakerboxServicesConfiguration(),
                             BreakerboxDependencyKey.BRKRBX_LDAP_AUTH, new TenacityConfiguration());

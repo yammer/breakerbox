@@ -1,7 +1,6 @@
 package com.yammer.breakerbox.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
 import com.yammer.breakerbox.service.archaius.ArchaiusFormatBuilder;
 import com.yammer.breakerbox.service.config.ArchaiusOverrideConfiguration;
 import com.yammer.breakerbox.store.BreakerboxStore;
@@ -14,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 
 @Path("/archaius/{service}")
 public class ArchaiusResource {

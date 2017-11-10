@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,7 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
                         return new Instance(host, extractClusterNameFor(pod), running);
                     }
                 })
-                .filter(pod -> pod != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

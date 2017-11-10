@@ -25,7 +25,7 @@ public class ArchaiusFormatBuilderTest {
                 .contains("hystrix.command.BRKRBX_SERVICES_PROPERTYKEYS.metrics.rollingStats.numBuckets=10");
     }
 
-    private static enum DependencyKeys implements TenacityPropertyKey {
+    private enum DependencyKeys implements TenacityPropertyKey {
         ONE, TWO
     }
 

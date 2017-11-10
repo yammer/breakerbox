@@ -9,9 +9,6 @@ import org.skife.jdbi.v2.tweak.ArgumentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 public class TenacityConfigurationArgumentFactory implements ArgumentFactory<TenacityConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TenacityConfigurationArgumentFactory.class);
     private final ObjectMapper objectMapper;
@@ -27,15 +24,12 @@ public class TenacityConfigurationArgumentFactory implements ArgumentFactory<Ten
 
     @Override
     public Argument build(Class<?> expectedType, final TenacityConfiguration value, StatementContext ctx) {
-        return new Argument() {
-            @Override
-            public void apply(int position, PreparedStatement statement, StatementContext ctx) throws SQLException {
-                try {
-                    statement.setObject(position, objectMapper.writeValueAsString(value));
-                } catch (JsonProcessingException err) {
-                    LOGGER.warn("Could not write as json: {}", value, err);
-                    throw new IllegalArgumentException(err);
-                }
+        return (position, statement, ctx1) -> {
+            try {
+                statement.setObject(position, objectMapper.writeValueAsString(value));
+            } catch (JsonProcessingException err) {
+                LOGGER.warn("Could not write as json: {}", value, err);
+                throw new IllegalArgumentException(err);
             }
         };
     }
