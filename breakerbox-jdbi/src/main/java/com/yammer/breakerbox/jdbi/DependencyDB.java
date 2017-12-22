@@ -23,7 +23,7 @@ public interface DependencyDB {
     @SqlUpdate("delete from dependency where name = :dependency.id and timestamp = :timestamp.millis")
     int delete(@BindBean("dependency") DependencyId dependencyId, @BindBean("timestamp") DateTime timestamp);
 
-    @SqlQuery("select * from dependency where name = :dependency.id and service = :service.id order by timestamp desc limit 1")
+    @SqlQuery("select * from dependency where timestamp = (select max(timestamp) from dependency where name = :dependency.id and service = :service.id)")
     DependencyModel findLatest(@BindBean("dependency") DependencyId dependencyId, @BindBean("service") ServiceId serviceId);
 
     @SqlQuery("select * from dependency where name = :dependency.id and service = :service.id order by timestamp desc")
