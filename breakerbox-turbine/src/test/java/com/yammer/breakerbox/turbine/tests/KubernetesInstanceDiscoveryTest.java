@@ -1,5 +1,6 @@
 package com.yammer.breakerbox.turbine.tests;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.netflix.turbine.discovery.Instance;
 import com.yammer.breakerbox.turbine.KubernetesInstanceDiscovery;
@@ -175,5 +176,29 @@ public class KubernetesInstanceDiscoveryTest {
                 .filter(instance -> instance.getCluster().equals("production-service-depl"))
                 .findAny();
         assertThat(instanceOptional.isPresent()).isTrue();
+    }
+
+    @Test
+    public void prefersAppLabelToExtractedName() throws Exception {
+        Pod deploymentPod = new Pod();
+        deploymentPod.setMetadata(new ObjectMeta());
+        deploymentPod.setStatus(new PodStatus());
+        deploymentPod.getStatus().setPodIP("10.116.0.8");
+        deploymentPod.getStatus().setPhase("Running");
+        deploymentPod.getMetadata().setAnnotations(
+                Maps.newHashMap(KubernetesInstanceDiscovery.PORT_ANNOTATION_KEY, "8080"));
+        deploymentPod.getMetadata().setLabels(ImmutableMap.of(
+                KubernetesInstanceDiscovery.POD_HASH_LABEL_KEY, "5432543253",
+                KubernetesInstanceDiscovery.APP_LABEL_KEY, "test-service")
+        );
+        deploymentPod.getMetadata().setName("service-depl-5432543253-097fsd");
+        deploymentPod.getMetadata().setGenerateName("service-depl-5432543253-");
+        deploymentPod.getMetadata().setNamespace("production");
+        pods.add(deploymentPod);
+        Optional<Instance> instanceOptional = discovery.getInstanceList().stream()
+                .filter(instance -> instance.getCluster().equals("test-service"))
+                .findAny();
+        assertThat(instanceOptional.isPresent()).isTrue();
+
     }
 }
