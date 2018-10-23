@@ -28,6 +28,7 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
 
     public static final String PORT_ANNOTATION_KEY = "breakerbox-port";
     public static final String POD_HASH_LABEL_KEY = "pod-template-hash";
+    public static final String APP_LABEL_KEY = "app";
 
     private final KubernetesClient client;
 
@@ -42,7 +43,7 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
         LOGGER.info("Starting Kubernetes instance discovery using master URL: {}", client.getMasterUrl());
-        return client.pods().inAnyNamespace()
+        return client.pods()
                 .list()
                 .getItems().stream()
                 .filter(pod -> pod.getMetadata().getAnnotations() != null)  // Ignore pods without annotations
@@ -66,12 +67,17 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
     private static String extractClusterNameFor(Pod pod) {
         String podBaseName = pod.getMetadata().getGenerateName();
         // Remove auto-generated hashes, if there are any
-        if (pod.getMetadata().getLabels() != null && pod.getMetadata().getLabels().containsKey(POD_HASH_LABEL_KEY)) {
-            String hash = pod.getMetadata().getLabels().get(POD_HASH_LABEL_KEY);
-            podBaseName = podBaseName.replace(hash + "-", "");
+        if (pod.getMetadata().getLabels() != null) {
+            if (pod.getMetadata().getLabels().containsKey(APP_LABEL_KEY)) {
+                return pod.getMetadata().getLabels().get(APP_LABEL_KEY);
+            }
+            if (pod.getMetadata().getLabels().containsKey(POD_HASH_LABEL_KEY)) {
+                String hash = pod.getMetadata().getLabels().get(POD_HASH_LABEL_KEY);
+                podBaseName = podBaseName.replace(hash + "-", "");
+            }
         }
         // Pod's base names always end with a '-', remove it
-        podBaseName = podBaseName.substring(0, podBaseName.length()-1);
+        podBaseName = podBaseName.substring(0, podBaseName.length() - 1);
         return String.format("%s-%s", pod.getMetadata().getNamespace(), podBaseName);
     }
 }
