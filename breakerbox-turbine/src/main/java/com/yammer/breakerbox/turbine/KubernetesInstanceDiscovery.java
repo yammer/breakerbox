@@ -43,7 +43,7 @@ public class KubernetesInstanceDiscovery implements InstanceDiscovery {
     @Override
     public Collection<Instance> getInstanceList() throws Exception {
         LOGGER.info("Starting Kubernetes instance discovery using master URL: {}", client.getMasterUrl());
-        return client.pods().inAnyNamespace()
+        return client.pods()
                 .list()
                 .getItems().stream()
                 .filter(pod -> pod.getMetadata().getAnnotations() != null)  // Ignore pods without annotations

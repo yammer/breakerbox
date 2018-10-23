@@ -29,7 +29,6 @@ public class KubernetesInstanceDiscoveryTest {
 
     @Mock DefaultKubernetesClient client;
     @Mock ClientMixedOperation<Pod, PodList, DoneablePod, ClientPodResource<Pod, DoneablePod>> podsOperation;
-    @Mock ClientMixedOperation<Pod, PodList, DoneablePod, ClientPodResource<Pod, DoneablePod>> podsAnyNsOperation;
     @Mock PodList podList;
 
     private KubernetesInstanceDiscovery discovery;
@@ -38,8 +37,7 @@ public class KubernetesInstanceDiscoveryTest {
     @Before
     public void setupDiscovery() {
         stub(client.pods()).toReturn(podsOperation);
-        stub(podsOperation.inAnyNamespace()).toReturn(podsAnyNsOperation);
-        stub(podsAnyNsOperation.list()).toReturn(podList);
+        stub(podsOperation.list()).toReturn(podList);
 
         Pod serviceA1 = new Pod();
         serviceA1.setMetadata(new ObjectMeta());
